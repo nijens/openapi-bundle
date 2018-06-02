@@ -24,4 +24,4 @@ script:
     - if [ "$PHP_CS_FIXER" = "" ]; then ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml; fi;
     - if [ "$PHP_CS_FIXER" = "true" ]; then ./vendor/bin/php-cs-fixer fix --dry-run; fi;
 
-after_script: if [ "$PHP_CS_FIXER" = "" ]; then ./vendor/bin/coveralls -v; fi;
+after_script: if [ "$PHP_CS_FIXER" = "" ]; then ./vendor/bin/php-coveralls -v; fi;
