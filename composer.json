@@ -16,6 +16,16 @@
     "require-dev": {
         "phpunit/phpunit": "^7.2"
     },
+    "autoload": {
+        "psr-4": {
+            "Nijens\\OpenapiBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nijens\\OpenapiBundle\\Tests\\": "tests/"
+        }
+    },
     "config": {
         "sort-packages": true
     }
