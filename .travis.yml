@@ -1,0 +1,27 @@
+language: php
+
+sudo: false
+
+matrix:
+  include:
+    - php: 7.1
+    - php: 7.1
+      env: SYMFONY_VERSION=3.4.*
+    - php: 7.1
+      env: SYMFONY_VERSION=4.0.*
+    - php: 7.1
+      env: PHP_CS_FIXER=true
+
+before_install: composer selfupdate
+
+install:
+    - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; composer update symfony/*; fi;
+    - if [ "$SYMFONY_VERSION" = "" ]; then composer install; fi;
+
+before_script: mkdir -p build/logs
+
+script:
+    - if [ "$PHP_CS_FIXER" = "" ]; then ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml; fi;
+    - if [ "$PHP_CS_FIXER" = "true" ]; then ./vendor/bin/php-cs-fixer fix --dry-run; fi;
+
+after_script: if [ "$PHP_CS_FIXER" = "" ]; then ./vendor/bin/php-coveralls -v; fi;

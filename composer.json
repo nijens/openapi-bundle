@@ -1,0 +1,34 @@
+{
+    "name": "nijens/openapi-bundle",
+    "description": "Helps you create a REST API from your OpenAPI specification.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Niels Nijens",
+            "email": "nijens.niels@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "symfony/framework-bundle": "^3.4 || ^4.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.11",
+        "php-coveralls/php-coveralls": "^2.1",
+        "phpunit/phpunit": "^7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nijens\\OpenapiBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nijens\\OpenapiBundle\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
