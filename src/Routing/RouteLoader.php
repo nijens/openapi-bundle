@@ -132,11 +132,11 @@ class RouteLoader extends Loader
             'openapi_resource' => $resource,
         );
 
-        if (isset($operation->{"x-symfony-controller"})) {
-            $defaults['_controller'] = $operation->{"x-symfony-controller"};
+        if (isset($operation->{'x-symfony-controller'})) {
+            $defaults['_controller'] = $operation->{'x-symfony-controller'};
         }
 
-        if (isset($operation->requestBody->content->{"application/json"})) {
+        if (isset($operation->requestBody->content->{'application/json'})) {
             $options['openapi_json_request_validation_pointer'] = sprintf(
                 '/paths/%s/%s/requestBody/content/%s/schema',
                 $jsonPointer->escape($path),
@@ -173,7 +173,7 @@ class RouteLoader extends Loader
                 Request::METHOD_OPTIONS,
                 Request::METHOD_HEAD,
                 Request::METHOD_PATCH,
-                Request::METHOD_TRACE
+                Request::METHOD_TRACE,
             )
         );
     }
