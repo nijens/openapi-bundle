@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the OpenapiBundle package.
+ *
+ * (c) Niels Nijens <nijens.niels@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Nijens\OpenapiBundle\Tests\Json;
 
 use Nijens\OpenapiBundle\Json\JsonPointer;
@@ -38,7 +47,7 @@ class JsonPointerTest extends TestCase
     }
 
     /**
-     * Returns a list with test cases for @see testEscape
+     * Returns a list with test cases for @see testEscape.
      *
      * @return array
      */
