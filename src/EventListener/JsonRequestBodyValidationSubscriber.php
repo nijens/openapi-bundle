@@ -47,6 +47,11 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     private $dereferencer;
 
     /**
+     * @var Validator
+     */
+    private $jsonValidator;
+
+    /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
@@ -64,12 +69,18 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
      * @param RouterInterface       $router
      * @param JsonParser            $jsonParser
      * @param DereferencerInterface $dereferencer
+     * @param Validator             $jsonValidator
      */
-    public function __construct(RouterInterface $router, JsonParser $jsonParser, DereferencerInterface $dereferencer)
-    {
+    public function __construct(
+        RouterInterface $router,
+        JsonParser $jsonParser,
+        DereferencerInterface $dereferencer,
+        Validator $jsonValidator
+    ) {
         $this->router = $router;
         $this->jsonParser = $jsonParser;
         $this->dereferencer = $dereferencer;
+        $this->jsonValidator = $jsonValidator;
     }
 
     /**
@@ -137,11 +148,13 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         $jsonPointer = new JsonPointer($schema);
         $jsonSchema = $jsonPointer->get($route->getOption('openapi_json_request_validation_pointer'));
 
-        $validator = new Validator();
-        $validator->validate($decodedJsonRequestBody, $jsonSchema);
+        $this->jsonValidator->validate($decodedJsonRequestBody, $jsonSchema);
 
-        if ($validator->isValid() === false) {
-            $this->throwInvalidRequestException($validator->getErrors());
+        if ($this->jsonValidator->isValid() === false) {
+            $validationErrors = $this->jsonValidator->getErrors();
+            $this->jsonValidator->reset();
+
+            $this->throwInvalidRequestException($validationErrors);
         }
     }
 

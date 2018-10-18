@@ -11,6 +11,7 @@
 
 namespace Nijens\OpenapiBundle\Tests\EventListener;
 
+use JsonSchema\Validator;
 use League\JsonReference\Dereferencer;
 use League\JsonReference\DereferencerInterface;
 use Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber;
@@ -53,6 +54,11 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     private $dereferencerMock;
 
     /**
+     * @var Validator
+     */
+    private $jsonValidator;
+
+    /**
      * Creates a new JsonRequestBodyValidationSubscriber instance for testing.
      */
     protected function setUp()
@@ -67,10 +73,13 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->dereferencerMock = $this->getMockBuilder(DereferencerInterface::class)
             ->getMock();
 
+        $this->jsonValidator = new Validator();
+
         $this->subscriber = new JsonRequestBodyValidationSubscriber(
             $this->routerMock,
             $this->jsonParserMock,
-            $this->dereferencerMock
+            $this->dereferencerMock,
+            $this->jsonValidator
         );
     }
 
@@ -99,6 +108,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->assertAttributeSame($this->routerMock, 'router', $this->subscriber);
         $this->assertAttributeSame($this->jsonParserMock, 'jsonParser', $this->subscriber);
         $this->assertAttributeSame($this->dereferencerMock, 'dereferencer', $this->subscriber);
+        $this->assertAttributeSame($this->jsonValidator, 'jsonValidator', $this->subscriber);
     }
 
     /**

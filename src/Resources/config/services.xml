@@ -5,8 +5,9 @@
 
     <parameters>
         <parameter key="nijens_openapi.routing.loader.class">Nijens\OpenapiBundle\Routing\RouteLoader</parameter>
-        <parameter key="nijens_openapi.json.dereferencer.class">League\JsonReference\Dereferencer</parameter>
         <parameter key="nijens_openapi.json.parser.class">Seld\JsonLint\JsonParser</parameter>
+        <parameter key="nijens_openapi.json.dereferencer.class">League\JsonReference\Dereferencer</parameter>
+        <parameter key="nijens_openapi.json.validator.class">JsonSchema\Validator</parameter>
         <parameter key="nijens_openapi.event_subscriber.json_request_body_validation.class">Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber</parameter>
     </parameters>
 
@@ -22,10 +23,13 @@
 
         <service id="nijens_openapi.json.dereferencer" class="%nijens_openapi.json.dereferencer.class%"/>
 
+        <service id="nijens_openapi.json.validator" class="%nijens_openapi.json.validator.class%"/>
+
         <service id="nijens_openapi.event_subscriber.json_request_body_validation" class="%nijens_openapi.event_subscriber.json_request_body_validation.class%">
             <argument type="service" id="router"/>
             <argument type="service" id="nijens_openapi.json.parser"/>
             <argument type="service" id="nijens_openapi.json.dereferencer"/>
+            <argument type="service" id="nijens_openapi.json.validator"/>
 
             <tag name="kernel.event_subscriber"/>
         </service>
