@@ -18,6 +18,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class OpenapiBundle extends Bundle
+class NijensOpenapiBundle extends Bundle
 {
 }

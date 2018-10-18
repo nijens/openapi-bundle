@@ -11,6 +11,9 @@
     ],
     "require": {
         "php": "^7.1",
+        "justinrainbow/json-schema": "^5.2",
+        "league/json-reference": "^1.1",
+        "seld/jsonlint": "^1.7",
         "symfony/framework-bundle": "^3.4 || ^4.0"
     },
     "require-dev": {

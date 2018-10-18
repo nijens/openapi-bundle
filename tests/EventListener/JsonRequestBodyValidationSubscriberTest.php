@@ -1,0 +1,380 @@
+<?php
+
+/*
+ * This file is part of the OpenapiBundle package.
+ *
+ * (c) Niels Nijens <nijens.niels@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Nijens\OpenapiBundle\Tests\EventListener;
+
+use JsonSchema\Validator;
+use League\JsonReference\Dereferencer;
+use League\JsonReference\DereferencerInterface;
+use Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber;
+use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Seld\JsonLint\JsonParser;
+use Seld\JsonLint\ParsingException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
+
+/**
+ * JsonRequestBodyValidationSubscriberTest.
+ */
+class JsonRequestBodyValidationSubscriberTest extends TestCase
+{
+    /**
+     * @var JsonRequestBodyValidationSubscriber
+     */
+    private $subscriber;
+
+    /**
+     * @var MockObject
+     */
+    private $routerMock;
+
+    /**
+     * @var MockObject
+     */
+    private $jsonParserMock;
+
+    /**
+     * @var MockObject
+     */
+    private $dereferencerMock;
+
+    /**
+     * @var Validator
+     */
+    private $jsonValidator;
+
+    /**
+     * Creates a new JsonRequestBodyValidationSubscriber instance for testing.
+     */
+    protected function setUp()
+    {
+        $this->routerMock = $this->getMockBuilder(RouterInterface::class)
+            ->getMock();
+
+        $this->jsonParserMock = $this->getMockBuilder(JsonParser::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->dereferencerMock = $this->getMockBuilder(DereferencerInterface::class)
+            ->getMock();
+
+        $this->jsonValidator = new Validator();
+
+        $this->subscriber = new JsonRequestBodyValidationSubscriber(
+            $this->routerMock,
+            $this->jsonParserMock,
+            $this->dereferencerMock,
+            $this->jsonValidator
+        );
+    }
+
+    /**
+     * Tests if JsonRequestBodyValidationSubscriber::getSubscribedEvents returns the list with expected listeners.
+     */
+    public function testGetSubscribedEvents()
+    {
+        $subscribedEvents = JsonRequestBodyValidationSubscriber::getSubscribedEvents();
+
+        $this->assertSame(
+            array(
+                KernelEvents::REQUEST => array(
+                    array('validateRequestBody', 28),
+                ),
+            ),
+            $subscribedEvents
+        );
+    }
+
+    /**
+     * Tests if constructing a new JsonRequestBodyValidationSubscriber instance sets the instance properties.
+     */
+    public function testConstruct()
+    {
+        $this->assertAttributeSame($this->routerMock, 'router', $this->subscriber);
+        $this->assertAttributeSame($this->jsonParserMock, 'jsonParser', $this->subscriber);
+        $this->assertAttributeSame($this->dereferencerMock, 'dereferencer', $this->subscriber);
+        $this->assertAttributeSame($this->jsonValidator, 'jsonValidator', $this->subscriber);
+    }
+
+    /**
+     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody skips validation when no Route is available.
+     * This could happen when the priority/order of event listeners is changed, as this listener
+     * depends on the output of the RouterListener.
+     *
+     * @depends testConstruct
+     */
+    public function testValidateRequestBodySkipsValidationWhenRouteIsNotAvailable()
+    {
+        $this->routerMock->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn(new RouteCollection());
+
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $this->dereferencerMock->expects($this->never())
+            ->method('dereference');
+
+        $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
+            ->getMock();
+
+        $request = new Request();
+        $request->headers->set('Content-Type', 'application/json');
+
+        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $this->subscriber->validateRequestBody($event);
+    }
+
+    /**
+     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody skips validation when the Route
+     * does not contain the following OpenAPI options set by the RouteLoader:
+     * - The path to the OpenAPI specification file.
+     * - The JSON pointer to a JSON Schema in the OpenAPI specification.
+     *
+     * @depends testConstruct
+     */
+    public function testValidateRequestBodySkipsValidationWhenRouteDoesNotContainOpenApiOptions()
+    {
+        $route = new Route('/test-route');
+
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('test_route', $route);
+
+        $this->routerMock->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
+
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $this->dereferencerMock->expects($this->never())
+            ->method('dereference');
+
+        $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
+            ->getMock();
+
+        $request = new Request();
+        $request->headers->set('Content-Type', 'application/json');
+        $request->attributes->set('_route', 'test_route');
+
+        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $this->subscriber->validateRequestBody($event);
+    }
+
+    /**
+     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody throws a InvalidRequestHttpException
+     * when the content-type of the request is not 'application/json'.
+     *
+     * @depends testConstruct
+     */
+    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestContentTypeInvalid()
+    {
+        $route = $this->createRouteForTesting();
+
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('test_route', $route);
+
+        $this->routerMock->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
+
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $this->dereferencerMock->expects($this->never())
+            ->method('dereference');
+
+        $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
+            ->getMock();
+
+        $request = new Request();
+        $request->headers->set('Content-Type', 'application/xml');
+        $request->attributes->set('_route', 'test_route');
+
+        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $this->expectException(InvalidRequestHttpException::class);
+        $this->expectExceptionMessage('The request body should be valid JSON.');
+
+        $this->subscriber->validateRequestBody($event);
+    }
+
+    /**
+     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody throws a InvalidRequestHttpException
+     * when the body of the request is not valid JSON.
+     *
+     * @depends testConstruct
+     */
+    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestBodyIsInvalidJson()
+    {
+        $route = $this->createRouteForTesting();
+
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('test_route', $route);
+
+        $requestBody = '{"invalid": "json';
+
+        $this->routerMock->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
+
+        $this->jsonParserMock->expects($this->once())
+            ->method('lint')
+            ->with($requestBody)
+            ->willReturn(new ParsingException('An Invalid JSON error message'));
+
+        $this->dereferencerMock->expects($this->never())
+            ->method('dereference');
+
+        $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
+            ->getMock();
+
+        $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
+        $request->headers->set('Content-Type', 'application/json');
+        $request->attributes->set('_route', 'test_route');
+
+        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $this->expectException(InvalidRequestHttpException::class);
+        $this->expectExceptionMessage('The request body should be valid JSON.');
+
+        try {
+            $this->subscriber->validateRequestBody($event);
+        } catch (InvalidRequestHttpException $exception) {
+            // Also assert contents of errors.
+            $this->assertSame(
+                array('An Invalid JSON error message'),
+                $exception->getErrors()
+            );
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody throws a InvalidRequestHttpException
+     * when the body of the request does not validate against the JSON Schema.
+     *
+     * @depends testConstruct
+     */
+    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestBodyDoesNotValidateWithJsonSchema()
+    {
+        $route = $this->createRouteForTesting();
+
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('test_route', $route);
+
+        $this->routerMock->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
+
+        $requestBody = '{"invalid": "json"}';
+
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $realDereferencer = new Dereferencer();
+
+        $this->dereferencerMock->expects($this->once())
+            ->method('dereference')
+            ->with('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
+            ->willReturn($realDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
+
+        $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
+            ->getMock();
+
+        $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
+        $request->headers->set('Content-Type', 'application/json');
+        $request->attributes->set('_route', 'test_route');
+
+        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $this->expectException(InvalidRequestHttpException::class);
+        $this->expectExceptionMessage('Validation of JSON request body failed.');
+
+        try {
+            $this->subscriber->validateRequestBody($event);
+        } catch (InvalidRequestHttpException $exception) {
+            // Also assert contents of errors.
+            $this->assertSame(
+                array(
+                    'The property name is required',
+                    'The property invalid is not defined and the definition does not allow additional properties',
+                ),
+                $exception->getErrors()
+            );
+
+            throw $exception;
+        }
+    }
+
+    /**
+     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody does not throw exceptions
+     * on successful validation.
+     */
+    public function testValidateRequestBodySuccessful()
+    {
+        $route = $this->createRouteForTesting();
+
+        $routeCollection = new RouteCollection();
+        $routeCollection->add('test_route', $route);
+
+        $this->routerMock->expects($this->once())
+            ->method('getRouteCollection')
+            ->willReturn($routeCollection);
+
+        $requestBody = '{"name": "Dog"}';
+
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $realDereferencer = new Dereferencer();
+
+        $this->dereferencerMock->expects($this->once())
+            ->method('dereference')
+            ->with('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
+            ->willReturn($realDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
+
+        $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
+            ->getMock();
+
+        $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
+        $request->headers->set('Content-Type', 'application/json');
+        $request->attributes->set('_route', 'test_route');
+
+        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $this->subscriber->validateRequestBody($event);
+    }
+
+    /**
+     * Creates a new Route for testing.
+     *
+     * @return Route
+     */
+    private function createRouteForTesting()
+    {
+        $route = new Route('/pets');
+        $route->setOption('openapi_resource', __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json');
+        $route->setOption('openapi_json_request_validation_pointer', '/paths/~1pets/put/requestBody/content/application~1json/schema');
+
+        return $route;
+    }
+}
