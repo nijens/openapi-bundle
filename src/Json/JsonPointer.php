@@ -12,6 +12,7 @@
 namespace Nijens\OpenapiBundle\Json;
 
 use League\JsonReference\Pointer;
+use League\JsonReference\Reference;
 use stdClass;
 
 /**
@@ -55,7 +56,12 @@ class JsonPointer
      */
     public function get(string $pointer)
     {
-        return $this->pointer->get($pointer);
+        $json = $this->pointer->get($pointer);
+        if ($json instanceof Reference) {
+            $json = $json->resolve();
+        }
+
+        return $json;
     }
 
     /**
