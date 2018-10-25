@@ -8,6 +8,7 @@
         <parameter key="nijens_openapi.json.parser.class">Seld\JsonLint\JsonParser</parameter>
         <parameter key="nijens_openapi.json.dereferencer.class">League\JsonReference\Dereferencer</parameter>
         <parameter key="nijens_openapi.json.dereferencer.serializer.class">League\JsonReference\ReferenceSerializer\InlineReferenceSerializer</parameter>
+        <parameter key="nijens_openapi.json.schema_loader.class">Nijens\OpenapiBundle\Json\SchemaLoader</parameter>
         <parameter key="nijens_openapi.json.validator.class">JsonSchema\Validator</parameter>
         <parameter key="nijens_openapi.event_subscriber.json_request_body_validation.class">Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber</parameter>
     </parameters>
@@ -28,6 +29,11 @@
         </service>
 
         <service id="nijens_openapi.json.dereferencer.serializer" class="%nijens_openapi.json.dereferencer.serializer.class%"/>
+
+        <service id="nijens_openapi.json.schema_loader" class="%nijens_openapi.json.schema_loader.class%">
+            <argument type="service" id="file_locator"/>
+            <argument type="service" id="nijens_openapi.json.dereferencer"/>
+        </service>
 
         <service id="nijens_openapi.json.validator" class="%nijens_openapi.json.validator.class%"/>
 
