@@ -11,10 +11,9 @@
 
 namespace Nijens\OpenapiBundle\Routing;
 
-use League\JsonReference\DereferencerInterface;
 use Nijens\OpenapiBundle\Json\JsonPointer;
+use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use stdClass;
-use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -33,25 +32,18 @@ class RouteLoader extends Loader
     const TYPE = 'openapi';
 
     /**
-     * @var FileLocatorInterface
+     * @var SchemaLoaderInterface
      */
-    private $fileLocator;
-
-    /**
-     * @var DereferencerInterface
-     */
-    private $dereferencer;
+    private $schemaLoader;
 
     /**
      * Constructs a new RouteLoader instance.
      *
-     * @param FileLocatorInterface  $fileLocator
-     * @param DereferencerInterface $dereferencer
+     * @param SchemaLoaderInterface $schemaLoader
      */
-    public function __construct(FileLocatorInterface $fileLocator, DereferencerInterface $dereferencer)
+    public function __construct(SchemaLoaderInterface $schemaLoader)
     {
-        $this->fileLocator = $fileLocator;
-        $this->dereferencer = $dereferencer;
+        $this->schemaLoader = $schemaLoader;
     }
 
     /**
@@ -67,9 +59,7 @@ class RouteLoader extends Loader
      */
     public function load($resource, $type = null): RouteCollection
     {
-        $resource = $this->fileLocator->locate($resource);
-
-        $schema = $this->dereferencer->dereference('file://'.$resource);
+        $schema = $this->schemaLoader->load($resource);
 
         $jsonPointer = new JsonPointer($schema);
 

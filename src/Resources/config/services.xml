@@ -15,8 +15,7 @@
 
     <services>
         <service id="nijens_openapi.routing.loader" class="%nijens_openapi.routing.loader.class%">
-            <argument type="service" id="file_locator"/>
-            <argument type="service" id="nijens_openapi.json.dereferencer"/>
+            <argument type="service" id="nijens_openapi.json.schema_loader"/>
 
             <tag name="routing.loader"/>
         </service>

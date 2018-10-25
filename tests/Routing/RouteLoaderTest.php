@@ -12,6 +12,8 @@
 namespace Nijens\OpenapiBundle\Tests\Routing;
 
 use League\JsonReference\Dereferencer;
+use League\JsonReference\ReferenceSerializer\InlineReferenceSerializer;
+use Nijens\OpenapiBundle\Json\SchemaLoader;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
@@ -29,27 +31,24 @@ class RouteLoaderTest extends TestCase
     private $routeLoader;
 
     /**
-     * @var FileLocator
+     * @var SchemaLoader
      */
-    private $fileLocator;
-
-    /**
-     * @var Dereferencer
-     */
-    private $dereferencer;
+    private $schemaLoader;
 
     /**
      * Creates a new RouteLoader for testing.
      */
     protected function setUp()
     {
-        $this->fileLocator = new FileLocator(array(
+        $fileLocator = new FileLocator(array(
             __DIR__.'/../Resources/specifications/',
         ));
 
-        $this->dereferencer = new Dereferencer();
+        $dereferencer = new Dereferencer(null, new InlineReferenceSerializer());
 
-        $this->routeLoader = new RouteLoader($this->fileLocator, $this->dereferencer);
+        $this->schemaLoader = new SchemaLoader($fileLocator, $dereferencer);
+
+        $this->routeLoader = new RouteLoader($this->schemaLoader);
     }
 
     /**
@@ -57,8 +56,7 @@ class RouteLoaderTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertAttributeSame($this->fileLocator, 'fileLocator', $this->routeLoader);
-        $this->assertAttributeSame($this->dereferencer, 'dereferencer', $this->routeLoader);
+        $this->assertAttributeSame($this->schemaLoader, 'schemaLoader', $this->routeLoader);
     }
 
     /**
@@ -81,10 +79,7 @@ class RouteLoaderTest extends TestCase
 
         $this->assertSame('/pets', $route->getPath());
         $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
-        $this->assertFileEquals(
-            __DIR__.'/../Resources/specifications/route-loader-minimal.json',
-            $route->getOption('openapi_resource')
-        );
+        $this->assertSame('route-loader-minimal.json', $route->getOption('openapi_resource'));
     }
 
     /**
