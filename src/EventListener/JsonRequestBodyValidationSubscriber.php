@@ -13,9 +13,9 @@ namespace Nijens\OpenapiBundle\EventListener;
 
 use Exception;
 use JsonSchema\Validator;
-use League\JsonReference\DereferencerInterface;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Json\JsonPointer;
+use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -42,9 +42,9 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     private $jsonParser;
 
     /**
-     * @var DereferencerInterface
+     * @var SchemaLoaderInterface
      */
-    private $dereferencer;
+    private $schemaLoader;
 
     /**
      * @var Validator
@@ -68,18 +68,18 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
      *
      * @param RouterInterface       $router
      * @param JsonParser            $jsonParser
-     * @param DereferencerInterface $dereferencer
+     * @param SchemaLoaderInterface $schemaLoader
      * @param Validator             $jsonValidator
      */
     public function __construct(
         RouterInterface $router,
         JsonParser $jsonParser,
-        DereferencerInterface $dereferencer,
+        SchemaLoaderInterface $schemaLoader,
         Validator $jsonValidator
     ) {
         $this->router = $router;
         $this->jsonParser = $jsonParser;
-        $this->dereferencer = $dereferencer;
+        $this->schemaLoader = $schemaLoader;
         $this->jsonValidator = $jsonValidator;
     }
 
@@ -143,7 +143,7 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
      */
     private function validateJsonAgainstSchema(Route $route, $decodedJsonRequestBody)
     {
-        $schema = $this->dereferencer->dereference('file://'.$route->getOption('openapi_resource'));
+        $schema = $this->schemaLoader->load($route->getOption('openapi_resource'));
 
         $jsonPointer = new JsonPointer($schema);
         $jsonSchema = $jsonPointer->get($route->getOption('openapi_json_request_validation_pointer'));

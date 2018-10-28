@@ -13,9 +13,10 @@ namespace Nijens\OpenapiBundle\Tests\EventListener;
 
 use JsonSchema\Validator;
 use League\JsonReference\Dereferencer;
-use League\JsonReference\DereferencerInterface;
+use League\JsonReference\ReferenceSerializer\InlineReferenceSerializer;
 use Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
+use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Seld\JsonLint\JsonParser;
@@ -51,7 +52,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     /**
      * @var MockObject
      */
-    private $dereferencerMock;
+    private $schemaLoaderMock;
 
     /**
      * @var Validator
@@ -70,7 +71,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->dereferencerMock = $this->getMockBuilder(DereferencerInterface::class)
+        $this->schemaLoaderMock = $this->getMockBuilder(SchemaLoaderInterface::class)
             ->getMock();
 
         $this->jsonValidator = new Validator();
@@ -78,7 +79,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->subscriber = new JsonRequestBodyValidationSubscriber(
             $this->routerMock,
             $this->jsonParserMock,
-            $this->dereferencerMock,
+            $this->schemaLoaderMock,
             $this->jsonValidator
         );
     }
@@ -107,7 +108,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     {
         $this->assertAttributeSame($this->routerMock, 'router', $this->subscriber);
         $this->assertAttributeSame($this->jsonParserMock, 'jsonParser', $this->subscriber);
-        $this->assertAttributeSame($this->dereferencerMock, 'dereferencer', $this->subscriber);
+        $this->assertAttributeSame($this->schemaLoaderMock, 'schemaLoader', $this->subscriber);
         $this->assertAttributeSame($this->jsonValidator, 'jsonValidator', $this->subscriber);
     }
 
@@ -127,8 +128,8 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->dereferencerMock->expects($this->never())
-            ->method('dereference');
+        $this->schemaLoaderMock->expects($this->never())
+            ->method('load');
 
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
@@ -163,8 +164,8 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->dereferencerMock->expects($this->never())
-            ->method('dereference');
+        $this->schemaLoaderMock->expects($this->never())
+            ->method('load');
 
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
@@ -198,8 +199,8 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->dereferencerMock->expects($this->never())
-            ->method('dereference');
+        $this->schemaLoaderMock->expects($this->never())
+            ->method('load');
 
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
@@ -240,8 +241,8 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             ->with($requestBody)
             ->willReturn(new ParsingException('An Invalid JSON error message'));
 
-        $this->dereferencerMock->expects($this->never())
-            ->method('dereference');
+        $this->schemaLoaderMock->expects($this->never())
+            ->method('load');
 
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
@@ -290,12 +291,12 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $realDereferencer = new Dereferencer();
+        $schemaLoaderDereferencer = new Dereferencer(null, new InlineReferenceSerializer());
 
-        $this->dereferencerMock->expects($this->once())
-            ->method('dereference')
-            ->with('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
-            ->willReturn($realDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
+        $this->schemaLoaderMock->expects($this->once())
+            ->method('load')
+            ->with(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
+            ->willReturn($schemaLoaderDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
 
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
@@ -345,12 +346,12 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $realDereferencer = new Dereferencer();
+        $schemaLoaderDereferencer = new Dereferencer(null, new InlineReferenceSerializer());
 
-        $this->dereferencerMock->expects($this->once())
-            ->method('dereference')
-            ->with('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
-            ->willReturn($realDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
+        $this->schemaLoaderMock->expects($this->once())
+            ->method('load')
+            ->with(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
+            ->willReturn($schemaLoaderDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
 
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
