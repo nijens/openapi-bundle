@@ -16,7 +16,7 @@ use stdClass;
 use Symfony\Component\Config\FileLocatorInterface;
 
 /**
- * SchemaLoader.
+ * Loads a dereferenced JSON schema.
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
