@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class InvalidRequestHttpException extends UnprocessableEntityHttpException
+class InvalidRequestHttpException extends UnprocessableEntityHttpException implements HttpExceptionInterface
 {
     /**
      * The list with errors resulting in this exception.
@@ -32,15 +32,13 @@ class InvalidRequestHttpException extends UnprocessableEntityHttpException
      *
      * @param array $errors
      */
-    public function setErrors(array $errors)
+    public function setErrors(array $errors): void
     {
         $this->errors = $errors;
     }
 
     /**
-     * Returns the list of errors.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getErrors(): array
     {

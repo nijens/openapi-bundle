@@ -13,11 +13,11 @@ namespace Nijens\OpenapiBundle\EventListener;
 
 use Exception;
 use JsonSchema\Validator;
+use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use Seld\JsonLint\JsonParser;
-use Seld\JsonLint\ParsingException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -54,7 +54,7 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             KernelEvents::REQUEST => array(
@@ -106,7 +106,7 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         }
 
         if ($requestContentType !== 'application/json') {
-            $this->throwInvalidJsonException();
+            throw new BadJsonRequestHttpException("The request content-type should be 'application/json'.");
         }
 
         $requestBody = $request->getContent();
@@ -130,9 +130,8 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         }
 
         $exception = $this->jsonParser->lint($requestBody);
-        if ($exception instanceof ParsingException) {
-            $this->throwInvalidJsonException($exception);
-        }
+
+        throw new BadJsonRequestHttpException('The request body should be valid JSON.', $exception);
     }
 
     /**
@@ -141,7 +140,7 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
      * @param Route $route
      * @param mixed $decodedJsonRequestBody
      */
-    private function validateJsonAgainstSchema(Route $route, $decodedJsonRequestBody)
+    private function validateJsonAgainstSchema(Route $route, $decodedJsonRequestBody): void
     {
         $schema = $this->schemaLoader->load($route->getOption('openapi_resource'));
 
@@ -156,21 +155,6 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
 
             $this->throwInvalidRequestException($validationErrors);
         }
-    }
-
-    /**
-     * @param Exception|null $previousException
-     */
-    private function throwInvalidJsonException(Exception $previousException = null): void
-    {
-        $exception = new InvalidRequestHttpException('The request body should be valid JSON.', $previousException);
-        if ($previousException instanceof ParsingException) {
-            $exception->setErrors(array(
-                $previousException->getMessage(),
-            ));
-        }
-
-        throw $exception;
     }
 
     /**
