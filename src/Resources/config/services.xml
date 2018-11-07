@@ -4,6 +4,7 @@
            xsi:schemaLocation='http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd'>
 
     <parameters>
+        <parameter key="nijens_openapi.controller.catch_all.class">Nijens\OpenapiBundle\Controller\CatchAllController</parameter>
         <parameter key="nijens_openapi.routing.loader.class">Nijens\OpenapiBundle\Routing\RouteLoader</parameter>
         <parameter key="nijens_openapi.json.parser.class">Seld\JsonLint\JsonParser</parameter>
         <parameter key="nijens_openapi.json.dereferencer.class">League\JsonReference\Dereferencer</parameter>
@@ -14,6 +15,12 @@
     </parameters>
 
     <services>
+        <service id="nijens_openapi.controller.catch_all" class="%nijens_openapi.controller.catch_all.class%">
+            <argument type="service" id="router"/>
+
+            <tag name="controller.service_arguments"/>
+        </service>
+
         <service id="nijens_openapi.routing.loader" class="%nijens_openapi.routing.loader.class%">
             <argument type="service" id="nijens_openapi.json.schema_loader"/>
 

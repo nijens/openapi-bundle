@@ -11,6 +11,7 @@
 
 namespace Nijens\OpenapiBundle\Routing;
 
+use Nijens\OpenapiBundle\Controller\CatchAllController;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use stdClass;
@@ -69,6 +70,8 @@ class RouteLoader extends Loader
         foreach ($paths as $path => $pathItem) {
             $this->parsePathItem($jsonPointer, $resource, $routeCollection, $path, $pathItem);
         }
+
+        $this->addDefaultRoutes($routeCollection, $resource);
 
         return $routeCollection;
     }
@@ -182,5 +185,23 @@ class RouteLoader extends Loader
             trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $path), '_'),
             $requestMethod
         );
+    }
+
+    /**
+     * Adds a catch-all route to handle responses for non-existing routes.
+     *
+     * @param RouteCollection $collection
+     * @param string          $resource
+     */
+    private function addDefaultRoutes(RouteCollection $collection, string $resource)
+    {
+        $catchAllRoute = new Route(
+            '/{catchall}',
+            array('_controller' => CatchAllController::CONTROLLER_REFERENCE),
+            array('catchall' => '.+'),
+            array('openapi_resource' => $resource)
+        );
+
+        $collection->add('catch_all', $catchAllRoute);
     }
 }
