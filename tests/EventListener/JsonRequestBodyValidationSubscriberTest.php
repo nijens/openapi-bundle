@@ -15,6 +15,7 @@ use JsonSchema\Validator;
 use League\JsonReference\Dereferencer;
 use League\JsonReference\ReferenceSerializer\InlineReferenceSerializer;
 use Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber;
+use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -211,8 +212,8 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
-        $this->expectException(InvalidRequestHttpException::class);
-        $this->expectExceptionMessage('The request body should be valid JSON.');
+        $this->expectException(BadJsonRequestHttpException::class);
+        $this->expectExceptionMessage("The request content-type should be 'application/json'.");
 
         $this->subscriber->validateRequestBody($event);
     }
@@ -253,7 +254,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
-        $this->expectException(InvalidRequestHttpException::class);
+        $this->expectException(BadJsonRequestHttpException::class);
         $this->expectExceptionMessage('The request body should be valid JSON.');
 
         try {
