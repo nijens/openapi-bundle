@@ -14,6 +14,8 @@ namespace Nijens\OpenapiBundle\Json;
 use League\JsonReference\DereferencerInterface;
 use stdClass;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * Loads a dereferenced JSON schema.
@@ -52,9 +54,7 @@ class SchemaLoader implements SchemaLoaderInterface
     }
 
     /**
-     * @param string $file
-     *
-     * @return stdClass
+     * {@inheritdoc}
      */
     public function load(string $file): stdClass
     {
@@ -68,5 +68,18 @@ class SchemaLoader implements SchemaLoaderInterface
         }
 
         return $this->schemas[$locatedFile];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFileResource(string $file): ?ResourceInterface
+    {
+        $locatedFile = $this->fileLocator->locate($file);
+        if (isset($this->schemas[$locatedFile])) {
+            return new FileResource($locatedFile);
+        }
+
+        return null;
     }
 }

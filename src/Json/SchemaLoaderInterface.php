@@ -12,6 +12,7 @@
 namespace Nijens\OpenapiBundle\Json;
 
 use stdClass;
+use Symfony\Component\Config\Resource\ResourceInterface;
 
 /**
  * Interface for JSON schema loaders.
@@ -21,11 +22,20 @@ use stdClass;
 interface SchemaLoaderInterface
 {
     /**
-     * Loads a dereferenced JSON schema.
+     * Loads and dereferences a JSON schema.
      *
      * @param string $file
      *
      * @return stdClass
      */
     public function load(string $file): stdClass;
+
+    /**
+     * Returns a FileResource for a loaded JSON schema.
+     *
+     * @param string $file
+     *
+     * @return ResourceInterface|null
+     */
+    public function getFileResource(string $file): ?ResourceInterface;
 }
