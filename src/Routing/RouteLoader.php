@@ -65,6 +65,7 @@ class RouteLoader extends Loader
         $jsonPointer = new JsonPointer($schema);
 
         $routeCollection = new RouteCollection();
+        $routeCollection->addResource($this->schemaLoader->getFileResource($resource));
 
         $paths = get_object_vars($jsonPointer->get('/paths'));
         foreach ($paths as $path => $pathItem) {
