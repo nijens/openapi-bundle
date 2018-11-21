@@ -11,11 +11,9 @@
 
 namespace Nijens\OpenapiBundle\EventListener;
 
-use Nijens\OpenapiBundle\Exception\HttpExceptionInterface;
+use Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -31,11 +29,9 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
     private $router;
 
     /**
-     * The boolean indicating if the kernel is in debug mode.
-     *
-     * @var bool
+     * @var ExceptionJsonResponseBuilderInterface
      */
-    private $debugMode;
+    private $responseBuilder;
 
     /**
      * {@inheritdoc}
@@ -52,13 +48,13 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
     /**
      * Constructs a new JsonResponseExceptionSubscriber instance.
      *
-     * @param RouterInterface $router
-     * @param bool            $debugMode
+     * @param RouterInterface                       $router
+     * @param ExceptionJsonResponseBuilderInterface $responseBuilder
      */
-    public function __construct(RouterInterface $router, bool $debugMode)
+    public function __construct(RouterInterface $router, ExceptionJsonResponseBuilderInterface $responseBuilder)
     {
         $this->router = $router;
-        $this->debugMode = $debugMode;
+        $this->responseBuilder = $responseBuilder;
     }
 
     /**
@@ -78,28 +74,6 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $response = new JsonResponse();
-
-        $statusCode = JsonResponse::HTTP_INTERNAL_SERVER_ERROR;
-        $message = 'Unexpected error.';
-
-        $exception = $event->getException();
-        if ($exception instanceof HttpException) {
-            $statusCode = $exception->getStatusCode();
-        }
-
-        if ($this->debugMode || $exception instanceof HttpException) {
-            $message = $exception->getMessage();
-        }
-
-        $responseBody = array('message' => $message);
-        if ($exception instanceof HttpExceptionInterface) {
-            $responseBody['errors'] = $exception->getErrors();
-        }
-
-        $response->setStatusCode($statusCode);
-        $response->setData($responseBody);
-
-        $event->setResponse($response);
+        $event->setResponse($this->responseBuilder->build($event->getException()));
     }
 }

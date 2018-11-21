@@ -30,7 +30,7 @@ class BadJsonRequestHttpException extends BadRequestHttpException implements Htt
 
         $previousException = $this->getPrevious();
         if ($previousException instanceof Exception) {
-            $errors[] = $previousException->getMessage();
+            $errors[] = array('message' => $previousException->getMessage());
         }
 
         return $errors;
