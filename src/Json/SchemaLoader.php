@@ -13,9 +13,11 @@ namespace Nijens\OpenapiBundle\Json;
 
 use League\JsonReference\DereferencerInterface;
 use stdClass;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Loads a dereferenced JSON schema.
@@ -55,13 +57,29 @@ class SchemaLoader implements SchemaLoaderInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws FileLoaderLoadException when given file does not have a valid JSON or YAML extension
      */
     public function load(string $file): stdClass
     {
         $locatedFile = $this->fileLocator->locate($file);
 
         if (isset($this->schemas[$locatedFile]) === false) {
-            $schema = $this->dereferencer->dereference('file://'.$locatedFile);
+            switch (pathinfo($locatedFile, PATHINFO_EXTENSION)) {
+                case 'yml':
+                case 'yaml':
+                    $dereference = Yaml::parseFile($locatedFile, Yaml::PARSE_OBJECT_FOR_MAP);
+                    break;
+
+                case 'json':
+                    $dereference = "file://{$locatedFile}";
+                    break;
+
+                default:
+                    throw new FileLoaderLoadException($locatedFile);
+            }
+
+            $schema = $this->dereferencer->dereference($dereference);
             $dereferencedSchema = json_decode(json_encode($schema));
 
             $this->schemas[$locatedFile] = $dereferencedSchema;

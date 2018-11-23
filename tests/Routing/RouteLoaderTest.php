@@ -16,6 +16,7 @@ use League\JsonReference\ReferenceSerializer\InlineReferenceSerializer;
 use Nijens\OpenapiBundle\Json\SchemaLoader;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -68,9 +69,9 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Tests if RouteLoader::load loads the path items and operations as routes.
+     * Tests if RouteLoader::load loads the JSON path items and operations as routes.
      */
-    public function testLoadMinimal()
+    public function testLoadMinimalFromJson()
     {
         $routes = $this->routeLoader->load('route-loader-minimal.json', 'openapi');
         $route = $routes->get('pets_get');
@@ -83,10 +84,49 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
+     * Tests if RouteLoader::load loads the YAML path items and operations as routes.
+     */
+    public function testLoadMinimalFromYaml()
+    {
+        $routes = $this->routeLoader->load('route-loader-minimal.yaml', 'openapi');
+        $route = $routes->get('pets_get');
+
+        $this->assertInstanceOf(Route::class, $route);
+
+        $this->assertSame('/pets', $route->getPath());
+        $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
+        $this->assertSame('route-loader-minimal.yaml', $route->getOption('openapi_resource'));
+    }
+
+    /**
+     * Tests if RouteLoader::load loads the YML path items and operations as routes.
+     */
+    public function testLoadMinimalFromYml()
+    {
+        $routes = $this->routeLoader->load('route-loader-minimal.yml', 'openapi');
+        $route = $routes->get('pets_get');
+
+        $this->assertInstanceOf(Route::class, $route);
+
+        $this->assertSame('/pets', $route->getPath());
+        $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
+        $this->assertSame('route-loader-minimal.yml', $route->getOption('openapi_resource'));
+    }
+
+    /**
+     * Tests if RouteLoader::load throws an exception when resource does not have a valid YAML or JSON extension.
+     */
+    public function testLoadFromUnsupportedExtension()
+    {
+        $this->expectException(FileLoaderLoadException::class);
+        $this->routeLoader->load('route-loader-minimal.txt', 'openapi');
+    }
+
+    /**
      * Tests if RouteLoader::load adds a 'openapi_json_request_validation_pointer' option
      * when the request body of an operation can be validated.
      *
-     * @depends testLoadMinimal
+     * @depends testLoadMinimalFromJson
      */
     public function testLoadWithValidationPointer()
     {
@@ -104,7 +144,7 @@ class RouteLoaderTest extends TestCase
      * Tests if RouteLoader::load adds a '_controller' default
      * when the 'x-symfony-controller' property of an operation is set.
      *
-     * @depends testLoadMinimal
+     * @depends testLoadMinimalFromJson
      */
     public function testLoadWithSymfonyControllerConfigured()
     {

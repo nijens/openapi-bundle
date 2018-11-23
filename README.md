@@ -78,7 +78,7 @@ This bundle provides a route loader and request validator that is able to load o
 
 api:
     prefix: /api
-    resource: ../openapi.json
+    resource: ../openapi.json # or ../openapi.yaml
     type: openapi
     name_prefix: "api_"
 ```
