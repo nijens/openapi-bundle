@@ -116,6 +116,44 @@ A Symfony controller for a route is configured by adding the `x-symfony-controll
 
 The value of the `x-symfony-controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
 
+## Custom Error Handling
+
+The default error response template looks like:
+```json
+{
+    "message": "Validation of JSON request body failed.",
+    "errors": [
+        "The property iAmRequired is required",
+        "The property iAmExtra is not defined and the definition does not allow additional properties"
+    ]
+}
+```
+
+If your project requires a different formatting of the response or perhaps different response codes, the default
+response builder can be overridden. Following the ["How to Decorate Services" guide from Symfony](https://symfony.com/doc/current/service_container/service_decoration.html),
+you can define your own service which implements `ExceptionJsonResponseBuilderInterface` and handles the error response
+building instead of `nijens_openapi.service.exception_json_response_builder`. When validation against the schema fails,
+an exception will be thrown which implements `HttpExceptionInterface`. The `getErrors()` method will provide a
+multi-dimensional array similar to this:
+```php
+array(
+    array(
+        'property' => 'iAmRequired',
+        'pointer' => '/iAmRequired',
+        'message' => 'The property iAmRequired is required',
+        'constraint' => 'required',
+        'context' => 1,
+    ),
+    array(
+        'property' => '',
+        'pointer' => '',
+        'message' => 'The property iAmExtra is not defined and the definition does not allow additional properties',
+        'constraint' => 'additionalProp',
+        'context' => 1,
+    ),
+)
+```
+
 ## Credits and acknowledgements
 
 * Author: [Niels Nijens][link-author]

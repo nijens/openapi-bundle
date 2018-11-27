@@ -11,7 +11,6 @@
 
 namespace Nijens\OpenapiBundle\EventListener;
 
-use Exception;
 use JsonSchema\Validator;
 use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
@@ -162,15 +161,8 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
      */
     private function throwInvalidRequestException(array $errors): void
     {
-        $errorMessages = array_map(
-            function ($error) {
-                return $error['message'];
-            },
-            $errors
-        );
-
         $exception = new InvalidRequestHttpException('Validation of JSON request body failed.');
-        $exception->setErrors($errorMessages);
+        $exception->setErrors($errors);
 
         throw $exception;
     }

@@ -13,7 +13,7 @@ namespace Nijens\OpenapiBundle\Tests\EventListener;
 
 use Exception;
 use Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber;
-use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
+use Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilderInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -35,9 +35,14 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     private $subscriber;
 
     /**
-     * @var MockObject
+     * @var MockObject|RouterInterface
      */
     private $routerMock;
+
+    /**
+     * @var MockObject|ExceptionJsonResponseBuilderInterface
+     */
+    private $responseBuilderMock;
 
     /**
      * Creates a new JsonResponseExceptionSubscriber instance for testing.
@@ -47,7 +52,10 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $this->routerMock = $this->getMockBuilder(RouterInterface::class)
             ->getMock();
 
-        $this->subscriber = new JsonResponseExceptionSubscriber($this->routerMock, false);
+        $this->responseBuilderMock = $this->getMockBuilder(ExceptionJsonResponseBuilderInterface::class)
+            ->getMock();
+
+        $this->subscriber = new JsonResponseExceptionSubscriber($this->routerMock, $this->responseBuilderMock);
     }
 
     /**
@@ -73,7 +81,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     public function testConstruct()
     {
         $this->assertAttributeSame($this->routerMock, 'router', $this->subscriber);
-        $this->assertAttributeSame(false, 'debugMode', $this->subscriber);
+        $this->assertAttributeSame($this->responseBuilderMock, 'responseBuilder', $this->subscriber);
     }
 
     /**
@@ -93,6 +101,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request = new Request();
         $request->attributes->set('_route', 'not_in_collection');
 
+        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
         $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest'))
@@ -124,6 +133,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request = new Request();
         $request->attributes->set('_route', 'no_openapi_route');
 
+        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
         $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest'))
@@ -139,12 +149,11 @@ class JsonResponseExceptionSubscriberTest extends TestCase
 
     /**
      * Tests if JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse
-     * sets a response with 'Unexpected error' message for non-http exceptions and not
-     * the actual error message, as that might expose private information.
+     * sets a response when the Route does have the 'openapi_resource' option set.
      *
      * @depends testConstruct
      */
-    public function testOnKernelExceptionTransformToJsonResponseSetsJsonResponseWithUnexpectedErrorMessage()
+    public function testOnKernelExceptionTransformToJsonResponseSetsResponseWhenRouteIsAnOpenapiRoute()
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add(
@@ -164,6 +173,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request = new Request();
         $request->attributes->set('_route', 'openapi_route');
 
+        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
         $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
             ->disableOriginalConstructor()
             ->setMethods(array('getRequest', 'getException'))
@@ -175,113 +185,15 @@ class JsonResponseExceptionSubscriberTest extends TestCase
             ->method('getException')
             ->willReturn(new Exception('This message should not be visible.'));
 
-        $this->subscriber->onKernelExceptionTransformToJsonResponse($eventMock);
-
-        $response = $eventMock->getResponse();
-
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertSame(JsonResponse::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
-        $this->assertSame('{"message":"Unexpected error."}', $response->getContent());
-    }
-
-    /**
-     * Tests if JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse
-     * sets a response with the message and status of the http exception.
-     *
-     * @depends testConstruct
-     */
-    public function testOnKernelExceptionTransformToJsonResponseSetsJsonResponseWithExceptionMessage()
-    {
-        $routeCollection = new RouteCollection();
-        $routeCollection->add(
-            'openapi_route',
-            new Route(
-                '/openapi-route',
-                array(),
-                array(),
-                array('openapi_resource' => 'openapi.json')
-            )
-        );
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
-        $request = new Request();
-        $request->attributes->set('_route', 'openapi_route');
-
-        $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
+        $response = $this->getMockBuilder(JsonResponse::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', 'getException'))
             ->getMock();
-        $eventMock->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
-        $eventMock->expects($this->once())
-            ->method('getException')
-            ->willReturn(
-                new BadJsonRequestHttpException(
-                    'This message should be visible.',
-                    new Exception('This previous exception message should be visible too.')
-                )
-            );
+        $this->responseBuilderMock->expects($this->once())
+            ->method('build')
+            ->willReturn($response);
 
         $this->subscriber->onKernelExceptionTransformToJsonResponse($eventMock);
 
-        $response = $eventMock->getResponse();
-
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertSame(JsonResponse::HTTP_BAD_REQUEST, $response->getStatusCode());
-        $this->assertSame(
-            '{"message":"This message should be visible.","errors":["This previous exception message should be visible too."]}',
-            $response->getContent()
-        );
-    }
-
-    /**
-     * Tests if JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse
-     * sets a response with the message of any exception when debug mode is active.
-     *
-     * @depends testConstruct
-     */
-    public function testOnKernelExceptionTransformToJsonResponseSetsJsonResponseWithExceptionMessageInDebugMode()
-    {
-        $routeCollection = new RouteCollection();
-        $routeCollection->add(
-            'openapi_route',
-            new Route(
-                '/openapi-route',
-                array(),
-                array(),
-                array('openapi_resource' => 'openapi.json')
-            )
-        );
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
-        $request = new Request();
-        $request->attributes->set('_route', 'openapi_route');
-
-        $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', 'getException'))
-            ->getMock();
-        $eventMock->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
-        $eventMock->expects($this->once())
-            ->method('getException')
-            ->willReturn(new Exception('This message should be visible in debug mode.'));
-
-        $this->subscriber = new JsonResponseExceptionSubscriber($this->routerMock, true);
-        $this->subscriber->onKernelExceptionTransformToJsonResponse($eventMock);
-
-        $response = $eventMock->getResponse();
-
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertSame(JsonResponse::HTTP_INTERNAL_SERVER_ERROR, $response->getStatusCode());
-        $this->assertSame('{"message":"This message should be visible in debug mode."}', $response->getContent());
+        $this->assertSame($response, $eventMock->getResponse());
     }
 }

@@ -41,17 +41,17 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     private $subscriber;
 
     /**
-     * @var MockObject
+     * @var MockObject|RouterInterface
      */
     private $routerMock;
 
     /**
-     * @var MockObject
+     * @var MockObject|JsonParser
      */
     private $jsonParserMock;
 
     /**
-     * @var MockObject
+     * @var MockObject|SchemaLoaderInterface
      */
     private $schemaLoaderMock;
 
@@ -132,6 +132,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->schemaLoaderMock->expects($this->never())
             ->method('load');
 
+        /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 
@@ -168,6 +169,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->schemaLoaderMock->expects($this->never())
             ->method('load');
 
+        /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 
@@ -203,6 +205,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->schemaLoaderMock->expects($this->never())
             ->method('load');
 
+        /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 
@@ -245,6 +248,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->schemaLoaderMock->expects($this->never())
             ->method('load');
 
+        /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 
@@ -299,6 +303,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             ->with(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
             ->willReturn($schemaLoaderDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
 
+        /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 
@@ -317,8 +322,20 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             // Also assert contents of errors.
             $this->assertSame(
                 array(
-                    'The property name is required',
-                    'The property invalid is not defined and the definition does not allow additional properties',
+                    array(
+                        'property' => 'name',
+                        'pointer' => '/name',
+                        'message' => 'The property name is required',
+                        'constraint' => 'required',
+                        'context' => 1,
+                    ),
+                    array(
+                        'property' => '',
+                        'pointer' => '',
+                        'message' => 'The property invalid is not defined and the definition does not allow additional properties',
+                        'constraint' => 'additionalProp',
+                        'context' => 1,
+                    ),
                 ),
                 $exception->getErrors()
             );
@@ -354,6 +371,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             ->with(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
             ->willReturn($schemaLoaderDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
 
+        /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 

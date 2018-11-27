@@ -13,6 +13,7 @@
         <parameter key="nijens_openapi.json.validator.class">JsonSchema\Validator</parameter>
         <parameter key="nijens_openapi.event_subscriber.json_request_body_validation.class">Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber</parameter>
         <parameter key="nijens_openapi.event_subscriber.json_response_exception.class">Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber</parameter>
+        <parameter key="nijens_openapi.service.exception_json_response_builder.class">Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilder</parameter>
     </parameters>
 
     <services>
@@ -53,9 +54,13 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="nijens_openapi.service.exception_json_response_builder" class="%nijens_openapi.service.exception_json_response_builder.class%">
+            <argument>%kernel.debug%</argument>
+        </service>
+
         <service id="nijens_openapi.event_subscriber.json_response_exception" class="%nijens_openapi.event_subscriber.json_response_exception.class%">
             <argument type="service" id="router"/>
-            <argument>%kernel.debug%</argument>
+            <argument type="service" id="nijens_openapi.service.exception_json_response_builder"/>
 
             <tag name="kernel.event_subscriber"/>
         </service>
