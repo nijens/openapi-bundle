@@ -13,7 +13,7 @@ namespace Nijens\OpenapiBundle\Json;
 
 use League\JsonReference\DereferencerInterface;
 use stdClass;
-use Symfony\Component\Config\Exception\LoaderLoadException;
+use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
@@ -58,7 +58,7 @@ class SchemaLoader implements SchemaLoaderInterface
     /**
      * {@inheritdoc}
      *
-     * @throws LoaderLoadException when given file does not have a valid JSON or YAML extension
+     * @throws FileLoaderLoadException when given file does not have a valid JSON or YAML extension
      */
     public function load(string $file): stdClass
     {
@@ -76,7 +76,7 @@ class SchemaLoader implements SchemaLoaderInterface
                     break;
 
                 default:
-                    throw new LoaderLoadException($locatedFile);
+                    throw new FileLoaderLoadException($locatedFile);
             }
 
             $schema = $this->dereferencer->dereference($dereference);
