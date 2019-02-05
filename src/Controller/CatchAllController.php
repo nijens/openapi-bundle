@@ -11,7 +11,6 @@
 
 namespace Nijens\OpenapiBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -27,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class CatchAllController extends Controller
+class CatchAllController
 {
     /**
      * The routing reference to this controller.

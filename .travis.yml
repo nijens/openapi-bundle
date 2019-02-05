@@ -15,7 +15,7 @@ matrix:
 before_install: composer selfupdate
 
 install:
-    - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; composer update symfony/*; fi;
+    - if [ "$SYMFONY_VERSION" != "" ]; then composer remove friendsofphp/php-cs-fixer --dev; composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; composer update symfony/*; fi;
     - if [ "$SYMFONY_VERSION" = "" ]; then composer install; fi;
 
 before_script: mkdir -p build/logs
