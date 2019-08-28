@@ -157,6 +157,36 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
+     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody skips validation when the Route
+     * does not contain the following OpenAPI options set by the RouteLoader:
+     * - The JSON pointer to a JSON Schema in the OpenAPI specification.
+     *
+     * @depends testConstruct
+     */
+    public function testValidateRequestBodySkipsValidationWhenRouteDoesNotContainValidationPointer()
+    {
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $this->schemaLoaderMock->expects($this->never())
+            ->method('load');
+
+        /** @var MockObject|HttpKernelInterface $kernelMock */
+        $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
+            ->getMock();
+
+        $request = new Request();
+        $request->headers->set('Content-Type', 'application/json');
+        $request->attributes->set('_nijens_openapi', [
+            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+        ]);
+
+        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+
+        $this->subscriber->validateRequestBody($event);
+    }
+
+    /**
      * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody throws a InvalidRequestHttpException
      * when the content-type of the request is not 'application/json'.
      *

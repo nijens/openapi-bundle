@@ -82,14 +82,15 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $requestContentType = $request->headers->get('Content-Type');
 
-        if ($event->getRequest()->attributes->has('_nijens_openapi') === false) {
+        $routeOptions = $event->getRequest()->attributes->get('_nijens_openapi');
+
+        // Not an openAPI route.
+        if (isset($routeOptions['openapi_resource']) === false) {
             return;
         }
 
-        $routeOptions = $event->getRequest()->attributes->get('_nijens_openapi');
-        if (isset($routeOptions['openapi_resource']) === false ||
-            isset($routeOptions['openapi_json_request_validation_pointer']) === false
-        ) {
+        // No need for validation.
+        if (isset($routeOptions['openapi_json_request_validation_pointer']) === false) {
             return;
         }
 
