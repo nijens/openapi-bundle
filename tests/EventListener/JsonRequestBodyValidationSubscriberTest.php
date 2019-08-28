@@ -26,9 +26,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * JsonRequestBodyValidationSubscriberTest.
@@ -39,11 +36,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      * @var JsonRequestBodyValidationSubscriber
      */
     private $subscriber;
-
-    /**
-     * @var MockObject|RouterInterface
-     */
-    private $routerMock;
 
     /**
      * @var MockObject|JsonParser
@@ -65,9 +57,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      */
     protected function setUp()
     {
-        $this->routerMock = $this->getMockBuilder(RouterInterface::class)
-            ->getMock();
-
         $this->jsonParserMock = $this->getMockBuilder(JsonParser::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -78,7 +67,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->jsonValidator = new Validator();
 
         $this->subscriber = new JsonRequestBodyValidationSubscriber(
-            $this->routerMock,
             $this->jsonParserMock,
             $this->schemaLoaderMock,
             $this->jsonValidator
@@ -107,7 +95,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertAttributeSame($this->routerMock, 'router', $this->subscriber);
         $this->assertAttributeSame($this->jsonParserMock, 'jsonParser', $this->subscriber);
         $this->assertAttributeSame($this->schemaLoaderMock, 'schemaLoader', $this->subscriber);
         $this->assertAttributeSame($this->jsonValidator, 'jsonValidator', $this->subscriber);
@@ -122,10 +109,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      */
     public function testValidateRequestBodySkipsValidationWhenRouteIsNotAvailable()
     {
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn(new RouteCollection());
-
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
@@ -154,15 +137,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      */
     public function testValidateRequestBodySkipsValidationWhenRouteDoesNotContainOpenApiOptions()
     {
-        $route = new Route('/test-route');
-
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('test_route', $route);
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
@@ -190,15 +164,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      */
     public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestContentTypeInvalid()
     {
-        $route = $this->createRouteForTesting();
-
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('test_route', $route);
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
@@ -211,7 +176,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request();
         $request->headers->set('Content-Type', 'application/xml');
-        $request->attributes->set('_route', 'test_route');
+        $request->attributes->set('_nijens_openapi', [
+            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+            'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+        ]);
 
         $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
@@ -229,16 +197,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      */
     public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestBodyIsInvalidJson()
     {
-        $route = $this->createRouteForTesting();
-
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('test_route', $route);
-
         $requestBody = '{"invalid": "json';
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
 
         $this->jsonParserMock->expects($this->once())
             ->method('lint')
@@ -254,7 +213,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
         $request->headers->set('Content-Type', 'application/json');
-        $request->attributes->set('_route', 'test_route');
+        $request->attributes->set('_nijens_openapi', [
+            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+            'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+        ]);
 
         $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
@@ -282,15 +244,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      */
     public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestBodyDoesNotValidateWithJsonSchema()
     {
-        $route = $this->createRouteForTesting();
-
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('test_route', $route);
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
         $requestBody = '{"invalid": "json"}';
 
         $this->jsonParserMock->expects($this->never())
@@ -309,7 +262,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
         $request->headers->set('Content-Type', 'application/json');
-        $request->attributes->set('_route', 'test_route');
+        $request->attributes->set('_nijens_openapi', [
+            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+            'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+        ]);
 
         $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
@@ -350,15 +306,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
      */
     public function testValidateRequestBodySuccessful()
     {
-        $route = $this->createRouteForTesting();
-
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('test_route', $route);
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
         $requestBody = '{"name": "Dog"}';
 
         $this->jsonParserMock->expects($this->never())
@@ -377,24 +324,13 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
         $request->headers->set('Content-Type', 'application/json');
-        $request->attributes->set('_route', 'test_route');
+        $request->attributes->set('_nijens_openapi', [
+            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+            'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+        ]);
 
         $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->subscriber->validateRequestBody($event);
-    }
-
-    /**
-     * Creates a new Route for testing.
-     *
-     * @return Route
-     */
-    private function createRouteForTesting()
-    {
-        $route = new Route('/pets');
-        $route->setOption('openapi_resource', __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json');
-        $route->setOption('openapi_json_request_validation_pointer', '/paths/~1pets/put/requestBody/content/application~1json/schema');
-
-        return $route;
     }
 }

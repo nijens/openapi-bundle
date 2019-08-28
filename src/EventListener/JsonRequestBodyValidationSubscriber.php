@@ -20,8 +20,6 @@ use Seld\JsonLint\JsonParser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Validates a JSON request body for routes loaded through the OpenAPI specification.
@@ -30,11 +28,6 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
     /**
      * @var JsonParser
      */
@@ -65,18 +58,15 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     /**
      * Constructs a new JsonRequestBodyValidationSubscriber instance.
      *
-     * @param RouterInterface       $router
      * @param JsonParser            $jsonParser
      * @param SchemaLoaderInterface $schemaLoader
      * @param Validator             $jsonValidator
      */
     public function __construct(
-        RouterInterface $router,
         JsonParser $jsonParser,
         SchemaLoaderInterface $schemaLoader,
         Validator $jsonValidator
     ) {
-        $this->router = $router;
         $this->jsonParser = $jsonParser;
         $this->schemaLoader = $schemaLoader;
         $this->jsonValidator = $jsonValidator;
@@ -92,15 +82,14 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $requestContentType = $request->headers->get('Content-Type');
 
-        $route = $this->router->getRouteCollection()->get(
-            $request->attributes->get('_route')
-        );
-
-        if ($route instanceof Route === false) {
+        if ($event->getRequest()->attributes->has('_nijens_openapi') === false) {
             return;
         }
 
-        if ($route->hasOption('openapi_resource') === false || $route->hasOption('openapi_json_request_validation_pointer') === false) {
+        $routeOptions = $event->getRequest()->attributes->get('_nijens_openapi');
+        if (isset($routeOptions['openapi_resource']) === false ||
+            isset($routeOptions['openapi_json_request_validation_pointer']) === false
+        ) {
             return;
         }
 
@@ -111,7 +100,11 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         $requestBody = $request->getContent();
         $decodedJsonRequestBody = $this->validateJsonRequestBody($requestBody);
 
-        $this->validateJsonAgainstSchema($route, $decodedJsonRequestBody);
+        $this->validateJsonAgainstSchema(
+            $routeOptions['openapi_resource'],
+            $routeOptions['openapi_json_request_validation_pointer'],
+            $decodedJsonRequestBody
+        );
     }
 
     /**
@@ -136,15 +129,16 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     /**
      * Validates the JSON request body against the JSON Schema within the OpenAPI specification.
      *
-     * @param Route $route
-     * @param mixed $decodedJsonRequestBody
+     * @param string $openApiResource
+     * @param string $openApiValidationPointer
+     * @param mixed  $decodedJsonRequestBody
      */
-    private function validateJsonAgainstSchema(Route $route, $decodedJsonRequestBody): void
+    private function validateJsonAgainstSchema(string $openApiResource, string $openApiValidationPointer, $decodedJsonRequestBody): void
     {
-        $schema = $this->schemaLoader->load($route->getOption('openapi_resource'));
+        $schema = $this->schemaLoader->load($openApiResource);
 
         $jsonPointer = new JsonPointer($schema);
-        $jsonSchema = $jsonPointer->get($route->getOption('openapi_json_request_validation_pointer'));
+        $jsonSchema = $jsonPointer->get($openApiValidationPointer);
 
         $this->jsonValidator->validate($decodedJsonRequestBody, $jsonSchema);
 

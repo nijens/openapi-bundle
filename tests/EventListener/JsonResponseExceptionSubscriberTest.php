@@ -20,8 +20,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -49,13 +47,10 @@ class JsonResponseExceptionSubscriberTest extends TestCase
      */
     protected function setUp()
     {
-        $this->routerMock = $this->getMockBuilder(RouterInterface::class)
-            ->getMock();
-
         $this->responseBuilderMock = $this->getMockBuilder(ExceptionJsonResponseBuilderInterface::class)
             ->getMock();
 
-        $this->subscriber = new JsonResponseExceptionSubscriber($this->routerMock, $this->responseBuilderMock);
+        $this->subscriber = new JsonResponseExceptionSubscriber($this->responseBuilderMock);
     }
 
     /**
@@ -80,7 +75,6 @@ class JsonResponseExceptionSubscriberTest extends TestCase
      */
     public function testConstruct()
     {
-        $this->assertAttributeSame($this->routerMock, 'router', $this->subscriber);
         $this->assertAttributeSame($this->responseBuilderMock, 'responseBuilder', $this->subscriber);
     }
 
@@ -92,12 +86,6 @@ class JsonResponseExceptionSubscriberTest extends TestCase
      */
     public function testOnKernelExceptionTransformToJsonResponseDoesNothingWhenRouteIsNotFoundInCollection()
     {
-        $routeCollection = new RouteCollection();
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
         $request = new Request();
         $request->attributes->set('_route', 'not_in_collection');
 
@@ -123,13 +111,6 @@ class JsonResponseExceptionSubscriberTest extends TestCase
      */
     public function testOnKernelExceptionTransformToJsonResponseDoesNothingWhenRouteIsNotAnOpenapiRoute()
     {
-        $routeCollection = new RouteCollection();
-        $routeCollection->add('no_openapi_route', new Route('/no-openapi-route'));
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
         $request = new Request();
         $request->attributes->set('_route', 'no_openapi_route');
 
@@ -155,23 +136,11 @@ class JsonResponseExceptionSubscriberTest extends TestCase
      */
     public function testOnKernelExceptionTransformToJsonResponseSetsResponseWhenRouteIsAnOpenapiRoute()
     {
-        $routeCollection = new RouteCollection();
-        $routeCollection->add(
-            'openapi_route',
-            new Route(
-                '/openapi-route',
-                array(),
-                array(),
-                array('openapi_resource' => 'openapi.json')
-            )
-        );
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->willReturn($routeCollection);
-
         $request = new Request();
         $request->attributes->set('_route', 'openapi_route');
+        $request->attributes->set('_nijens_openapi', [
+            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+        ]);
 
         /** @var MockObject|GetResponseForExceptionEvent $eventMock */
         $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)

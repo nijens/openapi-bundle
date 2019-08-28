@@ -24,11 +24,6 @@ use Symfony\Component\Routing\RouterInterface;
 class JsonResponseExceptionSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
      * @var ExceptionJsonResponseBuilderInterface
      */
     private $responseBuilder;
@@ -48,12 +43,10 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
     /**
      * Constructs a new JsonResponseExceptionSubscriber instance.
      *
-     * @param RouterInterface                       $router
      * @param ExceptionJsonResponseBuilderInterface $responseBuilder
      */
-    public function __construct(RouterInterface $router, ExceptionJsonResponseBuilderInterface $responseBuilder)
+    public function __construct(ExceptionJsonResponseBuilderInterface $responseBuilder)
     {
-        $this->router = $router;
         $this->responseBuilder = $responseBuilder;
     }
 
@@ -64,13 +57,9 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
      */
     public function onKernelExceptionTransformToJsonResponse(GetResponseForExceptionEvent $event): void
     {
-        $request = $event->getRequest();
+        $routeOptions = $event->getRequest()->attributes->get('_nijens_openapi');
 
-        $route = $this->router->getRouteCollection()->get(
-            $request->attributes->get('_route')
-        );
-
-        if ($route instanceof Route === false || $route->hasOption('openapi_resource') === false) {
+        if (isset($routeOptions['openapi_resource']) === false) {
             return;
         }
 
