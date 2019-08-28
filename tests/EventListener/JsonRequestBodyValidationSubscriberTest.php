@@ -149,7 +149,6 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request();
         $request->headers->set('Content-Type', 'application/json');
-        $request->attributes->set('_route', 'test_route');
 
         $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
