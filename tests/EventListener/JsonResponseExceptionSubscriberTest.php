@@ -68,7 +68,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $this->assertSame(
             array(
                 KernelEvents::EXCEPTION => array(
-                    array('onKernelExceptionTransformToJsonResponse', 0),
+                    array('onKernelExceptionTransformToJsonResponse', 10),
                 ),
             ),
             $subscribedEvents
