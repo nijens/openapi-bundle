@@ -55,7 +55,6 @@ class NijensOpenapiExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasParameter('nijens_openapi.service.exception_json_response_builder.class', ExceptionJsonResponseBuilder::class);
 
         $this->assertContainerBuilderHasService('nijens_openapi.controller.catch_all', CatchAllController::class);
-        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.controller.catch_all', 0, new Reference('router'));
         $this->assertContainerBuilderHasServiceDefinitionWithTag('nijens_openapi.controller.catch_all', 'controller.service_arguments');
 
         $this->assertContainerBuilderHasService('nijens_openapi.routing.loader', RouteLoader::class);
@@ -77,18 +76,16 @@ class NijensOpenapiExtensionTest extends AbstractExtensionTestCase
         $this->assertContainerBuilderHasService('nijens_openapi.json.validator', Validator::class);
 
         $this->assertContainerBuilderHasService('nijens_openapi.event_subscriber.json_request_body_validation', JsonRequestBodyValidationSubscriber::class);
-        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_request_body_validation', 0, new Reference('router'));
-        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_request_body_validation', 1, new Reference('nijens_openapi.json.parser'));
-        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_request_body_validation', 2, new Reference('nijens_openapi.json.schema_loader'));
-        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_request_body_validation', 3, new Reference('nijens_openapi.json.validator'));
+        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_request_body_validation', 0, new Reference('nijens_openapi.json.parser'));
+        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_request_body_validation', 1, new Reference('nijens_openapi.json.schema_loader'));
+        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_request_body_validation', 2, new Reference('nijens_openapi.json.validator'));
         $this->assertContainerBuilderHasServiceDefinitionWithTag('nijens_openapi.event_subscriber.json_request_body_validation', 'kernel.event_subscriber');
 
         $this->assertContainerBuilderHasService('nijens_openapi.service.exception_json_response_builder', ExceptionJsonResponseBuilder::class);
         $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.service.exception_json_response_builder', 0, '%kernel.debug%');
 
         $this->assertContainerBuilderHasService('nijens_openapi.event_subscriber.json_response_exception');
-        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_response_exception', 0, new Reference('router'));
-        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_response_exception', 1, new Reference('nijens_openapi.service.exception_json_response_builder'));
+        $this->assertContainerBuilderHasServiceDefinitionWithArgument('nijens_openapi.event_subscriber.json_response_exception', 0, new Reference('nijens_openapi.service.exception_json_response_builder'));
         $this->assertContainerBuilderHasServiceDefinitionWithTag('nijens_openapi.event_subscriber.json_response_exception', 'kernel.event_subscriber');
     }
 }

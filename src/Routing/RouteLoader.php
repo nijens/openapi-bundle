@@ -122,7 +122,7 @@ class RouteLoader extends Loader
         stdClass $operation
     ): void {
         $defaults = array();
-        $options = array(
+        $openApiConfiguration = array(
             'openapi_resource' => $resource,
         );
 
@@ -131,7 +131,7 @@ class RouteLoader extends Loader
         }
 
         if (isset($operation->requestBody->content->{'application/json'})) {
-            $options['openapi_json_request_validation_pointer'] = sprintf(
+            $openApiConfiguration['openapi_json_request_validation_pointer'] = sprintf(
                 '/paths/%s/%s/requestBody/content/%s/schema',
                 $jsonPointer->escape($path),
                 $requestMethod,
@@ -139,7 +139,9 @@ class RouteLoader extends Loader
             );
         }
 
-        $route = new Route($path, $defaults, array(), $options);
+        $defaults['_nijens_openapi'] = $openApiConfiguration;
+
+        $route = new Route($path, $defaults, array());
         $route->setMethods($requestMethod);
 
         $collection->add(

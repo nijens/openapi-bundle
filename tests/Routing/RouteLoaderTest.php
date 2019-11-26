@@ -80,7 +80,7 @@ class RouteLoaderTest extends TestCase
 
         $this->assertSame('/pets', $route->getPath());
         $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
-        $this->assertSame('route-loader-minimal.json', $route->getOption('openapi_resource'));
+        $this->assertSame('route-loader-minimal.json', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
     }
 
     /**
@@ -95,7 +95,7 @@ class RouteLoaderTest extends TestCase
 
         $this->assertSame('/pets', $route->getPath());
         $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
-        $this->assertSame('route-loader-minimal.yaml', $route->getOption('openapi_resource'));
+        $this->assertSame('route-loader-minimal.yaml', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
     }
 
     /**
@@ -110,7 +110,7 @@ class RouteLoaderTest extends TestCase
 
         $this->assertSame('/pets', $route->getPath());
         $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
-        $this->assertSame('route-loader-minimal.yml', $route->getOption('openapi_resource'));
+        $this->assertSame('route-loader-minimal.yml', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
     }
 
     /**
@@ -136,7 +136,7 @@ class RouteLoaderTest extends TestCase
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame(
             '/paths/~1pets/put/requestBody/content/application~1json/schema',
-            $route->getOption('openapi_json_request_validation_pointer')
+            $route->getDefaults()['_nijens_openapi']['openapi_json_request_validation_pointer']
         );
     }
 
