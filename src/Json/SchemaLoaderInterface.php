@@ -23,19 +23,11 @@ interface SchemaLoaderInterface
 {
     /**
      * Loads and dereferences a JSON schema.
-     *
-     * @param string $file
-     *
-     * @return stdClass
      */
     public function load(string $file): stdClass;
 
     /**
      * Returns a FileResource for a loaded JSON schema.
-     *
-     * @param string $file
-     *
-     * @return ResourceInterface|null
      */
     public function getFileResource(string $file): ?ResourceInterface;
 }

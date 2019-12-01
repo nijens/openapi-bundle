@@ -31,17 +31,15 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return array(
-            KernelEvents::EXCEPTION => array(
-                array('onKernelExceptionTransformToJsonResponse', 10),
-            ),
-        );
+        return [
+            KernelEvents::EXCEPTION => [
+                ['onKernelExceptionTransformToJsonResponse', 10],
+            ],
+        ];
     }
 
     /**
      * Constructs a new JsonResponseExceptionSubscriber instance.
-     *
-     * @param ExceptionJsonResponseBuilderInterface $responseBuilder
      */
     public function __construct(ExceptionJsonResponseBuilderInterface $responseBuilder)
     {
@@ -50,8 +48,6 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
 
     /**
      * Converts the exception to a JSON response.
-     *
-     * @param GetResponseForExceptionEvent $event
      */
     public function onKernelExceptionTransformToJsonResponse(GetResponseForExceptionEvent $event): void
     {
