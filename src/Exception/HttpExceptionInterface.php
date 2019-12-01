@@ -20,8 +20,6 @@ interface HttpExceptionInterface
 {
     /**
      * Returns the list of errors.
-     *
-     * @return array
      */
     public function getErrors(): array;
 }

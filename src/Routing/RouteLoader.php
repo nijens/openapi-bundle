@@ -39,8 +39,6 @@ class RouteLoader extends Loader
 
     /**
      * Constructs a new RouteLoader instance.
-     *
-     * @param SchemaLoaderInterface $schemaLoader
      */
     public function __construct(SchemaLoaderInterface $schemaLoader)
     {
@@ -79,12 +77,6 @@ class RouteLoader extends Loader
 
     /**
      * Parses a path item of the OpenAPI specification for a route.
-     *
-     * @param JsonPointer     $jsonPointer
-     * @param string          $resource
-     * @param RouteCollection $collection
-     * @param string          $path
-     * @param stdClass        $pathItem
      */
     private function parsePathItem(
         JsonPointer $jsonPointer,
@@ -105,13 +97,6 @@ class RouteLoader extends Loader
 
     /**
      * Parses an operation of the OpenAPI specification for a route.
-     *
-     * @param JsonPointer     $jsonPointer
-     * @param string          $resource
-     * @param RouteCollection $collection
-     * @param string          $path
-     * @param string          $requestMethod
-     * @param stdClass        $operation
      */
     private function parseOperation(
         JsonPointer $jsonPointer,
@@ -121,10 +106,10 @@ class RouteLoader extends Loader
         string $requestMethod,
         stdClass $operation
     ): void {
-        $defaults = array();
-        $openApiConfiguration = array(
+        $defaults = [];
+        $openApiConfiguration = [
             'openapi_resource' => $resource,
-        );
+        ];
 
         if (isset($operation->{'x-symfony-controller'})) {
             $defaults['_controller'] = $operation->{'x-symfony-controller'};
@@ -141,7 +126,7 @@ class RouteLoader extends Loader
 
         $defaults['_nijens_openapi'] = $openApiConfiguration;
 
-        $route = new Route($path, $defaults, array());
+        $route = new Route($path, $defaults, []);
         $route->setMethods($requestMethod);
 
         $collection->add(
@@ -152,16 +137,12 @@ class RouteLoader extends Loader
 
     /**
      * Returns true when the provided request method is a valid request method in the OpenAPI specification.
-     *
-     * @param string $requestMethod
-     *
-     * @return bool
      */
     private function isValidRequestMethod(string $requestMethod): bool
     {
         return in_array(
             strtoupper($requestMethod),
-            array(
+            [
                 Request::METHOD_GET,
                 Request::METHOD_PUT,
                 Request::METHOD_POST,
@@ -170,17 +151,12 @@ class RouteLoader extends Loader
                 Request::METHOD_HEAD,
                 Request::METHOD_PATCH,
                 Request::METHOD_TRACE,
-            )
+            ]
         );
     }
 
     /**
      * Creates a route name based on the path and request method.
-     *
-     * @param string $path
-     * @param string $requestMethod
-     *
-     * @return string
      */
     private function createRouteName(string $path, string $requestMethod): string
     {
@@ -192,17 +168,14 @@ class RouteLoader extends Loader
 
     /**
      * Adds a catch-all route to handle responses for non-existing routes.
-     *
-     * @param RouteCollection $collection
-     * @param string          $resource
      */
     private function addDefaultRoutes(RouteCollection $collection, string $resource)
     {
         $catchAllRoute = new Route(
             '/{catchall}',
-            array('_controller' => CatchAllController::CONTROLLER_REFERENCE),
-            array('catchall' => '.+'),
-            array('openapi_resource' => $resource)
+            ['_controller' => CatchAllController::CONTROLLER_REFERENCE],
+            ['catchall' => '.+'],
+            ['openapi_resource' => $resource]
         );
 
         $collection->add('catch_all', $catchAllRoute);

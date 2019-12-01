@@ -37,9 +37,6 @@ class JsonPointerTest extends TestCase
      * Tests if JsonPointer::escape escapes the ~ and / characters.
      *
      * @dataProvider provideEscapeTestCases
-     *
-     * @param string $expectedResult
-     * @param string $value
      */
     public function testEscape(string $expectedResult, string $value)
     {
@@ -48,14 +45,12 @@ class JsonPointerTest extends TestCase
 
     /**
      * Returns a list with test cases for @see testEscape.
-     *
-     * @return array
      */
     public function provideEscapeTestCases(): array
     {
-        return array(
-            array('application~1json', 'application/json'),
-            array('~0~1some-home-directory', '~/some-home-directory'),
-        );
+        return [
+            ['application~1json', 'application/json'],
+            ['~0~1some-home-directory', '~/some-home-directory'],
+        ];
     }
 }

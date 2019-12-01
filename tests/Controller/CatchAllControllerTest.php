@@ -49,27 +49,27 @@ class CatchAllControllerTest extends TestCase
      */
     protected function setUp()
     {
-        $routeOptions = array('openapi_resource' => 'openapi.json');
+        $routeOptions = ['openapi_resource' => 'openapi.json'];
 
         $this->routeCollection = new RouteCollection();
         $this->routeCollection->add(
             'test',
             new Route(
                 '/test',
-                array(),
-                array(),
+                [],
+                [],
                 $routeOptions,
                 '',
-                array(),
-                array(Request::METHOD_GET)
+                [],
+                [Request::METHOD_GET]
             )
         );
         $this->routeCollection->add(
             'catch_all',
             new Route(
                 '/{catchall}',
-                array('_controller' => CatchAllController::CONTROLLER_REFERENCE),
-                array('catchall' => '.+'),
+                ['_controller' => CatchAllController::CONTROLLER_REFERENCE],
+                ['catchall' => '.+'],
                 $routeOptions
             )
         );
