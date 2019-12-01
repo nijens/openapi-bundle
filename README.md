@@ -1,7 +1,7 @@
 # OpenAPI bundle
 
 [![Latest version on Packagist][ico-version]][link-version]
-[![Software License][ico-license]](LICENSE.md)
+[![Software License][ico-license]][link-license]
 [![Build Status][ico-build]][link-build]
 [![Coverage Status][ico-coverage]][link-coverage]
 [![Code Quality][ico-code-quality]][link-code-quality]
@@ -161,7 +161,7 @@ array(
 Also see the list of [contributors][link-contributors] who participated in this project.
 
 ## License
-The OpenAPI bundle is licensed under the MIT License. Please see the [LICENSE file](LICENSE.md) for details.
+The OpenAPI bundle is licensed under the MIT License. Please see the [LICENSE file][link-license] for details.
 
 [ico-version]: https://img.shields.io/packagist/v/nijens/openapi-bundle.svg
 [ico-pre-release-version]: https://img.shields.io/packagist/vpre/nijens/openapi-bundle.svg
@@ -171,6 +171,7 @@ The OpenAPI bundle is licensed under the MIT License. Please see the [LICENSE fi
 [ico-code-quality]: https://scrutinizer-ci.com/g/nijens/openapi-bundle/badges/quality-score.png?b=master
 
 [link-version]: https://packagist.org/packages/nijens/openapi-bundle
+[link-license]: LICENSE
 [link-build]: https://travis-ci.com/nijens/openapi-bundle
 [link-coverage]: https://coveralls.io/r/nijens/openapi-bundle?branch=master
 [link-code-quality]: https://scrutinizer-ci.com/g/nijens/openapi-bundle/?branch=master
