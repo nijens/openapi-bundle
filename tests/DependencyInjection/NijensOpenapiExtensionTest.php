@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class NijensOpenapiExtensionTest extends AbstractExtensionTestCase
 {
-    protected function getContainerExtensions()
+    protected function getContainerExtensions(): array
     {
         return [
             new NijensOpenapiExtension(),

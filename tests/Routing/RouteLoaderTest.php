@@ -16,7 +16,7 @@ use League\JsonReference\ReferenceSerializer\InlineReferenceSerializer;
 use Nijens\OpenapiBundle\Json\SchemaLoader;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
+use Symfony\Component\Config\Exception\LoaderLoadException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -39,7 +39,7 @@ class RouteLoaderTest extends TestCase
     /**
      * Creates a new RouteLoader for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $fileLocator = new FileLocator([
             __DIR__.'/../Resources/specifications/',
@@ -118,7 +118,7 @@ class RouteLoaderTest extends TestCase
      */
     public function testLoadFromUnsupportedExtension()
     {
-        $this->expectException(FileLoaderLoadException::class);
+        $this->expectException(LoaderLoadException::class);
         $this->routeLoader->load('route-loader-minimal.txt', 'openapi');
     }
 

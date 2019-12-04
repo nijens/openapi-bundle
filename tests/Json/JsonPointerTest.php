@@ -28,7 +28,7 @@ class JsonPointerTest extends TestCase
     /**
      * Creates a new JsonPointer instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jsonPointer = new JsonPointer(new stdClass());
     }

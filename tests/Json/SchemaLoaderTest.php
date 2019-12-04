@@ -44,7 +44,7 @@ class SchemaLoaderTest extends TestCase
     /**
      * Creates a new SchemaLoader instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileLocatorMock = $this->getMockBuilder(FileLocatorInterface::class)
             ->getMock();

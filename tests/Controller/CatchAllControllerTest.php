@@ -47,7 +47,7 @@ class CatchAllControllerTest extends TestCase
     /**
      * Creates a new CatchAllController instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $routeOptions = ['openapi_resource' => 'openapi.json'];
 

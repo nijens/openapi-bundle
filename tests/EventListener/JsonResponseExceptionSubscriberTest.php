@@ -18,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -45,7 +45,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     /**
      * Creates a new JsonResponseExceptionSubscriber instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->responseBuilderMock = $this->getMockBuilder(ExceptionJsonResponseBuilderInterface::class)
             ->getMock();
@@ -89,8 +89,8 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request = new Request();
         $request->attributes->set('_route', 'not_in_collection');
 
-        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
-        $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
+        /** @var MockObject|ExceptionEvent $eventMock */
+        $eventMock = $this->getMockBuilder(ExceptionEvent::class)
             ->disableOriginalConstructor()
             ->setMethods(['getRequest'])
             ->getMock();
@@ -114,8 +114,8 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request = new Request();
         $request->attributes->set('_route', 'no_openapi_route');
 
-        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
-        $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
+        /** @var MockObject|ExceptionEvent $eventMock */
+        $eventMock = $this->getMockBuilder(ExceptionEvent::class)
             ->disableOriginalConstructor()
             ->setMethods(['getRequest'])
             ->getMock();
@@ -142,8 +142,8 @@ class JsonResponseExceptionSubscriberTest extends TestCase
             'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
         ]);
 
-        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
-        $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
+        /** @var MockObject|ExceptionEvent $eventMock */
+        $eventMock = $this->getMockBuilder(ExceptionEvent::class)
             ->disableOriginalConstructor()
             ->setMethods(['getRequest', 'getException'])
             ->getMock();

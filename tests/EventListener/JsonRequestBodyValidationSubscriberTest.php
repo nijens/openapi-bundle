@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -55,7 +55,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     /**
      * Creates a new JsonRequestBodyValidationSubscriber instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jsonParserMock = $this->getMockBuilder(JsonParser::class)
             ->disableOriginalConstructor()
@@ -122,7 +122,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $request = new Request();
         $request->headers->set('Content-Type', 'application/json');
 
-        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->subscriber->validateRequestBody($event);
     }
@@ -150,7 +150,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $request = new Request();
         $request->headers->set('Content-Type', 'application/json');
 
-        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->subscriber->validateRequestBody($event);
     }
@@ -180,7 +180,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
         ]);
 
-        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->subscriber->validateRequestBody($event);
     }
@@ -210,7 +210,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
         ]);
 
-        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->expectException(BadJsonRequestHttpException::class);
         $this->expectExceptionMessage("The request content-type should be 'application/json'.");
@@ -247,7 +247,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
         ]);
 
-        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->expectException(BadJsonRequestHttpException::class);
         $this->expectExceptionMessage('The request body should be valid JSON.');
@@ -296,7 +296,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
         ]);
 
-        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->expectException(InvalidRequestHttpException::class);
         $this->expectExceptionMessage('Validation of JSON request body failed.');
@@ -358,7 +358,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
         ]);
 
-        $event = new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
 
         $this->subscriber->validateRequestBody($event);
     }
