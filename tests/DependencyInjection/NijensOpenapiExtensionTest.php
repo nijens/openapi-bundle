@@ -34,9 +34,9 @@ class NijensOpenapiExtensionTest extends AbstractExtensionTestCase
 {
     protected function getContainerExtensions()
     {
-        return array(
+        return [
             new NijensOpenapiExtension(),
-        );
+        ];
     }
 
     public function testXmlParsedCorrectly()

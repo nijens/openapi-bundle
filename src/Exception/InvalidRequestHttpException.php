@@ -25,12 +25,10 @@ class InvalidRequestHttpException extends UnprocessableEntityHttpException imple
      *
      * @var array
      */
-    private $errors = array();
+    private $errors = [];
 
     /**
      * Sets the list of errors resulting in this exception.
-     *
-     * @param array $errors
      */
     public function setErrors(array $errors): void
     {

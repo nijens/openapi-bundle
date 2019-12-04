@@ -41,9 +41,9 @@ class RouteLoaderTest extends TestCase
      */
     protected function setUp()
     {
-        $fileLocator = new FileLocator(array(
+        $fileLocator = new FileLocator([
             __DIR__.'/../Resources/specifications/',
-        ));
+        ]);
 
         $dereferencer = new Dereferencer(null, new InlineReferenceSerializer());
 
@@ -79,7 +79,7 @@ class RouteLoaderTest extends TestCase
         $this->assertInstanceOf(Route::class, $route);
 
         $this->assertSame('/pets', $route->getPath());
-        $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
+        $this->assertSame([Request::METHOD_GET], $route->getMethods());
         $this->assertSame('route-loader-minimal.json', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
     }
 
@@ -94,7 +94,7 @@ class RouteLoaderTest extends TestCase
         $this->assertInstanceOf(Route::class, $route);
 
         $this->assertSame('/pets', $route->getPath());
-        $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
+        $this->assertSame([Request::METHOD_GET], $route->getMethods());
         $this->assertSame('route-loader-minimal.yaml', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
     }
 
@@ -109,7 +109,7 @@ class RouteLoaderTest extends TestCase
         $this->assertInstanceOf(Route::class, $route);
 
         $this->assertSame('/pets', $route->getPath());
-        $this->assertSame(array(Request::METHOD_GET), $route->getMethods());
+        $this->assertSame([Request::METHOD_GET], $route->getMethods());
         $this->assertSame('route-loader-minimal.yml', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
     }
 

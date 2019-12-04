@@ -81,11 +81,11 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $subscribedEvents = JsonRequestBodyValidationSubscriber::getSubscribedEvents();
 
         $this->assertSame(
-            array(
-                KernelEvents::REQUEST => array(
-                    array('validateRequestBody', 28),
-                ),
-            ),
+            [
+                KernelEvents::REQUEST => [
+                    ['validateRequestBody', 28],
+                ],
+            ],
             $subscribedEvents
         );
     }
@@ -240,7 +240,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 
-        $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
+        $request = new Request([], [], [], [], [], [], $requestBody);
         $request->headers->set('Content-Type', 'application/json');
         $request->attributes->set('_nijens_openapi', [
             'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
@@ -257,7 +257,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         } catch (InvalidRequestHttpException $exception) {
             // Also assert contents of errors.
             $this->assertSame(
-                array('An Invalid JSON error message'),
+                ['An Invalid JSON error message'],
                 $exception->getErrors()
             );
 
@@ -289,7 +289,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 
-        $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
+        $request = new Request([], [], [], [], [], [], $requestBody);
         $request->headers->set('Content-Type', 'application/json');
         $request->attributes->set('_nijens_openapi', [
             'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
@@ -306,22 +306,22 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         } catch (InvalidRequestHttpException $exception) {
             // Also assert contents of errors.
             $this->assertSame(
-                array(
-                    array(
+                [
+                    [
                         'property' => 'name',
                         'pointer' => '/name',
                         'message' => 'The property name is required',
                         'constraint' => 'required',
                         'context' => 1,
-                    ),
-                    array(
+                    ],
+                    [
                         'property' => '',
                         'pointer' => '',
                         'message' => 'The property invalid is not defined and the definition does not allow additional properties',
                         'constraint' => 'additionalProp',
                         'context' => 1,
-                    ),
-                ),
+                    ],
+                ],
                 $exception->getErrors()
             );
 
@@ -351,7 +351,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->getMock();
 
-        $request = new Request(array(), array(), array(), array(), array(), array(), $requestBody);
+        $request = new Request([], [], [], [], [], [], $requestBody);
         $request->headers->set('Content-Type', 'application/json');
         $request->attributes->set('_nijens_openapi', [
             'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',

@@ -61,11 +61,11 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $subscribedEvents = JsonResponseExceptionSubscriber::getSubscribedEvents();
 
         $this->assertSame(
-            array(
-                KernelEvents::EXCEPTION => array(
-                    array('onKernelExceptionTransformToJsonResponse', 10),
-                ),
-            ),
+            [
+                KernelEvents::EXCEPTION => [
+                    ['onKernelExceptionTransformToJsonResponse', 10],
+                ],
+            ],
             $subscribedEvents
         );
     }
@@ -92,7 +92,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         /** @var MockObject|GetResponseForExceptionEvent $eventMock */
         $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest'))
+            ->setMethods(['getRequest'])
             ->getMock();
         $eventMock->expects($this->once())
             ->method('getRequest')
@@ -117,7 +117,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         /** @var MockObject|GetResponseForExceptionEvent $eventMock */
         $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest'))
+            ->setMethods(['getRequest'])
             ->getMock();
         $eventMock->expects($this->once())
             ->method('getRequest')
@@ -145,7 +145,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         /** @var MockObject|GetResponseForExceptionEvent $eventMock */
         $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(array('getRequest', 'getException'))
+            ->setMethods(['getRequest', 'getException'])
             ->getMock();
         $eventMock->expects($this->once())
             ->method('getRequest')

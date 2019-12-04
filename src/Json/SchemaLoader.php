@@ -41,13 +41,10 @@ class SchemaLoader implements SchemaLoaderInterface
      *
      * @var array
      */
-    private $schemas = array();
+    private $schemas = [];
 
     /**
      * Constructs a new SchemaLoader instance.
-     *
-     * @param FileLocatorInterface  $fileLocator
-     * @param DereferencerInterface $dereferencer
      */
     public function __construct(FileLocatorInterface $fileLocator, DereferencerInterface $dereferencer)
     {

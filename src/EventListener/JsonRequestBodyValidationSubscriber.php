@@ -48,19 +48,15 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return array(
-            KernelEvents::REQUEST => array(
-                array('validateRequestBody', 28),
-            ),
-        );
+        return [
+            KernelEvents::REQUEST => [
+                ['validateRequestBody', 28],
+            ],
+        ];
     }
 
     /**
      * Constructs a new JsonRequestBodyValidationSubscriber instance.
-     *
-     * @param JsonParser            $jsonParser
-     * @param SchemaLoaderInterface $schemaLoader
-     * @param Validator             $jsonValidator
      */
     public function __construct(
         JsonParser $jsonParser,
@@ -74,8 +70,6 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
 
     /**
      * Validates the body of a request to an OpenAPI specification route. Throws an exception when validation failed.
-     *
-     * @param GetResponseEvent $event
      */
     public function validateRequestBody(GetResponseEvent $event): void
     {
@@ -111,8 +105,6 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     /**
      * Validates if the request body is valid JSON.
      *
-     * @param string $requestBody
-     *
      * @return mixed
      */
     private function validateJsonRequestBody(string $requestBody)
@@ -130,9 +122,7 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     /**
      * Validates the JSON request body against the JSON Schema within the OpenAPI specification.
      *
-     * @param string $openApiResource
-     * @param string $openApiValidationPointer
-     * @param mixed  $decodedJsonRequestBody
+     * @param mixed $decodedJsonRequestBody
      */
     private function validateJsonAgainstSchema(string $openApiResource, string $openApiValidationPointer, $decodedJsonRequestBody): void
     {
@@ -151,9 +141,6 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param array $errors
-     */
     private function throwInvalidRequestException(array $errors): void
     {
         $exception = new InvalidRequestHttpException('Validation of JSON request body failed.');
