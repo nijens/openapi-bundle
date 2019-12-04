@@ -30,15 +30,13 @@ class JsonPointer
     /**
      * @var array
      */
-    private $escapeCharacters = array(
+    private $escapeCharacters = [
         '~' => '~0',
         '/' => '~1',
-    );
+    ];
 
     /**
      * Constructs a new JsonPointer instance.
-     *
-     * @param stdClass $json
      */
     public function __construct(stdClass $json)
     {
@@ -47,8 +45,6 @@ class JsonPointer
 
     /**
      * Returns the JSON found by the pointer.
-     *
-     * @param string $pointer
      *
      * @return mixed
      *
@@ -66,10 +62,6 @@ class JsonPointer
 
     /**
      * Escapes the ~ and / characters within the value for use within a JSON pointer.
-     *
-     * @param string $value
-     *
-     * @return string
      */
     public function escape(string $value): string
     {

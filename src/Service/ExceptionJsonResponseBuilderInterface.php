@@ -23,10 +23,6 @@ interface ExceptionJsonResponseBuilderInterface
 {
     /**
      * Builds and provides a Response from the given Exception.
-     *
-     * @param Exception $exception
-     *
-     * @return JsonResponse
      */
     public function build(Exception $exception): JsonResponse;
 }

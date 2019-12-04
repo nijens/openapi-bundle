@@ -32,8 +32,6 @@ class ExceptionJsonResponseBuilder implements ExceptionJsonResponseBuilderInterf
 
     /**
      * Default constructor.
-     *
-     * @param bool $debugMode
      */
     public function __construct(bool $debugMode)
     {
@@ -58,7 +56,7 @@ class ExceptionJsonResponseBuilder implements ExceptionJsonResponseBuilderInterf
             $message = $exception->getMessage();
         }
 
-        $responseBody = array('message' => $message);
+        $responseBody = ['message' => $message];
         if ($exception instanceof HttpExceptionInterface) {
             $responseBody['errors'] = array_map(function ($error) {
                 return $error['message'];

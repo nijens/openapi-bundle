@@ -42,8 +42,6 @@ class CatchAllController
 
     /**
      * Constructs a new CatchAllController instance.
-     *
-     * @param RouterInterface $router
      */
     public function __construct(RouterInterface $router)
     {
@@ -52,8 +50,6 @@ class CatchAllController
 
     /**
      * Throws a NotFoundHttpException or MethodNotAllowedException when this controller action is reached.
-     *
-     * @param Request $request
      *
      * @throws NotFoundHttpException         when the route could not be found
      * @throws MethodNotAllowedHttpException when the route was found but the request method is not allowed
@@ -88,8 +84,6 @@ class CatchAllController
 
     /**
      * Returns a new URL matcher to match the request with existing API routes.
-     *
-     * @return UrlMatcherInterface
      */
     private function createUrlMatcher(): UrlMatcherInterface
     {
@@ -101,8 +95,6 @@ class CatchAllController
 
     /**
      * Returns a RouteCollection cloned from the router with the 'catch-all' route removed.
-     *
-     * @return RouteCollection
      */
     private function getUrlMatcherRouteCollection(): RouteCollection
     {
