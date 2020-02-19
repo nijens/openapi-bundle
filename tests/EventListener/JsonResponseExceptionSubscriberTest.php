@@ -145,13 +145,13 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         /** @var MockObject|ExceptionEvent $eventMock */
         $eventMock = $this->getMockBuilder(ExceptionEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRequest', 'getException'])
+            ->setMethods(['getRequest', 'getThrowable'])
             ->getMock();
         $eventMock->expects($this->once())
             ->method('getRequest')
             ->willReturn($request);
         $eventMock->expects($this->once())
-            ->method('getException')
+            ->method('getThrowable')
             ->willReturn(new Exception('This message should not be visible.'));
 
         $response = $this->getMockBuilder(JsonResponse::class)
