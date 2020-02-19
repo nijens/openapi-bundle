@@ -57,6 +57,6 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $event->setResponse($this->responseBuilder->build($event->getException()));
+        $event->setResponse($this->responseBuilder->build($event->getThrowable()));
     }
 }
