@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a66187d4e9c88825173ec403c8fa68dc",
+    "content-hash": "061926228c21409667c8f7c7deae2249",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
