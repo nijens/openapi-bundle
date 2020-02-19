@@ -11,10 +11,10 @@
 
 namespace Nijens\OpenapiBundle\Service;
 
-use Throwable;
 use Nijens\OpenapiBundle\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 /**
  * Builds a JSON response to an exception for OpenAPI routes.
