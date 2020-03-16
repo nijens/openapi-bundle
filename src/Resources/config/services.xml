@@ -11,6 +11,7 @@
         <parameter key="nijens_openapi.json.dereferencer.serializer.class">League\JsonReference\ReferenceSerializer\InlineReferenceSerializer</parameter>
         <parameter key="nijens_openapi.json.schema_loader.class">Nijens\OpenapiBundle\Json\SchemaLoader</parameter>
         <parameter key="nijens_openapi.json.validator.class">JsonSchema\Validator</parameter>
+        <parameter key="nijens_openapi.json.validator.factory.class">JsonSchema\Constraints\Factory</parameter>
         <parameter key="nijens_openapi.event_subscriber.json_request_body_validation.class">Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber</parameter>
         <parameter key="nijens_openapi.event_subscriber.json_response_exception.class">Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber</parameter>
         <parameter key="nijens_openapi.service.exception_json_response_builder.class">Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilder</parameter>
@@ -43,7 +44,16 @@
             <argument type="service" id="nijens_openapi.json.dereferencer"/>
         </service>
 
-        <service id="nijens_openapi.json.validator" class="%nijens_openapi.json.validator.class%"/>
+        <service id="nijens_openapi.json.validator" class="%nijens_openapi.json.validator.class%">
+            <argument type="service" id="nijens_openapi.json.validator.factory" />
+        </service>
+
+        <service id="nijens_openapi.json.validator.factory" class="%nijens_openapi.json.validator.factory.class%">
+            <call method="setConstraintClass">
+                <argument>type</argument>
+                <argument>Nijens\OpenapiBundle\Json\Schema\Constraint\TypeConstraint</argument>
+            </call>
+        </service>
 
         <service id="nijens_openapi.event_subscriber.json_request_body_validation" class="%nijens_openapi.event_subscriber.json_request_body_validation.class%">
             <argument type="service" id="nijens_openapi.json.parser"/>
