@@ -33,7 +33,7 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::EXCEPTION => [
-                ['onKernelExceptionTransformToJsonResponse', 10],
+                ['onKernelExceptionTransformToJsonResponse', 0],
             ],
         ];
     }
