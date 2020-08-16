@@ -18,4 +18,8 @@
     <listeners>
         <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
     </listeners>
+
+    <php>
+        <server name="KERNEL_CLASS" value="Nijens\OpenapiBundle\Tests\Functional\App\Kernel"/>
+    </php>
 </phpunit>
