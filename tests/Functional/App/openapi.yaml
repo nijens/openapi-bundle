@@ -59,6 +59,7 @@ paths:
                       - write:pets
                       - read:pets
         post:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\PetController::create'
             tags:
                 - pet
             summary: Add a new pet to the store
