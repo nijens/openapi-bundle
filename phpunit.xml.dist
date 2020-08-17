@@ -6,6 +6,10 @@
     <testsuites>
         <testsuite name="OpenapiBundle">
             <directory>./tests/</directory>
+            <exclude>./tests/Functional</exclude>
+        </testsuite>
+        <testsuite name="OpenapiBundle-functional">
+            <directory>./tests/Functional</directory>
         </testsuite>
     </testsuites>
 
