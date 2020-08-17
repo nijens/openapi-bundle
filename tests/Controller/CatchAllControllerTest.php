@@ -42,17 +42,15 @@ class CatchAllControllerTest extends TestCase
     private $routeCollection;
 
     /**
-     * @var MockObject
+     * @var MockObject|RouterInterface
      */
     private $routerMock;
 
     /**
-     * Creates a new CatchAllController instance for testing.
+     * Creates a new {@see CatchAllController} instance for testing.
      */
     protected function setUp(): void
     {
-        $routeOptions = ['openapi_resource' => 'openapi.json'];
-
         $this->routeCollection = new RouteCollection();
         $this->routeCollection->add(
             'test',
@@ -60,7 +58,7 @@ class CatchAllControllerTest extends TestCase
                 '/test',
                 [],
                 [],
-                $routeOptions,
+                [],
                 '',
                 [],
                 [Request::METHOD_GET]
@@ -71,8 +69,7 @@ class CatchAllControllerTest extends TestCase
             new Route(
                 '/{catchall}',
                 ['_controller' => CatchAllController::CONTROLLER_REFERENCE],
-                ['catchall' => '.+'],
-                $routeOptions
+                ['catchall' => '.+']
             )
         );
 
@@ -95,20 +92,12 @@ class CatchAllControllerTest extends TestCase
             ->method('getContext')
             ->willReturn(new RequestContext());
 
-        $requestMock = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_GET);
-        $requestMock->expects($this->exactly(2))
-            ->method('getPathInfo')
-            ->willReturn('/does-not-exist');
+        $request = Request::create('/does-not-exist');
 
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage("No route found for 'GET /does-not-exist'.");
 
-        $this->controller->throwNoRouteException($requestMock);
+        $this->controller->throwNoRouteException($request);
     }
 
     /**
@@ -126,24 +115,17 @@ class CatchAllControllerTest extends TestCase
             ->method('getContext')
             ->willReturn($requestContext);
 
-        $requestMock = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requestMock->expects($this->exactly(2))
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_POST);
-        $requestMock->expects($this->exactly(3))
-            ->method('getPathInfo')
-            ->willReturn('/test');
+        $request = Request::create('/test', Request::METHOD_POST);
 
         $this->expectException(MethodNotAllowedHttpException::class);
         $this->expectExceptionMessage("No route found for 'POST /test': Method Not Allowed (Allowed: GET).");
 
-        $this->controller->throwNoRouteException($requestMock);
+        $this->controller->throwNoRouteException($request);
     }
 
     /**
-     * Tests if {@see CatchAllController::throwNoRouteException} retains the routes in the original {@see RouteCollection}.
+     * Tests if {@see CatchAllController::throwNoRouteException} retains the routes in the original
+     * {@see RouteCollection}.
      */
     public function testThrowNoRouteExceptionRetrainsTheOriginalRouteCollection(): void
     {
@@ -151,18 +133,10 @@ class CatchAllControllerTest extends TestCase
             ->method('getContext')
             ->willReturn(new RequestContext());
 
-        $requestMock = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $requestMock->expects($this->once())
-            ->method('getMethod')
-            ->willReturn(Request::METHOD_GET);
-        $requestMock->expects($this->exactly(2))
-            ->method('getPathInfo')
-            ->willReturn('/does-not-exist');
+        $request = Request::create('/does-not-exist');
 
         try {
-            $this->controller->throwNoRouteException($requestMock);
+            $this->controller->throwNoRouteException($request);
             $this->fail();
         } catch (NotFoundHttpException | MethodNotAllowedHttpException $exception) {
         }
