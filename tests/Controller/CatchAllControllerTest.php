@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -23,7 +25,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * CatchAllControllerTest.
+ * Tests the {@see CatchAllController}.
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
@@ -47,7 +49,7 @@ class CatchAllControllerTest extends TestCase
     /**
      * Creates a new CatchAllController instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $routeOptions = ['openapi_resource' => 'openapi.json'];
 
@@ -84,20 +86,10 @@ class CatchAllControllerTest extends TestCase
     }
 
     /**
-     * Tests if constructing a new CatchAllController instance sets the instance properties.
-     */
-    public function testConstruct()
-    {
-        $this->assertAttributeSame($this->routerMock, 'router', $this->controller);
-    }
-
-    /**
-     * Tests if CatchAllController::throwNoRouteException throws a NotFoundHttpException
+     * Tests if {@see CatchAllController::throwNoRouteException} throws a {@see NotFoundHttpException}
      * when no route is found.
-     *
-     * @depends testConstruct
      */
-    public function testThrowNoRouteExceptionThrowsNotFoundHttpException()
+    public function testThrowNoRouteExceptionThrowsNotFoundHttpException(): void
     {
         $this->routerMock->expects($this->once())
             ->method('getContext')
@@ -120,12 +112,12 @@ class CatchAllControllerTest extends TestCase
     }
 
     /**
-     * Tests if CatchAllController::throwNoRouteException throws a MethodNotAllowedHttpException
+     * Tests if {@see CatchAllController::throwNoRouteException} throws a {@see MethodNotAllowedHttpException}
      * when a route is found but the request method is not allowed.
      *
      * @depends testThrowNoRouteExceptionThrowsNotFoundHttpException
      */
-    public function testThrowNoRouteExceptionThrowsMethodNotAllowedHttpException()
+    public function testThrowNoRouteExceptionThrowsMethodNotAllowedHttpException(): void
     {
         $requestContext = new RequestContext('', Request::METHOD_POST);
         $requestContext->setPathInfo('/test');
@@ -151,9 +143,9 @@ class CatchAllControllerTest extends TestCase
     }
 
     /**
-     * Tests if CatchAllController::throwNoRouteException retains the routes in the original RouteCollection.
+     * Tests if {@see CatchAllController::throwNoRouteException} retains the routes in the original {@see RouteCollection}.
      */
-    public function testThrowNoRouteExceptionRetrainsTheOriginalRouteCollection()
+    public function testThrowNoRouteExceptionRetrainsTheOriginalRouteCollection(): void
     {
         $this->routerMock->expects($this->once())
             ->method('getContext')

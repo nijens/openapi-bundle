@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -20,7 +22,7 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
- * SchemaLoaderTest.
+ * Tests the {@see SchemaLoader}.
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
@@ -32,19 +34,19 @@ class SchemaLoaderTest extends TestCase
     private $schemaLoader;
 
     /**
-     * @var MockObject
+     * @var MockObject|FileLocatorInterface
      */
     private $fileLocatorMock;
 
     /**
-     * @var MockObject
+     * @var MockObject|DereferencerInterface
      */
     private $dereferencerMock;
 
     /**
-     * Creates a new SchemaLoader instance for testing.
+     * Creates a new {@see SchemaLoader} instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileLocatorMock = $this->getMockBuilder(FileLocatorInterface::class)
             ->getMock();
@@ -56,20 +58,9 @@ class SchemaLoaderTest extends TestCase
     }
 
     /**
-     * Tests if constructing a new SchemaLoader instance sets the instance properties.
+     * Tests if {@see SchemaLoader::load} locates and dereferences an JSON schema file.
      */
-    public function testConstruct()
-    {
-        $this->assertAttributeSame($this->fileLocatorMock, 'fileLocator', $this->schemaLoader);
-        $this->assertAttributeSame($this->dereferencerMock, 'dereferencer', $this->schemaLoader);
-    }
-
-    /**
-     * Tests if SchemaLoader::load locates and dereferences an JSON schema file.
-     *
-     * @depends testConstruct
-     */
-    public function testLoad()
+    public function testLoad(): void
     {
         $dereferenceJson = new stdClass();
         $dereferenceJson->openapi = '3.0.0';
@@ -90,7 +81,7 @@ class SchemaLoaderTest extends TestCase
     }
 
     /**
-     * Tests if SchemaLoader::getFileResource returns a FileResource for a loaded JSON schema file.
+     * Tests if {@see SchemaLoader::getFileResource} returns a {@see FileResource} for a loaded JSON schema file.
      *
      * @depends testLoad
      */
@@ -117,7 +108,7 @@ class SchemaLoaderTest extends TestCase
     }
 
     /**
-     * Tests if SchemaLoader::getFileResource returns for a file not loaded by the SchemaLoader.
+     * Tests if {@see SchemaLoader::getFileResource} returns null for a file not loaded by the {@see SchemaLoader}.
      *
      * @depends testLoad
      */

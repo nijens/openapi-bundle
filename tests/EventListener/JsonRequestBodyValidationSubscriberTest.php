@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -18,17 +20,20 @@ use Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber;
 use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
+use Nijens\OpenapiBundle\Routing\RouteLoader;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Route;
 
 /**
- * JsonRequestBodyValidationSubscriberTest.
+ * Tests the {@see JsonRequestBodyValidationSubscriber}.
  */
 class JsonRequestBodyValidationSubscriberTest extends TestCase
 {
@@ -53,9 +58,9 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     private $jsonValidator;
 
     /**
-     * Creates a new JsonRequestBodyValidationSubscriber instance for testing.
+     * Creates a new {@see JsonRequestBodyValidationSubscriber} instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jsonParserMock = $this->getMockBuilder(JsonParser::class)
             ->disableOriginalConstructor()
@@ -74,9 +79,9 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonRequestBodyValidationSubscriber::getSubscribedEvents returns the list with expected listeners.
+     * Tests if {@see JsonRequestBodyValidationSubscriber::getSubscribedEvents} returns the list with expected listeners.
      */
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $subscribedEvents = JsonRequestBodyValidationSubscriber::getSubscribedEvents();
 
@@ -91,23 +96,11 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if constructing a new JsonRequestBodyValidationSubscriber instance sets the instance properties.
-     */
-    public function testConstruct()
-    {
-        $this->assertAttributeSame($this->jsonParserMock, 'jsonParser', $this->subscriber);
-        $this->assertAttributeSame($this->schemaLoaderMock, 'schemaLoader', $this->subscriber);
-        $this->assertAttributeSame($this->jsonValidator, 'jsonValidator', $this->subscriber);
-    }
-
-    /**
-     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody skips validation when no Route is available.
+     * Tests if {@see JsonRequestBodyValidationSubscriber::validateRequestBody} skips validation when no {@see Route} is available.
      * This could happen when the priority/order of event listeners is changed, as this listener
-     * depends on the output of the RouterListener.
-     *
-     * @depends testConstruct
+     * depends on the output of the {@see RouterListener}.
      */
-    public function testValidateRequestBodySkipsValidationWhenRouteIsNotAvailable()
+    public function testValidateRequestBodySkipsValidationWhenRouteIsNotAvailable(): void
     {
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
@@ -128,14 +121,12 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody skips validation when the Route
-     * does not contain the following OpenAPI options set by the RouteLoader:
+     * Tests if {@see JsonRequestBodyValidationSubscriber::validateRequestBody} skips validation when the {@see Route}
+     * does not contain the following OpenAPI options set by the {@see RouteLoader}:
      * - The path to the OpenAPI specification file.
      * - The JSON pointer to a JSON Schema in the OpenAPI specification.
-     *
-     * @depends testConstruct
      */
-    public function testValidateRequestBodySkipsValidationWhenRouteDoesNotContainOpenApiOptions()
+    public function testValidateRequestBodySkipsValidationWhenRouteDoesNotContainOpenApiOptions(): void
     {
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
@@ -156,13 +147,11 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody skips validation when the Route
-     * does not contain the following OpenAPI options set by the RouteLoader:
+     * Tests if {@see JsonRequestBodyValidationSubscriber::validateRequestBody} skips validation when the {@see Route}
+     * does not contain the following OpenAPI options set by the {@see RouteLoader}:
      * - The JSON pointer to a JSON Schema in the OpenAPI specification.
-     *
-     * @depends testConstruct
      */
-    public function testValidateRequestBodySkipsValidationWhenRouteDoesNotContainValidationPointer()
+    public function testValidateRequestBodySkipsValidationWhenRouteDoesNotContainValidationPointer(): void
     {
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
@@ -186,12 +175,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody throws a InvalidRequestHttpException
+     * Tests if {@see JsonRequestBodyValidationSubscriber::validateRequestBody} throws a {@see InvalidRequestHttpException}
      * when the content-type of the request is not 'application/json'.
-     *
-     * @depends testConstruct
      */
-    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestContentTypeInvalid()
+    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestContentTypeInvalid(): void
     {
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
@@ -219,12 +206,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody throws a InvalidRequestHttpException
+     * Tests if {@see JsonRequestBodyValidationSubscriber::validateRequestBody} throws a {@see InvalidRequestHttpException}
      * when the body of the request is not valid JSON.
-     *
-     * @depends testConstruct
      */
-    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestBodyIsInvalidJson()
+    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestBodyIsInvalidJson(): void
     {
         $requestBody = '{"invalid": "json';
 
@@ -266,12 +251,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody throws a InvalidRequestHttpException
+     * Tests if {@see JsonRequestBodyValidationSubscriber::validateRequestBody} throws a {@see InvalidRequestHttpException}
      * when the body of the request does not validate against the JSON Schema.
-     *
-     * @depends testConstruct
      */
-    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestBodyDoesNotValidateWithJsonSchema()
+    public function testValidateRequestBodyThrowsInvalidRequestHttpExceptionWhenRequestBodyDoesNotValidateWithJsonSchema(): void
     {
         $requestBody = '{"invalid": "json"}';
 
@@ -330,10 +313,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonRequestBodyValidationSubscriber::validateRequestBody does not throw exceptions
+     * Tests if {@see JsonRequestBodyValidationSubscriber::validateRequestBody} does not throw exceptions
      * on successful validation.
      */
-    public function testValidateRequestBodySuccessful()
+    public function testValidateRequestBodySuccessful(): void
     {
         $requestBody = '{"name": "Dog"}';
 

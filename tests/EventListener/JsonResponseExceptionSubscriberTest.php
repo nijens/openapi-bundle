@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -20,10 +22,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
- * JsonResponseExceptionSubscriberTest.
+ * Tests the {@see JsonResponseExceptionSubscriber}.
  */
 class JsonResponseExceptionSubscriberTest extends TestCase
 {
@@ -33,19 +34,14 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     private $subscriber;
 
     /**
-     * @var MockObject|RouterInterface
-     */
-    private $routerMock;
-
-    /**
      * @var MockObject|ExceptionJsonResponseBuilderInterface
      */
     private $responseBuilderMock;
 
     /**
-     * Creates a new JsonResponseExceptionSubscriber instance for testing.
+     * Creates a new {@see JsonResponseExceptionSubscriber} instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->responseBuilderMock = $this->getMockBuilder(ExceptionJsonResponseBuilderInterface::class)
             ->getMock();
@@ -54,9 +50,9 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonResponseExceptionSubscriber::getSubscribedEvents returns the list with expected listeners.
+     * Tests if {@see JsonResponseExceptionSubscriber::getSubscribedEvents} returns the list with expected listeners.
      */
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $subscribedEvents = JsonResponseExceptionSubscriber::getSubscribedEvents();
 
@@ -71,20 +67,10 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if constructing a new JsonResponseExceptionSubscriber instance sets the instance properties.
+     * Tests if {@see JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse}
+     * sets no response on the event when no Route is found in the {@see RouteCollection}.
      */
-    public function testConstruct()
-    {
-        $this->assertAttributeSame($this->responseBuilderMock, 'responseBuilder', $this->subscriber);
-    }
-
-    /**
-     * Tests if JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse
-     * sets no response on the event when no Route is found in the RouteCollection.
-     *
-     * @depends testConstruct
-     */
-    public function testOnKernelExceptionTransformToJsonResponseDoesNothingWhenRouteIsNotFoundInCollection()
+    public function testOnKernelExceptionTransformToJsonResponseDoesNothingWhenRouteIsNotFoundInCollection(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'not_in_collection');
@@ -104,12 +90,10 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse
+     * Tests if {@see JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse}
      * sets no response on the event when the Route does not have the 'openapi_resource' option set.
-     *
-     * @depends testConstruct
      */
-    public function testOnKernelExceptionTransformToJsonResponseDoesNothingWhenRouteIsNotAnOpenapiRoute()
+    public function testOnKernelExceptionTransformToJsonResponseDoesNothingWhenRouteIsNotAnOpenapiRoute(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'no_openapi_route');
@@ -129,12 +113,10 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     }
 
     /**
-     * Tests if JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse
+     * Tests if {@see JsonResponseExceptionSubscriber::onKernelExceptionTransformToJsonResponse}
      * sets a response when the Route does have the 'openapi_resource' option set.
-     *
-     * @depends testConstruct
      */
-    public function testOnKernelExceptionTransformToJsonResponseSetsResponseWhenRouteIsAnOpenapiRoute()
+    public function testOnKernelExceptionTransformToJsonResponseSetsResponseWhenRouteIsAnOpenapiRoute(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'openapi_route');

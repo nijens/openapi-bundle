@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -22,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
- * RouteLoaderTest.
+ * Tests the {@see RouteLoader}.
  */
 class RouteLoaderTest extends TestCase
 {
@@ -37,9 +39,9 @@ class RouteLoaderTest extends TestCase
     private $schemaLoader;
 
     /**
-     * Creates a new RouteLoader for testing.
+     * Creates a new {@see RouteLoader} for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $fileLocator = new FileLocator([
             __DIR__.'/../Resources/specifications/',
@@ -53,25 +55,17 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Tests if constructing a new RouteLoader sets the instance properties.
+     * Tests if {@see RouteLoader::supports} only supports the openapi resource type.
      */
-    public function testConstruct()
-    {
-        $this->assertAttributeSame($this->schemaLoader, 'schemaLoader', $this->routeLoader);
-    }
-
-    /**
-     * Tests if RouteLoader::supports only supports the openapi resource type.
-     */
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->routeLoader->supports('route-loader-minimal.json', 'openapi'));
     }
 
     /**
-     * Tests if RouteLoader::load loads the JSON path items and operations as routes.
+     * Tests if {@see RouteLoader::load} loads the JSON path items and operations as routes.
      */
-    public function testLoadMinimalFromJson()
+    public function testLoadMinimalFromJson(): void
     {
         $routes = $this->routeLoader->load('route-loader-minimal.json', 'openapi');
         $route = $routes->get('pets_get');
@@ -84,9 +78,9 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Tests if RouteLoader::load loads the YAML path items and operations as routes.
+     * Tests if {@see RouteLoader::load} loads the YAML path items and operations as routes.
      */
-    public function testLoadMinimalFromYaml()
+    public function testLoadMinimalFromYaml(): void
     {
         $routes = $this->routeLoader->load('route-loader-minimal.yaml', 'openapi');
         $route = $routes->get('pets_get');
@@ -99,9 +93,9 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Tests if RouteLoader::load loads the YML path items and operations as routes.
+     * Tests if {@see RouteLoader::load} loads the YML path items and operations as routes.
      */
-    public function testLoadMinimalFromYml()
+    public function testLoadMinimalFromYml(): void
     {
         $routes = $this->routeLoader->load('route-loader-minimal.yml', 'openapi');
         $route = $routes->get('pets_get');
@@ -114,21 +108,21 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Tests if RouteLoader::load throws an exception when resource does not have a valid YAML or JSON extension.
+     * Tests if {@see RouteLoader::load} throws an exception when resource does not have a valid YAML or JSON extension.
      */
-    public function testLoadFromUnsupportedExtension()
+    public function testLoadFromUnsupportedExtension(): void
     {
         $this->expectException(FileLoaderLoadException::class);
         $this->routeLoader->load('route-loader-minimal.txt', 'openapi');
     }
 
     /**
-     * Tests if RouteLoader::load adds a 'openapi_json_request_validation_pointer' option
+     * Tests if {@see RouteLoader::load} adds a 'openapi_json_request_validation_pointer' option
      * when the request body of an operation can be validated.
      *
      * @depends testLoadMinimalFromJson
      */
-    public function testLoadWithValidationPointer()
+    public function testLoadWithValidationPointer(): void
     {
         $routes = $this->routeLoader->load('route-loader-validation-pointer.json', 'openapi');
         $route = $routes->get('pets_put');
@@ -141,12 +135,12 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Tests if RouteLoader::load adds a '_controller' default
+     * Tests if {@see RouteLoader::load} adds a '_controller' default
      * when the 'x-symfony-controller' property of an operation is set.
      *
      * @depends testLoadMinimalFromJson
      */
-    public function testLoadWithSymfonyControllerConfigured()
+    public function testLoadWithSymfonyControllerConfigured(): void
     {
         $routes = $this->routeLoader->load('route-loader-symfony-controller.json', 'openapi');
         $route = $routes->get('pets_uuid_put');

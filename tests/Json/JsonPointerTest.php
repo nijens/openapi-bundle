@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -16,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 use stdClass;
 
 /**
- * JsonPointerTest.
+ * Tests the {@see JsonPointer}.
  */
 class JsonPointerTest extends TestCase
 {
@@ -26,25 +28,25 @@ class JsonPointerTest extends TestCase
     private $jsonPointer;
 
     /**
-     * Creates a new JsonPointer instance for testing.
+     * Creates a new {@see JsonPointer} instance for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->jsonPointer = new JsonPointer(new stdClass());
     }
 
     /**
-     * Tests if JsonPointer::escape escapes the ~ and / characters.
+     * Tests if {@see JsonPointer::escape} escapes the ~ and / characters.
      *
      * @dataProvider provideEscapeTestCases
      */
-    public function testEscape(string $expectedResult, string $value)
+    public function testEscape(string $expectedResult, string $value): void
     {
         $this->assertSame($expectedResult, $this->jsonPointer->escape($value));
     }
 
     /**
-     * Returns a list with test cases for @see testEscape.
+     * Returns a list with test cases for {@see testEscape}.
      */
     public function provideEscapeTestCases(): array
     {
