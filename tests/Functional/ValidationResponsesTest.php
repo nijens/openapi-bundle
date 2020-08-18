@@ -61,10 +61,12 @@ class ValidationResponsesTest extends WebTestCase
             ],
         ];
 
-        self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $response = $this->client->getResponse();
+
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         self::assertJsonStringEqualsJsonString(
             json_encode($expectedJsonResponseBody),
-            $this->client->getResponse()->getContent()
+            $response->getContent()
         );
     }
 
@@ -93,10 +95,12 @@ class ValidationResponsesTest extends WebTestCase
             ],
         ];
 
-        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response = $this->client->getResponse();
+
+        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
         self::assertJsonStringEqualsJsonString(
             json_encode($expectedJsonResponseBody),
-            $this->client->getResponse()->getContent()
+            $response->getContent()
         );
     }
 
@@ -133,7 +137,9 @@ class ValidationResponsesTest extends WebTestCase
             ],
         ];
 
-        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $response = $this->client->getResponse();
+
+        self::assertSame(Response::HTTP_CREATED, $response->getStatusCode());
         self::assertJsonStringEqualsJsonString(
             json_encode($expectedJsonResponseBody),
             $this->client->getResponse()->getContent()

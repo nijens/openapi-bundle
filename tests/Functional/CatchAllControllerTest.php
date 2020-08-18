@@ -57,11 +57,12 @@ class CatchAllControllerTest extends WebTestCase
             'message' => "No route found for 'GET /api/does-not-exist'.",
         ];
 
-        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        self::assertRouteSame('api_catch_all');
+        $response = $this->client->getResponse();
+
+        self::assertSame(Response::HTTP_NOT_FOUND, $response->getStatusCode(), $response->getContent());
         self::assertJsonStringEqualsJsonString(
             json_encode($expectedJsonResponseBody),
-            $this->client->getResponse()->getContent()
+            $response->getContent()
         );
     }
 
@@ -85,10 +86,12 @@ class CatchAllControllerTest extends WebTestCase
             'message' => "No route found for 'GET /api/pet': Method Not Allowed (Allowed: PUT, POST).",
         ];
 
-        self::assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
+        $response = $this->client->getResponse();
+
+        self::assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $response->getStatusCode());
         self::assertJsonStringEqualsJsonString(
             json_encode($expectedJsonResponseBody),
-            $this->client->getResponse()->getContent()
+            $response->getContent()
         );
     }
 }

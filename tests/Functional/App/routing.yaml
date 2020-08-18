@@ -2,4 +2,3 @@ api:
     prefix: /api
     resource: openapi.yaml
     type: openapi
-    name_prefix: "api_"
