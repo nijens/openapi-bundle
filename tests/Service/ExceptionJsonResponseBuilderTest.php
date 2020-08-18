@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -13,13 +15,14 @@ namespace Nijens\OpenapiBundle\Tests\Service;
 
 use Exception;
 use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
+use Nijens\OpenapiBundle\Exception\HttpExceptionInterface;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * ExceptionJsonResponseBuilderTest.
+ * Tests the {@see ExceptionJsonResponseBuilder}.
  */
 class ExceptionJsonResponseBuilderTest extends TestCase
 {
@@ -29,28 +32,18 @@ class ExceptionJsonResponseBuilderTest extends TestCase
     private $builder;
 
     /**
-     * {@inheritdoc}
+     * Creates a new {@see ExceptionJsonResponseBuilder} for testing.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = new ExceptionJsonResponseBuilder(false);
     }
 
     /**
-     * Tests if constructing a new JsonExceptionResponseBuilder instance sets the instance properties.
+     * Tests if {@see JsonExceptionResponseBuilder::build} builds a response with 'Unexpected error' message for
+     * non-HTTP exceptions and not the actual error message, as that might expose private information.
      */
-    public function testConstruct()
-    {
-        $this->assertAttributeSame(false, 'debugMode', $this->builder);
-    }
-
-    /**
-     * Tests if JsonExceptionResponseBuilder::build builds a response with 'Unexpected error' message for non-http
-     * exceptions and not the actual error message, as that might expose private information.
-     *
-     * @depends testConstruct
-     */
-    public function testBuildReturnsJsonResponseWithUnexpectedErrorMessage()
+    public function testBuildReturnsJsonResponseWithUnexpectedErrorMessage(): void
     {
         $response = $this->builder->build(new Exception('This message should not be visible.'));
 
@@ -60,11 +53,10 @@ class ExceptionJsonResponseBuilderTest extends TestCase
     }
 
     /**
-     * Tests if JsonExceptionResponseBuilder::build builds a response with the message and status of the http exception.
-     *
-     * @depends testConstruct
+     * Tests if {@see JsonExceptionResponseBuilder::build} builds a response with the message and status of
+     * the HTTP exception.
      */
-    public function testBuildReturnsJsonResponseWithExceptionMessage()
+    public function testBuildReturnsJsonResponseWithExceptionMessage(): void
     {
         $response = $this->builder->build(
             new BadJsonRequestHttpException(
@@ -82,12 +74,10 @@ class ExceptionJsonResponseBuilderTest extends TestCase
     }
 
     /**
-     * Tests if JsonExceptionResponseBuilder::build builds a response with the message of any exception when debug mode
-     * is active.
-     *
-     * @depends testConstruct
+     * Tests if {@see JsonExceptionResponseBuilder::build} builds a response with the message of any exception when
+     * debug mode is active.
      */
-    public function testBuildReturnsJsonResponseWithExceptionMessageInDebugMode()
+    public function testBuildReturnsJsonResponseWithExceptionMessageInDebugMode(): void
     {
         $builder = new ExceptionJsonResponseBuilder(true);
         $response = $builder->build(new Exception('This message should be visible in debug mode.'));
@@ -98,12 +88,10 @@ class ExceptionJsonResponseBuilderTest extends TestCase
     }
 
     /**
-     * Tests if JsonExceptionResponseBuilder::build builds a response with simplified error messages within an
-     * OpenapiBundle HttpExceptionInterface exception.
-     *
-     * @depends testConstruct
+     * Tests if {@see JsonExceptionResponseBuilder::build} builds a response with simplified error messages within an
+     * OpenapiBundle {@see HttpExceptionInterface} exception.
      */
-    public function testBuildReturnsJsonResponseContainingSimplifiedOpenapiErrorMessages()
+    public function testBuildReturnsJsonResponseContainingSimplifiedOpenapiErrorMessages(): void
     {
         $exception = new InvalidRequestHttpException('An overall error message.');
         $exception->setErrors([
@@ -115,6 +103,9 @@ class ExceptionJsonResponseBuilderTest extends TestCase
 
         $this->assertInstanceOf(JsonResponse::class, $response);
         $this->assertSame($exception->getStatusCode(), $response->getStatusCode());
-        $this->assertSame('{"message":"An overall error message.","errors":["An additional error message.","Another additional error message."]}', $response->getContent());
+        $this->assertSame(
+            '{"message":"An overall error message.","errors":["An additional error message.","Another additional error message."]}',
+            $response->getContent()
+        );
     }
 }

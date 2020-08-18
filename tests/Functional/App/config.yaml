@@ -1,0 +1,20 @@
+framework:
+    secret: secret
+    test: true
+
+    router:
+        strict_requirements: true
+
+    session:
+        handler_id: ~
+        storage_id: session.storage.mock_file
+
+    profiler:
+        collect: false
+
+services:
+    logger:
+        class: Symfony\Component\HttpKernel\Log\Logger
+        arguments:
+            - ~
+            - '%kernel.logs_dir%/%kernel.environment%.log'

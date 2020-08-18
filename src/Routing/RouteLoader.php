@@ -173,9 +173,11 @@ class RouteLoader extends Loader
     {
         $catchAllRoute = new Route(
             '/{catchall}',
-            ['_controller' => CatchAllController::CONTROLLER_REFERENCE],
-            ['catchall' => '.+'],
-            ['openapi_resource' => $resource]
+            [
+                '_controller' => CatchAllController::CONTROLLER_REFERENCE,
+                '_nijens_openapi' => ['openapi_resource' => $resource],
+            ],
+            ['catchall' => '.*']
         );
 
         $collection->add('catch_all', $catchAllRoute);

@@ -33,7 +33,7 @@ class CatchAllController
      *
      * @var string
      */
-    public const CONTROLLER_REFERENCE = 'nijens_openapi.controller.catch_all::throwNoRouteException';
+    public const CONTROLLER_REFERENCE = 'nijens_openapi.controller.catch_all';
 
     /**
      * @var RouterInterface
@@ -54,7 +54,7 @@ class CatchAllController
      * @throws NotFoundHttpException         when the route could not be found
      * @throws MethodNotAllowedHttpException when the route was found but the request method is not allowed
      */
-    public function throwNoRouteException(Request $request)
+    public function __invoke(Request $request)
     {
         $exceptionMessage = sprintf("No route found for '%s %s'.", $request->getMethod(), $request->getPathInfo());
         $exception = new NotFoundHttpException($exceptionMessage);

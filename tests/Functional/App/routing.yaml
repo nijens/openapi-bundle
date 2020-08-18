@@ -1,0 +1,4 @@
+api:
+    prefix: /api
+    resource: openapi.yaml
+    type: openapi
