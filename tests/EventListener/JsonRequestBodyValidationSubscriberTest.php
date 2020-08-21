@@ -266,7 +266,7 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->schemaLoaderMock->expects($this->once())
             ->method('load')
             ->with(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
-            ->willReturn($schemaLoaderDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
+            ->willReturn(json_decode(json_encode($schemaLoaderDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'))));
 
         /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
