@@ -39,8 +39,23 @@
 
         <service id="nijens_openapi.json.dereferencer.serializer" class="%nijens_openapi.json.dereferencer.serializer.class%"/>
 
+        <service id="Nijens\OpenapiBundle\Json\Loader\LoaderInterface" alias="Nijens\OpenapiBundle\Json\Loader\ChainLoader"/>
+
+        <service id="Nijens\OpenapiBundle\Json\Loader\ChainLoader">
+            <argument type="tagged_iterator" tag="nijens_openapi.json.loader"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Json\Loader\JsonLoader">
+            <tag name="nijens_openapi.json.loader"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Json\Loader\YamlLoader">
+            <tag name="nijens_openapi.json.loader"/>
+        </service>
+
         <service id="nijens_openapi.json.schema_loader" class="%nijens_openapi.json.schema_loader.class%">
             <argument type="service" id="file_locator"/>
+            <argument type="service" id="Nijens\OpenapiBundle\Json\Loader\ChainLoader"/>
             <argument type="service" id="nijens_openapi.json.dereferencer"/>
         </service>
 

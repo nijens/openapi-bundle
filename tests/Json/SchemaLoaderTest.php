@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Nijens\OpenapiBundle\Tests\Json;
 
 use League\JsonReference\DereferencerInterface;
+use Nijens\OpenapiBundle\Json\Loader\LoaderInterface;
 use Nijens\OpenapiBundle\Json\SchemaLoader;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -39,6 +40,11 @@ class SchemaLoaderTest extends TestCase
     private $fileLocatorMock;
 
     /**
+     * @var MockObject|LoaderInterface
+     */
+    private $loaderMock;
+
+    /**
      * @var MockObject|DereferencerInterface
      */
     private $dereferencerMock;
@@ -48,13 +54,15 @@ class SchemaLoaderTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->fileLocatorMock = $this->getMockBuilder(FileLocatorInterface::class)
-            ->getMock();
+        $this->fileLocatorMock = $this->createMock(FileLocatorInterface::class);
+        $this->loaderMock = $this->createMock(LoaderInterface::class);
+        $this->dereferencerMock = $this->createMock(DereferencerInterface::class);
 
-        $this->dereferencerMock = $this->getMockBuilder(DereferencerInterface::class)
-            ->getMock();
-
-        $this->schemaLoader = new SchemaLoader($this->fileLocatorMock, $this->dereferencerMock);
+        $this->schemaLoader = new SchemaLoader(
+            $this->fileLocatorMock,
+            $this->loaderMock,
+            $this->dereferencerMock
+        );
     }
 
     /**
@@ -70,9 +78,14 @@ class SchemaLoaderTest extends TestCase
             ->with('openapi.json')
             ->willReturn('config/openapi.json');
 
+        $this->loaderMock->expects($this->once())
+            ->method('load')
+            ->with('config/openapi.json')
+            ->willReturn($dereferenceJson);
+
         $this->dereferencerMock->expects($this->once())
             ->method('dereference')
-            ->with('file://config/openapi.json')
+            ->with($dereferenceJson)
             ->willReturn($dereferenceJson);
 
         $schema = $this->schemaLoader->load('openapi.json');
@@ -95,9 +108,12 @@ class SchemaLoaderTest extends TestCase
             ->with('route-loader-minimal.json')
             ->willReturn(__DIR__.'/../Resources/specifications/route-loader-minimal.json');
 
-        $this->dereferencerMock->expects($this->once())
+        $this->loaderMock->expects($this->any())
+            ->method('load')
+            ->willReturn($dereferenceJson);
+
+        $this->dereferencerMock->expects($this->any())
             ->method('dereference')
-            ->with('file://'.__DIR__.'/../Resources/specifications/route-loader-minimal.json')
             ->willReturn($dereferenceJson);
 
         $this->schemaLoader->load('route-loader-minimal.json');

@@ -15,13 +15,17 @@ namespace Nijens\OpenapiBundle\Tests\Routing;
 
 use League\JsonReference\Dereferencer;
 use League\JsonReference\ReferenceSerializer\InlineReferenceSerializer;
+use Nijens\OpenapiBundle\Json\Exception\LoaderLoadException;
+use Nijens\OpenapiBundle\Json\Loader\ChainLoader;
+use Nijens\OpenapiBundle\Json\Loader\JsonLoader;
+use Nijens\OpenapiBundle\Json\Loader\YamlLoader;
 use Nijens\OpenapiBundle\Json\SchemaLoader;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Exception\FileLoaderLoadException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Tests the {@see RouteLoader}.
@@ -46,10 +50,10 @@ class RouteLoaderTest extends TestCase
         $fileLocator = new FileLocator([
             __DIR__.'/../Resources/specifications/',
         ]);
-
+        $loader = new ChainLoader([new JsonLoader(), new YamlLoader()]);
         $dereferencer = new Dereferencer(null, new InlineReferenceSerializer());
 
-        $this->schemaLoader = new SchemaLoader($fileLocator, $dereferencer);
+        $this->schemaLoader = new SchemaLoader($fileLocator, $loader, $dereferencer);
 
         $this->routeLoader = new RouteLoader($this->schemaLoader);
     }
@@ -112,7 +116,7 @@ class RouteLoaderTest extends TestCase
      */
     public function testLoadFromUnsupportedExtension(): void
     {
-        $this->expectException(FileLoaderLoadException::class);
+        $this->expectException(LoaderLoadException::class);
         $this->routeLoader->load('route-loader-minimal.txt', 'openapi');
     }
 
