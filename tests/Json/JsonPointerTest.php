@@ -15,6 +15,7 @@ namespace Nijens\OpenapiBundle\Tests\Json;
 
 use Nijens\OpenapiBundle\Json\Exception\InvalidJsonPointerException;
 use Nijens\OpenapiBundle\Json\JsonPointer;
+use Nijens\OpenapiBundle\Json\Reference;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -78,6 +79,34 @@ class JsonPointerTest extends TestCase
         $json = $this->jsonPointer->get($pointer);
 
         self::assertJsonStringEqualsJsonString(json_encode($expectedJson), json_encode($json));
+    }
+
+    /**
+     * Tests if {@see JsonPointer::get} returns the expected JSON for the JSON pointer
+     * which points at a {@see Reference} instance that should be resolved to JSON.
+     */
+    public function testGetReferenceResolving(): void
+    {
+        $json = (object) ['foo' => null, 'bar' => (object) ['baz' => 'qux']];
+        $json->foo = new Reference('#/bar/baz', $json);
+
+        $jsonPointer = $this->jsonPointer->withJson($json);
+
+        self::assertSame('qux', $jsonPointer->get('#/foo'));
+    }
+
+    /**
+     * Tests if {@see JsonPointer::get} returns the expected JSON for the JSON pointer
+     * passing through a {@see Reference} instance that should be resolved to JSON.
+     */
+    public function testGetPassingThroughResolvedReference(): void
+    {
+        $json = (object) ['foo' => null, 'bar' => (object) ['baz' => 'qux']];
+        $json->foo = new Reference('#/bar', $json);
+
+        $jsonPointer = $this->jsonPointer->withJson($json);
+
+        self::assertSame('qux', $jsonPointer->get('#/foo/baz'));
     }
 
     /**

@@ -118,6 +118,8 @@ class JsonPointer implements JsonPointerInterface
 
         $pointerSegments = $this->splitPointerIntoSegments($pointer);
         foreach ($pointerSegments as $pointerSegment) {
+            $json = &$this->resolveReference($json);
+
             if (is_object($json) && property_exists($json, $pointerSegment)) {
                 $json = &$json->{$pointerSegment};
 
@@ -132,6 +134,8 @@ class JsonPointer implements JsonPointerInterface
 
             throw new InvalidJsonPointerException(sprintf('The JSON pointer "%s" does not exist.', $pointer));
         }
+
+        $json = &$this->resolveReference($json);
 
         return $json;
     }
@@ -162,5 +166,22 @@ class JsonPointer implements JsonPointerInterface
             array_keys(self::ESCAPE_CHARACTERS),
             $value
         );
+    }
+
+    /**
+     * Resolves the reference when the provided JSON is a {@see Reference} instance.
+     *
+     * @param mixed $json
+     *
+     * @return mixed
+     */
+    private function &resolveReference(&$json)
+    {
+        if ($json instanceof Reference) {
+            $jsonPointer = $this->withJson($json->getJsonSchema());
+            $json = &$jsonPointer->getByReference($json->getPointer());
+        }
+
+        return $json;
     }
 }
