@@ -7,8 +7,6 @@
         <parameter key="nijens_openapi.controller.catch_all.class">Nijens\OpenapiBundle\Controller\CatchAllController</parameter>
         <parameter key="nijens_openapi.routing.loader.class">Nijens\OpenapiBundle\Routing\RouteLoader</parameter>
         <parameter key="nijens_openapi.json.parser.class">Seld\JsonLint\JsonParser</parameter>
-        <parameter key="nijens_openapi.json.dereferencer.class">League\JsonReference\Dereferencer</parameter>
-        <parameter key="nijens_openapi.json.dereferencer.serializer.class">League\JsonReference\ReferenceSerializer\InlineReferenceSerializer</parameter>
         <parameter key="nijens_openapi.json.schema_loader.class">Nijens\OpenapiBundle\Json\SchemaLoader</parameter>
         <parameter key="nijens_openapi.json.validator.class">JsonSchema\Validator</parameter>
         <parameter key="nijens_openapi.json.validator.factory.class">JsonSchema\Constraints\Factory</parameter>
@@ -32,13 +30,6 @@
 
         <service id="nijens_openapi.json.parser" class="%nijens_openapi.json.parser.class%"/>
 
-        <service id="nijens_openapi.json.dereferencer" class="%nijens_openapi.json.dereferencer.class%">
-            <argument>null</argument>
-            <argument type="service" id="nijens_openapi.json.dereferencer.serializer"/>
-        </service>
-
-        <service id="nijens_openapi.json.dereferencer.serializer" class="%nijens_openapi.json.dereferencer.serializer.class%"/>
-
         <service id="Nijens\OpenapiBundle\Json\Loader\LoaderInterface" alias="Nijens\OpenapiBundle\Json\Loader\ChainLoader"/>
 
         <service id="Nijens\OpenapiBundle\Json\Loader\ChainLoader">
@@ -53,10 +44,21 @@
             <tag name="nijens_openapi.json.loader"/>
         </service>
 
+        <service id="Nijens\OpenapiBundle\Json\JsonPointerInterface" alias="Nijens\OpenapiBundle\Json\JsonPointer"/>
+
+        <service id="Nijens\OpenapiBundle\Json\JsonPointer"/>
+
+        <service id="Nijens\OpenapiBundle\Json\DereferencerInterface" alias="Nijens\OpenapiBundle\Json\Dereferencer"/>
+
+        <service id="Nijens\OpenapiBundle\Json\Dereferencer">
+            <argument type="service" id="Nijens\OpenapiBundle\Json\JsonPointer"/>
+            <argument type="service" id="Nijens\OpenapiBundle\Json\Loader\LoaderInterface"/>
+        </service>
+
         <service id="nijens_openapi.json.schema_loader" class="%nijens_openapi.json.schema_loader.class%">
             <argument type="service" id="file_locator"/>
-            <argument type="service" id="Nijens\OpenapiBundle\Json\Loader\ChainLoader"/>
-            <argument type="service" id="nijens_openapi.json.dereferencer"/>
+            <argument type="service" id="Nijens\OpenapiBundle\Json\Loader\LoaderInterface"/>
+            <argument type="service" id="Nijens\OpenapiBundle\Json\DereferencerInterface"/>
         </service>
 
         <service id="nijens_openapi.json.validator" class="%nijens_openapi.json.validator.class%">

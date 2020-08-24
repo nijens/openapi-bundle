@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Json;
 
-use League\JsonReference\DereferencerInterface;
+use Nijens\OpenapiBundle\Json\DereferencerInterface;
 use Nijens\OpenapiBundle\Json\Loader\LoaderInterface;
 use Nijens\OpenapiBundle\Json\SchemaLoader;
 use PHPUnit\Framework\MockObject\MockObject;

@@ -11,7 +11,6 @@
 
 namespace Nijens\OpenapiBundle\Json;
 
-use League\JsonReference\DereferencerInterface;
 use Nijens\OpenapiBundle\Json\Loader\LoaderInterface;
 use stdClass;
 use Symfony\Component\Config\FileLocatorInterface;
@@ -69,9 +68,7 @@ class SchemaLoader implements SchemaLoaderInterface
 
         if (isset($this->schemas[$locatedFile]) === false) {
             $schema = $this->loader->load($locatedFile);
-
-            $schema = $this->dereferencer->dereference($schema);
-            $dereferencedSchema = json_decode(json_encode($schema));
+            $dereferencedSchema = $this->dereferencer->dereference($schema);
 
             $this->schemas[$locatedFile] = $dereferencedSchema;
         }

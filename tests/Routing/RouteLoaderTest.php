@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Routing;
 
-use League\JsonReference\Dereferencer;
-use League\JsonReference\ReferenceSerializer\InlineReferenceSerializer;
+use Nijens\OpenapiBundle\Json\Dereferencer;
 use Nijens\OpenapiBundle\Json\Exception\LoaderLoadException;
+use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\Loader\ChainLoader;
 use Nijens\OpenapiBundle\Json\Loader\JsonLoader;
 use Nijens\OpenapiBundle\Json\Loader\YamlLoader;
@@ -25,7 +25,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Tests the {@see RouteLoader}.
@@ -38,11 +37,6 @@ class RouteLoaderTest extends TestCase
     private $routeLoader;
 
     /**
-     * @var SchemaLoader
-     */
-    private $schemaLoader;
-
-    /**
      * Creates a new {@see RouteLoader} for testing.
      */
     protected function setUp(): void
@@ -51,11 +45,11 @@ class RouteLoaderTest extends TestCase
             __DIR__.'/../Resources/specifications/',
         ]);
         $loader = new ChainLoader([new JsonLoader(), new YamlLoader()]);
-        $dereferencer = new Dereferencer(null, new InlineReferenceSerializer());
+        $dereferencer = new Dereferencer(new JsonPointer(), $loader);
 
-        $this->schemaLoader = new SchemaLoader($fileLocator, $loader, $dereferencer);
+        $schemaLoader = new SchemaLoader($fileLocator, $loader, $dereferencer);
 
-        $this->routeLoader = new RouteLoader($this->schemaLoader);
+        $this->routeLoader = new RouteLoader($schemaLoader);
     }
 
     /**
