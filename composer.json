@@ -13,7 +13,6 @@
         "php": "^7.1",
         "ext-json": "*",
         "justinrainbow/json-schema": "^5.2",
-        "league/json-reference": "^1.1",
         "league/uri": "^6.3",
         "seld/jsonlint": "^1.7",
         "symfony/config": "^3.4 || ^4.0",
