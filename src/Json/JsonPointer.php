@@ -78,6 +78,14 @@ class JsonPointer implements JsonPointerInterface
     /**
      * {@inheritdoc}
      */
+    public function &getByReference(string $pointer)
+    {
+        return $this->traverseJson($pointer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function escape(string $value): string
     {
         return str_replace(

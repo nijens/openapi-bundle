@@ -43,6 +43,15 @@ interface JsonPointerInterface
     public function get(string $pointer);
 
     /**
+     * Returns the result found by the JSON pointer as reference.
+     *
+     * @return mixed
+     *
+     * @throws InvalidJsonPointerException when the JSON pointer does not exist
+     */
+    public function &getByReference(string $pointer);
+
+    /**
      * Escapes the ~ and / characters within the value for use within a JSON pointer.
      */
     public function escape(string $value): string;
