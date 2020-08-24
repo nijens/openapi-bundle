@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Nijens\OpenapiBundle\Tests\EventListener;
 
 use JsonSchema\Validator;
-use League\JsonReference\Dereferencer;
-use League\JsonReference\ReferenceSerializer\InlineReferenceSerializer;
 use Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber;
 use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
@@ -261,12 +259,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $schemaLoaderDereferencer = new Dereferencer(null, new InlineReferenceSerializer());
-
         $this->schemaLoaderMock->expects($this->once())
             ->method('load')
             ->with(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
-            ->willReturn(json_decode(json_encode($schemaLoaderDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'))));
+            ->willReturn(json_decode(file_get_contents(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')));
 
         /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
@@ -323,12 +319,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $schemaLoaderDereferencer = new Dereferencer(null, new InlineReferenceSerializer());
-
         $this->schemaLoaderMock->expects($this->once())
             ->method('load')
             ->with(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')
-            ->willReturn($schemaLoaderDereferencer->dereference('file://'.__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json'));
+            ->willReturn(json_decode(file_get_contents(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')));
 
         /** @var MockObject|HttpKernelInterface $kernelMock */
         $kernelMock = $this->getMockBuilder(HttpKernelInterface::class)
