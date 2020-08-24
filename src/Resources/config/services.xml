@@ -33,7 +33,7 @@
         <service id="Nijens\OpenapiBundle\Json\Loader\LoaderInterface" alias="Nijens\OpenapiBundle\Json\Loader\ChainLoader"/>
 
         <service id="Nijens\OpenapiBundle\Json\Loader\ChainLoader">
-            <argument type="tagged_iterator" tag="nijens_openapi.json.loader"/>
+            <argument type="tagged" tag="nijens_openapi.json.loader"/>
         </service>
 
         <service id="Nijens\OpenapiBundle\Json\Loader\JsonLoader">
