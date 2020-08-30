@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -11,64 +13,175 @@
 
 namespace Nijens\OpenapiBundle\Json;
 
-use League\JsonReference\Pointer;
-use League\JsonReference\Reference;
+use Nijens\OpenapiBundle\Json\Exception\InvalidJsonPointerException;
 use stdClass;
 
 /**
- * JSON Pointer wrapper.
+ * JSON Pointer.
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class JsonPointer
+class JsonPointer implements JsonPointerInterface
 {
-    /**
-     * @var Pointer
-     */
-    private $pointer;
-
     /**
      * @var array
      */
-    private $escapeCharacters = [
+    private const ESCAPE_CHARACTERS = [
         '~' => '~0',
         '/' => '~1',
     ];
 
     /**
-     * Constructs a new JsonPointer instance.
+     * @var stdClass
      */
-    public function __construct(stdClass $json)
+    private $json;
+
+    /**
+     * Constructs a new {@see JsonPointer} instance.
+     */
+    public function __construct(?stdClass $json = null)
     {
-        $this->pointer = new Pointer($json);
+        $this->json = $json;
     }
 
     /**
-     * Returns the JSON found by the pointer.
-     *
-     * @return mixed
-     *
-     * @throws InvalidPointerException when the JSON pointer does not exist
+     * {@inheritdoc}
+     */
+    public function withJson(stdClass $json): JsonPointerInterface
+    {
+        return new self($json);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function has(string $pointer): bool
+    {
+        try {
+            $this->traverseJson($pointer);
+
+            return true;
+        } catch (InvalidJsonPointerException $exception) {
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function get(string $pointer)
     {
-        $json = $this->pointer->get($pointer);
-        if ($json instanceof Reference) {
-            $json = $json->resolve();
+        return $this->traverseJson($pointer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &getByReference(string $pointer)
+    {
+        return $this->traverseJson($pointer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function escape(string $value): string
+    {
+        return str_replace(
+            array_keys(self::ESCAPE_CHARACTERS),
+            array_values(self::ESCAPE_CHARACTERS),
+            $value
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function appendSegmentsToPointer(string $pointer, string ...$segments): string
+    {
+        $segments = array_map([$this, 'escape'], $segments);
+
+        return $pointer.'/'.implode('/', $segments);
+    }
+
+    /**
+     * Traverses through the segments of the JSON pointer and returns the result.
+     *
+     * @return mixed
+     *
+     * @throws InvalidJsonPointerException when the JSON pointer does not exist
+     */
+    private function &traverseJson(string $pointer)
+    {
+        $json = &$this->json;
+
+        $pointerSegments = $this->splitPointerIntoSegments($pointer);
+        foreach ($pointerSegments as $pointerSegment) {
+            $json = &$this->resolveReference($json);
+
+            if (is_object($json) && property_exists($json, $pointerSegment)) {
+                $json = &$json->{$pointerSegment};
+
+                continue;
+            }
+
+            if (is_array($json) && array_key_exists($pointerSegment, $json)) {
+                $json = &$json[$pointerSegment];
+
+                continue;
+            }
+
+            throw new InvalidJsonPointerException(sprintf('The JSON pointer "%s" does not exist.', $pointer));
         }
+
+        $json = &$this->resolveReference($json);
 
         return $json;
     }
 
     /**
-     * Escapes the ~ and / characters within the value for use within a JSON pointer.
+     * Splits the JSON pointer into segments.
+     *
+     * @return string[]
      */
-    public function escape(string $value): string
+    private function splitPointerIntoSegments(string $pointer): array
+    {
+        $segments = array_slice(explode('/', $pointer), 1);
+
+        return $this->unescape($segments);
+    }
+
+    /**
+     * Unescapes the JSON pointer variants of the ~ and / characters.
+     *
+     * @param string|string[] $value
+     *
+     * @return string|string[]
+     */
+    private function unescape($value)
     {
         return str_replace(
-            array_keys($this->escapeCharacters),
-            array_values($this->escapeCharacters),
+            array_values(self::ESCAPE_CHARACTERS),
+            array_keys(self::ESCAPE_CHARACTERS),
             $value
         );
+    }
+
+    /**
+     * Resolves the reference when the provided JSON is a {@see Reference} instance.
+     *
+     * @param mixed $json
+     *
+     * @return mixed
+     */
+    private function &resolveReference(&$json)
+    {
+        if ($json instanceof Reference) {
+            $jsonPointer = $this->withJson($json->getJsonSchema());
+            $json = &$jsonPointer->getByReference($json->getPointer());
+        }
+
+        return $json;
     }
 }

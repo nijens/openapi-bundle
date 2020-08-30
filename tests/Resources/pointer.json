@@ -1,0 +1,23 @@
+{
+    "array": ["bar", "baz"],
+    "array-with-objects": [
+        {
+            "object": 1
+        },
+        {
+            "object": 2
+        }
+    ],
+    "with|pipe": 3,
+    "with/slash": 4,
+    "with~curly": 5,
+    "really": [
+        {
+            "deep": {
+                "nesting": [
+                    "of data"
+                ]
+            }
+        }
+    ]
+}
