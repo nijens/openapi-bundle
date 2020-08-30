@@ -1,0 +1,9 @@
+# Remove all files from releases with 'export-ignore' by default.
+/**                 export-ignore
+
+# Exclude the following files from removal of releases with '-export-ignore'.
+/src                -export-ignore
+/composer.json      -export-ignore
+/CONTRIBUTING.md    -export-ignore
+/LICENSE            -export-ignore
+/README.md          -export-ignore
