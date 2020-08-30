@@ -42,14 +42,14 @@ class RouteLoaderTest extends TestCase
     protected function setUp(): void
     {
         $fileLocator = new FileLocator([
-            __DIR__.'/../Resources/specifications/',
+            __DIR__.'/../Resources/specifications',
         ]);
         $loader = new ChainLoader([new JsonLoader(), new YamlLoader()]);
         $dereferencer = new Dereferencer(new JsonPointer(), $loader);
 
-        $schemaLoader = new SchemaLoader($fileLocator, $loader, $dereferencer);
+        $schemaLoader = new SchemaLoader($loader, $dereferencer);
 
-        $this->routeLoader = new RouteLoader($schemaLoader);
+        $this->routeLoader = new RouteLoader($fileLocator, $schemaLoader);
     }
 
     /**
@@ -72,7 +72,10 @@ class RouteLoaderTest extends TestCase
 
         $this->assertSame('/pets', $route->getPath());
         $this->assertSame([Request::METHOD_GET], $route->getMethods());
-        $this->assertSame('route-loader-minimal.json', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
+        $this->assertSame(
+            __DIR__.'/../Resources/specifications/route-loader-minimal.json',
+            $route->getDefaults()['_nijens_openapi']['openapi_resource']
+        );
     }
 
     /**
@@ -87,7 +90,10 @@ class RouteLoaderTest extends TestCase
 
         $this->assertSame('/pets', $route->getPath());
         $this->assertSame([Request::METHOD_GET], $route->getMethods());
-        $this->assertSame('route-loader-minimal.yaml', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
+        $this->assertSame(
+            __DIR__.'/../Resources/specifications/route-loader-minimal.yaml',
+            $route->getDefaults()['_nijens_openapi']['openapi_resource']
+        );
     }
 
     /**
@@ -102,7 +108,10 @@ class RouteLoaderTest extends TestCase
 
         $this->assertSame('/pets', $route->getPath());
         $this->assertSame([Request::METHOD_GET], $route->getMethods());
-        $this->assertSame('route-loader-minimal.yml', $route->getDefaults()['_nijens_openapi']['openapi_resource']);
+        $this->assertSame(
+            __DIR__.'/../Resources/specifications/route-loader-minimal.yml',
+            $route->getDefaults()['_nijens_openapi']['openapi_resource']
+        );
     }
 
     /**
