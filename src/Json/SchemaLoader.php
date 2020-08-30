@@ -13,7 +13,6 @@ namespace Nijens\OpenapiBundle\Json;
 
 use Nijens\OpenapiBundle\Json\Loader\LoaderInterface;
 use stdClass;
-use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 
@@ -24,11 +23,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 class SchemaLoader implements SchemaLoaderInterface
 {
-    /**
-     * @var FileLocatorInterface
-     */
-    private $fileLocator;
-
     /**
      * @var LoaderInterface
      */
@@ -49,12 +43,8 @@ class SchemaLoader implements SchemaLoaderInterface
     /**
      * Constructs a new {@see SchemaLoader} instance.
      */
-    public function __construct(
-        FileLocatorInterface $fileLocator,
-        LoaderInterface $loader,
-        DereferencerInterface $dereferencer
-    ) {
-        $this->fileLocator = $fileLocator;
+    public function __construct(LoaderInterface $loader, DereferencerInterface $dereferencer)
+    {
         $this->loader = $loader;
         $this->dereferencer = $dereferencer;
     }
@@ -64,16 +54,14 @@ class SchemaLoader implements SchemaLoaderInterface
      */
     public function load(string $file): stdClass
     {
-        $locatedFile = $this->fileLocator->locate($file);
-
-        if (isset($this->schemas[$locatedFile]) === false) {
-            $schema = $this->loader->load($locatedFile);
+        if (isset($this->schemas[$file]) === false) {
+            $schema = $this->loader->load($file);
             $dereferencedSchema = $this->dereferencer->dereference($schema);
 
-            $this->schemas[$locatedFile] = $dereferencedSchema;
+            $this->schemas[$file] = $dereferencedSchema;
         }
 
-        return $this->schemas[$locatedFile];
+        return $this->schemas[$file];
     }
 
     /**
@@ -81,9 +69,8 @@ class SchemaLoader implements SchemaLoaderInterface
      */
     public function getFileResource(string $file): ?ResourceInterface
     {
-        $locatedFile = $this->fileLocator->locate($file);
-        if (isset($this->schemas[$locatedFile])) {
-            return new FileResource($locatedFile);
+        if (isset($this->schemas[$file])) {
+            return new FileResource($file);
         }
 
         return null;

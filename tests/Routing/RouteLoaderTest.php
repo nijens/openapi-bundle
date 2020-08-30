@@ -47,7 +47,7 @@ class RouteLoaderTest extends TestCase
         $loader = new ChainLoader([new JsonLoader(), new YamlLoader()]);
         $dereferencer = new Dereferencer(new JsonPointer(), $loader);
 
-        $schemaLoader = new SchemaLoader($fileLocator, $loader, $dereferencer);
+        $schemaLoader = new SchemaLoader($loader, $dereferencer);
 
         $this->routeLoader = new RouteLoader($fileLocator, $schemaLoader);
     }

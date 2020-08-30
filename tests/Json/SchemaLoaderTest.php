@@ -19,7 +19,6 @@ use Nijens\OpenapiBundle\Json\SchemaLoader;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
-use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Resource\FileResource;
 
 /**
@@ -33,11 +32,6 @@ class SchemaLoaderTest extends TestCase
      * @var SchemaLoader
      */
     private $schemaLoader;
-
-    /**
-     * @var MockObject|FileLocatorInterface
-     */
-    private $fileLocatorMock;
 
     /**
      * @var MockObject|LoaderInterface
@@ -54,12 +48,10 @@ class SchemaLoaderTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->fileLocatorMock = $this->createMock(FileLocatorInterface::class);
         $this->loaderMock = $this->createMock(LoaderInterface::class);
         $this->dereferencerMock = $this->createMock(DereferencerInterface::class);
 
         $this->schemaLoader = new SchemaLoader(
-            $this->fileLocatorMock,
             $this->loaderMock,
             $this->dereferencerMock
         );
@@ -73,11 +65,6 @@ class SchemaLoaderTest extends TestCase
         $dereferenceJson = new stdClass();
         $dereferenceJson->openapi = '3.0.0';
 
-        $this->fileLocatorMock->expects($this->once())
-            ->method('locate')
-            ->with('openapi.json')
-            ->willReturn('config/openapi.json');
-
         $this->loaderMock->expects($this->once())
             ->method('load')
             ->with('config/openapi.json')
@@ -88,7 +75,7 @@ class SchemaLoaderTest extends TestCase
             ->with($dereferenceJson)
             ->willReturn($dereferenceJson);
 
-        $schema = $this->schemaLoader->load('openapi.json');
+        $schema = $this->schemaLoader->load('config/openapi.json');
 
         $this->assertEquals($dereferenceJson, $schema);
     }
@@ -103,11 +90,6 @@ class SchemaLoaderTest extends TestCase
         $dereferenceJson = new stdClass();
         $dereferenceJson->openapi = '3.0.0';
 
-        $this->fileLocatorMock->expects($this->exactly(2))
-            ->method('locate')
-            ->with('route-loader-minimal.json')
-            ->willReturn(__DIR__.'/../Resources/specifications/route-loader-minimal.json');
-
         $this->loaderMock->expects($this->any())
             ->method('load')
             ->willReturn($dereferenceJson);
@@ -116,9 +98,9 @@ class SchemaLoaderTest extends TestCase
             ->method('dereference')
             ->willReturn($dereferenceJson);
 
-        $this->schemaLoader->load('route-loader-minimal.json');
+        $this->schemaLoader->load(__DIR__.'/../Resources/specifications/route-loader-minimal.json');
 
-        $fileResource = $this->schemaLoader->getFileResource('route-loader-minimal.json');
+        $fileResource = $this->schemaLoader->getFileResource(__DIR__.'/../Resources/specifications/route-loader-minimal.json');
 
         $this->assertInstanceOf(FileResource::class, $fileResource);
     }
@@ -130,11 +112,6 @@ class SchemaLoaderTest extends TestCase
      */
     public function testGetFileResourceReturnsNull()
     {
-        $this->fileLocatorMock->expects($this->once())
-            ->method('locate')
-            ->with('route-loader-minimal.json')
-            ->willReturn(__DIR__.'/../Resources/specifications/route-loader-minimal.json');
-
         $fileResource = $this->schemaLoader->getFileResource('route-loader-minimal.json');
 
         $this->assertNull($fileResource);

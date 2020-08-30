@@ -57,7 +57,6 @@
         </service>
 
         <service id="nijens_openapi.json.schema_loader" class="%nijens_openapi.json.schema_loader.class%">
-            <argument type="service" id="file_locator"/>
             <argument type="service" id="Nijens\OpenapiBundle\Json\Loader\LoaderInterface"/>
             <argument type="service" id="Nijens\OpenapiBundle\Json\DereferencerInterface"/>
         </service>
