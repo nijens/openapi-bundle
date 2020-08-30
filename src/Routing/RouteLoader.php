@@ -15,7 +15,8 @@ use Nijens\OpenapiBundle\Controller\CatchAllController;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use stdClass;
-use Symfony\Component\Config\Loader\Loader;
+use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -25,7 +26,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class RouteLoader extends Loader
+class RouteLoader extends FileLoader
 {
     /**
      * @var string
@@ -40,8 +41,10 @@ class RouteLoader extends Loader
     /**
      * Constructs a new RouteLoader instance.
      */
-    public function __construct(SchemaLoaderInterface $schemaLoader)
+    public function __construct(FileLocatorInterface $locator, SchemaLoaderInterface $schemaLoader)
     {
+        parent::__construct($locator);
+
         $this->schemaLoader = $schemaLoader;
     }
 
@@ -58,19 +61,21 @@ class RouteLoader extends Loader
      */
     public function load($resource, $type = null): RouteCollection
     {
-        $schema = $this->schemaLoader->load($resource);
+        $file = $this->getLocator()->locate($resource, null, true);
+
+        $schema = $this->schemaLoader->load($file);
 
         $jsonPointer = new JsonPointer($schema);
 
         $routeCollection = new RouteCollection();
-        $routeCollection->addResource($this->schemaLoader->getFileResource($resource));
+        $routeCollection->addResource($this->schemaLoader->getFileResource($file));
 
         $paths = get_object_vars($jsonPointer->get('/paths'));
         foreach ($paths as $path => $pathItem) {
-            $this->parsePathItem($jsonPointer, $resource, $routeCollection, $path, $pathItem);
+            $this->parsePathItem($jsonPointer, $file, $routeCollection, $path, $pathItem);
         }
 
-        $this->addDefaultRoutes($routeCollection, $resource);
+        $this->addDefaultRoutes($routeCollection, $file);
 
         return $routeCollection;
     }
