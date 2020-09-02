@@ -49,6 +49,8 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
 
     /**
      * Converts the exception to a JSON response.
+     *
+     * @param GetResponseForExceptionEvent|ExceptionEvent $event
      */
     public function onKernelExceptionTransformToJsonResponse($event): void
     {
