@@ -69,6 +69,8 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
 
     /**
      * Validates the body of a request to an OpenAPI specification route. Throws an exception when validation failed.
+     *
+     * @param GetResponseEvent|RequestEvent $event
      */
     public function validateRequestBody($event): void
     {
