@@ -78,7 +78,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request->attributes->set('_route', 'not_in_collection');
 
         $exceptionMock = $this->createMock(Exception::class);
-        $eventMock = $this->createResponseForExceptionEventWithException($request, $exceptionMock);
+        $eventMock = $this->createExceptionEvent($request, $exceptionMock);
 
         $this->subscriber->onKernelExceptionTransformToJsonResponse($eventMock);
 
@@ -95,7 +95,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request->attributes->set('_route', 'no_openapi_route');
 
         $exceptionMock = $this->createMock(Exception::class);
-        $eventMock = $this->createResponseForExceptionEventWithException($request, $exceptionMock);
+        $eventMock = $this->createExceptionEvent($request, $exceptionMock);
 
         $this->subscriber->onKernelExceptionTransformToJsonResponse($eventMock);
 
@@ -115,7 +115,7 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         ]);
 
         $exception = new Exception('This message should not be visible.');
-        $event = $this->createResponseForExceptionEventWithException($request, $exception);
+        $event = $this->createExceptionEvent($request, $exception);
 
         $response = $this->getMockBuilder(JsonResponse::class)
             ->disableOriginalConstructor()
@@ -130,11 +130,12 @@ class JsonResponseExceptionSubscriberTest extends TestCase
     }
 
     /**
-     * Create response for exception event with an exception.
+     * Creates an exception event. The type of event is created based on which
+     * Symfony version is being tested.
      *
      * @return GetResponseForExceptionEvent|ExceptionEvent
      */
-    private function createResponseForExceptionEventWithException(Request $request, Exception $exception)
+    private function createExceptionEvent(Request $request, Exception $exception)
     {
         $kernelMock = $this->createMock(HttpKernelInterface::class);
 

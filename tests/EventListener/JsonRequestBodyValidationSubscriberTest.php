@@ -314,9 +314,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     }
 
     /**
-     * Creates a request event.
+     * Creates a request event. The type of event is created based on which
+     * Symfony version is being tested.
      *
-     * @return RequestEvent|GetResponseEvent
+     * @return GetResponseEvent|RequestEvent
      */
     private function createRequestEvent(Request $request)
     {

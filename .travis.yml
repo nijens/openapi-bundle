@@ -7,18 +7,25 @@ cache:
         - vendor
         - $HOME/.composer
 
-matrix:
+jobs:
     include:
         - php: 7.3
           env: SYMFONY_VERSION=3.4.*
         - php: 7.3
           env: SYMFONY_VERSION=4.4.*
         - php: 7.3
-          env: SYMFONY_VERSION=5.0.*
-        - php: 7.3
-          env: SYMFONY_VERSION=5.1.*
-        - php: 7.3
+          # env: SYMFONY_VERSION=5.1.*
+        - php: 7.4
+          # env: SYMFONY_VERSION=5.1.*
+        - php: master
+          # env: SYMFONY_VERSION=5.1.*
+        - php: 7.4
           env: PHP_CS_FIXER=true
+
+    allow_failures:
+        - php: master
+
+    fast_finish: true
 
 before_install: composer selfupdate
 
