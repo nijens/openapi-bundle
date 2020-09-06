@@ -18,7 +18,6 @@ use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -70,8 +69,10 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
 
     /**
      * Validates the body of a request to an OpenAPI specification route. Throws an exception when validation failed.
+     *
+     * @param GetResponseEvent|RequestEvent $event
      */
-    public function validateRequestBody(GetResponseEvent $event): void
+    public function validateRequestBody($event): void
     {
         $request = $event->getRequest();
         $requestContentType = $request->headers->get('Content-Type');

@@ -20,7 +20,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -75,14 +77,8 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request = new Request();
         $request->attributes->set('_route', 'not_in_collection');
 
-        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
-        $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getRequest'])
-            ->getMock();
-        $eventMock->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
+        $exceptionMock = $this->createMock(Exception::class);
+        $eventMock = $this->createResponseForExceptionEventWithException($request, $exceptionMock);
 
         $this->subscriber->onKernelExceptionTransformToJsonResponse($eventMock);
 
@@ -98,14 +94,8 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $request = new Request();
         $request->attributes->set('_route', 'no_openapi_route');
 
-        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
-        $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getRequest'])
-            ->getMock();
-        $eventMock->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
+        $exceptionMock = $this->createMock(Exception::class);
+        $eventMock = $this->createResponseForExceptionEventWithException($request, $exceptionMock);
 
         $this->subscriber->onKernelExceptionTransformToJsonResponse($eventMock);
 
@@ -124,17 +114,8 @@ class JsonResponseExceptionSubscriberTest extends TestCase
             'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
         ]);
 
-        /** @var MockObject|GetResponseForExceptionEvent $eventMock */
-        $eventMock = $this->getMockBuilder(GetResponseForExceptionEvent::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getRequest', 'getException'])
-            ->getMock();
-        $eventMock->expects($this->once())
-            ->method('getRequest')
-            ->willReturn($request);
-        $eventMock->expects($this->once())
-            ->method('getException')
-            ->willReturn(new Exception('This message should not be visible.'));
+        $exception = new Exception('This message should not be visible.');
+        $event = $this->createResponseForExceptionEventWithException($request, $exception);
 
         $response = $this->getMockBuilder(JsonResponse::class)
             ->disableOriginalConstructor()
@@ -143,8 +124,24 @@ class JsonResponseExceptionSubscriberTest extends TestCase
             ->method('build')
             ->willReturn($response);
 
-        $this->subscriber->onKernelExceptionTransformToJsonResponse($eventMock);
+        $this->subscriber->onKernelExceptionTransformToJsonResponse($event);
 
-        $this->assertSame($response, $eventMock->getResponse());
+        $this->assertSame($response, $event->getResponse());
+    }
+
+    /**
+     * Create response for exception event with an exception.
+     *
+     * @return GetResponseForExceptionEvent|ExceptionEvent
+     */
+    private function createResponseForExceptionEventWithException(Request $request, Exception $exception)
+    {
+        $kernelMock = $this->createMock(HttpKernelInterface::class);
+
+        if (class_exists('Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent')) {
+            return new GetResponseForExceptionEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST, $exception);
+        }
+
+        return new ExceptionEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST, $exception);
     }
 }
