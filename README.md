@@ -116,9 +116,13 @@ A Symfony controller for a route is configured by adding the `x-symfony-controll
 
 The value of the `x-symfony-controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
 
-## Custom Error Handling
+#### Default validation error responses
+The following error responses can occur when validation fails during a request made to a route managed by the OpenAPI bundle:
+* `400 Bad Request`: when the request content type is not `application/json`
+* `400 Bad Request`: when the JSON within the request body is invalid
+* `422 Unprocessable Entity`: when the JSON within the request body does not validate with the JSON schema of the route
 
-The default error response template looks like:
+All validation error responses will return a response body similar to the following:
 ```json
 {
     "message": "Validation of JSON request body failed.",
@@ -129,6 +133,7 @@ The default error response template looks like:
 }
 ```
 
+#### Customizing validation responses
 If your project requires a different formatting of the response or perhaps different response codes, the default
 response builder can be overridden. Following the ["How to Decorate Services" guide from Symfony](https://symfony.com/doc/current/service_container/service_decoration.html),
 you can define your own service which implements `ExceptionJsonResponseBuilderInterface` and handles the error response
@@ -136,22 +141,22 @@ building instead of `nijens_openapi.service.exception_json_response_builder`. Wh
 an exception will be thrown which implements `HttpExceptionInterface`. The `getErrors()` method will provide a
 multi-dimensional array similar to this:
 ```php
-array(
-    array(
+[
+    [
         'property' => 'iAmRequired',
         'pointer' => '/iAmRequired',
         'message' => 'The property iAmRequired is required',
         'constraint' => 'required',
         'context' => 1,
-    ),
-    array(
+    ],
+    [
         'property' => '',
         'pointer' => '',
         'message' => 'The property iAmExtra is not defined and the definition does not allow additional properties',
         'constraint' => 'additionalProp',
         'context' => 1,
-    ),
-)
+    ],
+];
 ```
 
 ## Credits and acknowledgements
