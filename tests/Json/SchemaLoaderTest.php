@@ -85,7 +85,7 @@ class SchemaLoaderTest extends TestCase
      *
      * @depends testLoad
      */
-    public function testGetFileResource()
+    public function testGetFileResource(): void
     {
         $dereferenceJson = new stdClass();
         $dereferenceJson->openapi = '3.0.0';
@@ -110,7 +110,7 @@ class SchemaLoaderTest extends TestCase
      *
      * @depends testLoad
      */
-    public function testGetFileResourceReturnsNull()
+    public function testGetFileResourceReturnsNull(): void
     {
         $fileResource = $this->schemaLoader->getFileResource('route-loader-minimal.json');
 

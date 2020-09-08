@@ -51,7 +51,7 @@ class RouteLoader extends FileLoader
     /**
      * {@inheritdoc}
      */
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return self::TYPE === $type;
     }
@@ -174,7 +174,7 @@ class RouteLoader extends FileLoader
     /**
      * Adds a catch-all route to handle responses for non-existing routes.
      */
-    private function addDefaultRoutes(RouteCollection $collection, string $resource)
+    private function addDefaultRoutes(RouteCollection $collection, string $resource): void
     {
         $catchAllRoute = new Route(
             '/{catchall}',
