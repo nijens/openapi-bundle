@@ -42,6 +42,22 @@ jobs:
             - name: Run PHPUnit
               run: ./vendor/bin/phpunit
 
+    lockfile-integrity:
+        name: Composer lockfile integrity
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '7.4'
+                  coverage: none
+
+            - name: Validate composer.json and composer.lock
+              run: composer validate --strict
+
     code-style:
         name: Code standards
         runs-on: ubuntu-latest
