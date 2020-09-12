@@ -18,7 +18,7 @@ jobs:
                  coverage: pcov
 
             - name: Install dependencies
-              run: composer install --prefer-dist
+              run: composer install --prefer-dist --no-progress --no-suggest
 
             - name: Run PHPUnit
               run: ./vendor/bin/phpunit
@@ -37,7 +37,7 @@ jobs:
                   coverage: none
 
             - name: Install dependencies
-              run: composer install --prefer-dist
+              run: composer install --prefer-dist --no-progress --no-suggest
 
             - name: Check code standards
               run: ./vendor/bin/php-cs-fixer fix --dry-run -v
