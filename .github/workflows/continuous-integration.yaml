@@ -37,7 +37,7 @@ jobs:
               run: composer install --prefer-dist --no-progress --no-suggest
 
             - name: Switch Symfony components to version ${{ matrix.symfony-version }}
-              run: composer remove friendsofphp/php-cs-fixer --dev; composer require "symfony/symfony:${{ matrix.symfony-version }}" --no-update; composer update symfony/*
+              run: composer remove friendsofphp/php-cs-fixer --dev && composer require "symfony/symfony:${{ matrix.symfony-version }}.*" --no-update && composer update symfony/* --prefer-dist --no-progress --no-suggest
 
             - name: Run PHPUnit
               run: ./vendor/bin/phpunit
