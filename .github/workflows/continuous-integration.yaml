@@ -4,12 +4,13 @@ name: Continuous Integration
 
 jobs:
     test:
-        name: Tests (PHP ${{ matrix.php-version }})
+        name: Tests (Symfony ${{ matrix.symfony-version }} & PHP ${{ matrix.php-version }})
         runs-on: ubuntu-latest
 
         strategy:
             matrix:
                 php-version: ['7.3', '7.4']
+                symfony-version: ['3.4', '4.4', '5.1']
 
         steps:
             - uses: actions/checkout@v2
@@ -31,6 +32,9 @@ jobs:
                  path: ${{ steps.composer-cache.outputs.dir }}
                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
                  restore-keys: ${{ runner.os }}-composer-
+
+            - name: Switch Symfony to version ${{ matrix.symfony-version }}
+              run: composer remove friendsofphp/php-cs-fixer --dev; composer require "symfony/symfony:${{ matrix.symfony-version }}" --no-update; composer update symfony/*
 
             - name: Install dependencies
               run: composer install --prefer-dist --no-progress --no-suggest
