@@ -4,8 +4,12 @@ name: Continuous Integration
 
 jobs:
     test:
-        name: Tests
+        name: Tests (PHP ${{ matrix.php-version }})
         runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                php-version: ['7.2', '7.3', '7.4']
 
         steps:
             - uses: actions/checkout@v2
@@ -13,7 +17,7 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                 php-version: '7.4'
+                 php-version: ${{ matrix.php-version }}
                  extensions: mbstring, json, xml
                  coverage: pcov
 
