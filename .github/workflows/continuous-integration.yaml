@@ -33,11 +33,11 @@ jobs:
                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
                  restore-keys: ${{ runner.os }}-composer-
 
-            - name: Switch Symfony to version ${{ matrix.symfony-version }}
-              run: composer remove friendsofphp/php-cs-fixer --dev; composer require "symfony/symfony:${{ matrix.symfony-version }}" --no-update; composer update symfony/*
-
             - name: Install dependencies
               run: composer install --prefer-dist --no-progress --no-suggest
+
+            - name: Switch Symfony components to version ${{ matrix.symfony-version }}
+              run: composer remove friendsofphp/php-cs-fixer --dev; composer require "symfony/symfony:${{ matrix.symfony-version }}" --no-update; composer update symfony/*
 
             - name: Run PHPUnit
               run: ./vendor/bin/phpunit
