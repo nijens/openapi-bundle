@@ -10,7 +10,7 @@ jobs:
         strategy:
             matrix:
                 php-version: ['7.3', '7.4']
-                symfony-version: ['3.4', '4.4', '5.1']
+                symfony-version: ['3.4', '4.4']
                 phpunit-options: ['']
                 coverage: [false]
                 include:
