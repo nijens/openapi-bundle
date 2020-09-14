@@ -42,7 +42,7 @@ $coverageCovered = $coveragePercentage >= $minimumCoveragePercentage;
 fwrite(
     STDOUT,
     sprintf(
-        '::set-output name=coverage-percentage::%s%s',
+        '::set-output name=percentage::%s%s',
         $coveragePercentage,
         PHP_EOL
     )
@@ -51,8 +51,8 @@ fwrite(
 fwrite(
     STDOUT,
     sprintf(
-        '::set-output name=coverage-covered::%s%s',
-        $coverageCovered ? 'true' : 'false',
+        '::set-output name=conclusion::%s%s',
+        $coverageCovered ? 'success' : 'failure',
         PHP_EOL
     )
 );

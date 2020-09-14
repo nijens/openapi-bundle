@@ -69,11 +69,11 @@ jobs:
                       - antiope
                   name: Code coverage
                   head_sha: ${{ github.sha }}
-                  conclusion: success
+                  conclusion: ${{ steps.coverage.outputs.conclusion }}
                   status: completed
                   output: |
-                    title: Coverage at ${{ steps.coverage.outputs.coverage-percentage }}%
-                    summary: Coverage at ${{ steps.coverage.outputs.coverage-percentage }}%
+                    title: Coverage at ${{ steps.coverage.outputs.percentage }}%
+                    summary: Coverage at ${{ steps.coverage.outputs.percentage }}%
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
