@@ -11,6 +11,12 @@ jobs:
             matrix:
                 php-version: ['7.3', '7.4']
                 symfony-version: ['3.4', '4.4', '5.1']
+                coverage: [false]
+                include:
+                    - php-version: '7.4'
+                      symfony-version: '5.1'
+                      coverage: true
+                      minimum-coverage-percentage: 95
 
         steps:
             - uses: actions/checkout@v2
@@ -39,8 +45,18 @@ jobs:
             - name: Switch Symfony components to version ${{ matrix.symfony-version }}
               run: composer remove friendsofphp/php-cs-fixer --dev && composer require "symfony/symfony:${{ matrix.symfony-version }}.*" --no-update && composer update symfony/* --prefer-dist --no-progress --no-suggest
 
-            - name: Run PHPUnit
+            - name: Run PHPUnit without coverage
+              if: ${{ matrix.coverage == false }}
               run: ./vendor/bin/phpunit
+
+            - name: Run PHPUnit with coverage
+              if: ${{ matrix.coverage == true }}
+              run: ./vendor/bin/phpunit --coverage-xml coverage-xml
+
+            - name: Parse PHPUnit coverage
+              if: ${{ matrix.coverage == true }}
+              id: coverage
+              run: ./.github/bin/parse-coverage coverage-xml/index.xml ${{ matrix.minimum-coverage-percentage }}
 
     lockfile-integrity:
         name: Composer lockfile integrity
