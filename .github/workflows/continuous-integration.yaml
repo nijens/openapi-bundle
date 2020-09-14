@@ -69,8 +69,8 @@ jobs:
                   conclusion: ${{ steps.coverage.outputs.conclusion }}
                   status: completed
                   output: |
-                    title: Coverage at ${{ steps.coverage.outputs.percentage }}%
-                    summary: Coverage at ${{ steps.coverage.outputs.percentage }}%
+                    title: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
+                    summary: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
