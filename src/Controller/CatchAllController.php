@@ -54,7 +54,7 @@ class CatchAllController
      * @throws NotFoundHttpException         when the route could not be found
      * @throws MethodNotAllowedHttpException when the route was found but the request method is not allowed
      */
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): void
     {
         $exceptionMessage = sprintf("No route found for '%s %s'.", $request->getMethod(), $request->getPathInfo());
         $exception = new NotFoundHttpException($exceptionMessage);

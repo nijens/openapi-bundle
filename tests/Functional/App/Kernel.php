@@ -38,7 +38,7 @@ class Kernel extends BaseKernel
     /**
      * {@inheritdoc}
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return $this->getTemporaryDirectory().'/var/cache/'.$this->environment;
     }
@@ -46,7 +46,7 @@ class Kernel extends BaseKernel
     /**
      * {@inheritdoc}
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         return $this->getTemporaryDirectory().'/var/log';
     }
@@ -54,7 +54,7 @@ class Kernel extends BaseKernel
     /**
      * {@inheritdoc}
      */
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__;
     }
@@ -62,7 +62,7 @@ class Kernel extends BaseKernel
     /**
      * {@inheritdoc}
      */
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
         return [
             new FrameworkBundle(),
@@ -73,7 +73,7 @@ class Kernel extends BaseKernel
     /**
      * {@inheritdoc}
      */
-    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
+    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config.yaml');
     }
