@@ -11,13 +11,13 @@ jobs:
             matrix:
                 php-version: ['7.3', '7.4']
                 symfony-version: ['3.4', '4.4']
-                phpunit-options: ['']
+                test-options: ['']
                 coverage: [false]
                 include:
                     - php-version: '7.4'
                       symfony-version: '5.1'
                       coverage: true
-                      phpunit-options: '--coverage-xml coverage-xml'
+                      test-options: '-with-coverage'
                       minimum-coverage-percentage: 95
 
         steps:
@@ -41,14 +41,11 @@ jobs:
                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
                  restore-keys: ${{ runner.os }}-composer-
 
-            - name: Install dependencies
-              run: composer install --prefer-dist --no-progress --no-suggest
-
-            - name: Switch Symfony components to version ${{ matrix.symfony-version }}
-              run: composer remove friendsofphp/php-cs-fixer --dev && composer require "symfony/symfony:${{ matrix.symfony-version }}.*" --no-update && composer update symfony/* --prefer-dist --no-progress --no-suggest
+            - name: Install dependencies and switch Symfony components to version ${{ matrix.symfony-version }}
+              run: make switch-symfony version=${{ matrix.symfony-version }}
 
             - name: Run PHPUnit
-              run: ./vendor/bin/phpunit ${{ matrix.phpunit-options }}
+              run: make test${{ matrix.test-options }}
 
             - name: Parse PHPUnit coverage
               if: ${{ matrix.coverage == true }}
@@ -88,7 +85,7 @@ jobs:
                   coverage: none
 
             - name: Validate composer.json and composer.lock
-              run: composer validate --strict
+              run: make validate-dependencies
 
     code-style:
         name: Code standards
@@ -115,7 +112,7 @@ jobs:
                  restore-keys: ${{ runner.os }}-composer-
 
             - name: Install dependencies
-              run: composer install --prefer-dist --no-progress --no-suggest
+              run: make install
 
             - name: Check code standards
-              run: ./vendor/bin/php-cs-fixer fix --dry-run -v
+              run: make code-style-check
