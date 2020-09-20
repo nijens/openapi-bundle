@@ -27,19 +27,25 @@ Please follow the following guidelines when creating a pull request:
 ## Coding standards and naming conventions
 This project follows the [Symfony code standards](https://symfony.com/doc/current/contributing/code/standards.html) with one exception:
 
-- No [Yoda conditions](https://en.wikipedia.org/wiki/Yoda_conditions). We're more a Han Solo fan, you see.
+- No [Yoda conditions](https://en.wikipedia.org/wiki/Yoda_conditions). We believe in creating unit tests instead.
 
 Code style standards are best fixed with the [PHP Coding Standards Fixer](https://cs.symfony.com/).
 Please check your code before creating a commit by running the following command:
 
 ``` bash
-vendor/bin/php-cs-fixer fix
+make code-style-fix
 ```
 
 
 ## Running Tests
-Run the entire testsuite with the following command to see if everything works like it should after your changes:
+Run the entire test suite with the following command to see if everything works like it should after your changes:
 
 ``` bash
-vendor/bin/phpunit
+make test
+```
+
+If you'd like to test your changes against an older Symfony version (eg. 4.4), you can do so by using the following command:
+
+```bash
+make switch-symfony version=4.4 test
 ```
