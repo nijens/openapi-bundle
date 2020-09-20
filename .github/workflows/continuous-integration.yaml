@@ -1,0 +1,118 @@
+on: [push, pull_request]
+
+name: Continuous Integration
+
+jobs:
+    test:
+        name: Tests (Symfony ${{ matrix.symfony-version }} & PHP ${{ matrix.php-version }})
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                php-version: ['7.3', '7.4']
+                symfony-version: ['3.4', '4.4']
+                test-options: ['']
+                coverage: [false]
+                include:
+                    - php-version: '7.4'
+                      symfony-version: '5.1'
+                      coverage: true
+                      test-options: '-with-coverage'
+                      minimum-coverage-percentage: 95
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                 php-version: ${{ matrix.php-version }}
+                 extensions: mbstring, json, xml
+                 coverage: pcov
+
+            - name: Detect dependency cache directory
+              id: composer-cache
+              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            - name: Cache dependencies
+              uses: actions/cache@v2
+              with:
+                 path: ${{ steps.composer-cache.outputs.dir }}
+                 key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                 restore-keys: ${{ runner.os }}-composer-
+
+            - name: Install dependencies and switch Symfony components to version ${{ matrix.symfony-version }}
+              run: make switch-symfony version=${{ matrix.symfony-version }}
+
+            - name: Run PHPUnit
+              run: make test${{ matrix.test-options }}
+
+            - name: Parse PHPUnit coverage
+              if: ${{ matrix.coverage == true }}
+              id: coverage
+              run: ./.github/bin/parse-coverage coverage-xml/index.xml ${{ matrix.minimum-coverage-percentage }}
+
+            - name: Add coverage check run
+              uses: octokit/request-action@v2.x
+              if: ${{ matrix.coverage == true }}
+              with:
+                  route: POST /repos/:repository/check-runs
+                  repository: ${{ github.repository }}
+                  mediaType: |
+                    previews:
+                      - antiope
+                  name: Code coverage
+                  head_sha: ${{ github.sha }}
+                  conclusion: ${{ steps.coverage.outputs.conclusion }}
+                  status: completed
+                  output: |
+                    title: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
+                    summary: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    lockfile-integrity:
+        name: Composer lockfile integrity
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '7.4'
+                  coverage: none
+
+            - name: Validate composer.json and composer.lock
+              run: make validate-dependencies
+
+    code-style:
+        name: Code standards
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '7.4'
+                  coverage: none
+
+            - name: Detect dependency cache directory
+              id: composer-cache
+              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            - name: Cache dependencies
+              uses: actions/cache@v2
+              with:
+                 path: ${{ steps.composer-cache.outputs.dir }}
+                 key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                 restore-keys: ${{ runner.os }}-composer-
+
+            - name: Install dependencies
+              run: make install
+
+            - name: Check code standards
+              run: make code-style-check
