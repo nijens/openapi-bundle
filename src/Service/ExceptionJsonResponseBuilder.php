@@ -11,10 +11,10 @@
 
 namespace Nijens\OpenapiBundle\Service;
 
-use Exception;
 use Nijens\OpenapiBundle\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 /**
  * Builds a JSON response to an exception for OpenAPI routes.
@@ -41,7 +41,7 @@ class ExceptionJsonResponseBuilder implements ExceptionJsonResponseBuilderInterf
     /**
      * {@inheritdoc}
      */
-    public function build(Exception $exception): JsonResponse
+    public function build(Throwable $exception): JsonResponse
     {
         $response = new JsonResponse();
 
