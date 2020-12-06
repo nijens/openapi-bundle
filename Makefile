@@ -11,13 +11,12 @@ install: ## Install the dependencies with Composer.
 	composer install --prefer-dist --no-progress --no-suggest
 .PHONY: install
 
-switch-symfony: clean-dependencies install ## Switch the dependencies to another supported Symfony Framework version for testing.
+switch-symfony: clean-dependencies remove-code-style-fixer install ## Switch the dependencies to another supported Symfony Framework version for testing.
 ifndef version
 	@printf "\nUsage:\n  make \033[36mswitch-symfony\033[0m version=\033[33m<version>\033[0m\n\n"
 	@exit 1
 endif
 
-	composer remove friendsofphp/php-cs-fixer --dev
 	composer require "symfony/symfony:$(version).*" --dev --no-update
 	composer update symfony/* --prefer-dist --no-progress --no-suggest
 .PHONY: switch-symfony-version
@@ -45,4 +44,8 @@ validate-dependencies: ## Validates the Composer configuration and lockfile.
 clean-dependencies: ## Clears any changes made to the Composer configuration and removes installed dependencies.
 	@git checkout -- composer.*
 	@git clean -xf vendor
-.PHONY: clean
+.PHONY: clean-dependencies
+
+remove-code-style-fixer: ## Removes the PHP CS Fixer.
+	composer remove friendsofphp/php-cs-fixer --dev
+.PHONY: remove-code-style-fixer
