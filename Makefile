@@ -8,7 +8,7 @@ help: ## Display this help.
 .PHONY: help
 
 install: ## Install the dependencies with Composer.
-	composer install --prefer-dist --no-progress --no-suggest
+	composer install --prefer-dist --no-progress
 .PHONY: install
 
 switch-symfony: clean-dependencies remove-code-style-fixer install ## Switch the dependencies to another supported Symfony Framework version for testing.
@@ -18,7 +18,7 @@ ifndef version
 endif
 
 	composer require "symfony/symfony:$(version).*" --dev --no-update
-	composer update symfony/* --prefer-dist --no-progress --no-suggest
+	composer update symfony/* --prefer-dist --no-progress
 .PHONY: switch-symfony-version
 
 test: install ## Run the unit tests.
