@@ -10,17 +10,17 @@ jobs:
         strategy:
             matrix:
                 php-version: ['7.3', '7.4']
-                symfony-version: ['3.4', '4.4']
+                symfony-version: ['3.4', '4.4', '5.1']
                 test-options: ['']
                 coverage: [false]
                 include:
                     - php-version: '7.4'
-                      symfony-version: '5.1'
+                      symfony-version: '5.2'
                       coverage: true
                       test-options: '-with-coverage'
                       minimum-coverage-percentage: 95
                     - php-version: '8.0'
-                      symfony-version: '5.1'
+                      symfony-version: '5.2'
 
         steps:
             - uses: actions/checkout@v2
