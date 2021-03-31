@@ -11,11 +11,13 @@
 
 namespace Nijens\OpenapiBundle\EventListener;
 
+use Exception;
 use Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Throwable;
 
 /**
  * Transforms an exception to a JSON response for OpenAPI routes.
@@ -71,6 +73,10 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
 
         if ($exception === null) {
             return;
+        }
+
+        if ($exception instanceof Throwable) {
+            $exception = new Exception($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         $event->setResponse($this->responseBuilder->build($exception));
