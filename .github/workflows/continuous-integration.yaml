@@ -10,15 +10,17 @@ jobs:
         strategy:
             matrix:
                 php-version: ['7.3', '7.4']
-                symfony-version: ['3.4', '4.4']
+                symfony-version: ['3.4', '4.4', '5.1']
                 test-options: ['']
                 coverage: [false]
                 include:
                     - php-version: '7.4'
-                      symfony-version: '5.1'
+                      symfony-version: '5.2'
                       coverage: true
                       test-options: '-with-coverage'
                       minimum-coverage-percentage: 95
+                    - php-version: '8.0'
+                      symfony-version: '5.2'
 
         steps:
             - uses: actions/checkout@v2
@@ -52,24 +54,24 @@ jobs:
               id: coverage
               run: ./.github/bin/parse-coverage coverage-xml/index.xml ${{ matrix.minimum-coverage-percentage }}
 
-            - name: Add coverage check run
-              uses: octokit/request-action@v2.x
-              if: ${{ matrix.coverage == true }}
-              with:
-                  route: POST /repos/:repository/check-runs
-                  repository: ${{ github.repository }}
-                  mediaType: |
-                    previews:
-                      - antiope
-                  name: Code coverage
-                  head_sha: ${{ github.sha }}
-                  conclusion: ${{ steps.coverage.outputs.conclusion }}
-                  status: completed
-                  output: |
-                    title: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
-                    summary: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#            - name: Add coverage check run
+#              uses: octokit/request-action@v2.x
+#              if: ${{ matrix.coverage == true }}
+#              with:
+#                  route: POST /repos/:repository/check-runs
+#                  repository: ${{ github.repository }}
+#                  mediaType: |
+#                    previews:
+#                      - antiope
+#                  name: Code coverage
+#                  head_sha: ${{ github.sha }}
+#                  conclusion: ${{ steps.coverage.outputs.conclusion }}
+#                  status: completed
+#                  output: |
+#                    title: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
+#                    summary: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
+#              env:
+#                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     lockfile-integrity:
         name: Composer lockfile integrity
