@@ -18,7 +18,7 @@ use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -59,25 +59,20 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     /**
      * Constructs a new JsonRequestBodyValidationSubscriber instance.
      */
-    public function __construct(
-        JsonParser $jsonParser,
-        SchemaLoaderInterface $schemaLoader,
-        Validator $jsonValidator
-    ) {
+    public function __construct(JsonParser $jsonParser, SchemaLoaderInterface $schemaLoader, Validator $jsonValidator)
+    {
         $this->jsonParser = $jsonParser;
         $this->schemaLoader = $schemaLoader;
         $this->jsonValidator = $jsonValidator;
     }
 
     /**
-     * Validates the body of a request to an OpenAPI specification route. Throws an exception when validation failed.
-     *
-     * @param GetResponseEvent|RequestEvent $event
+     * Validates the body of a request to an OpenAPI specification route. Throws an exception when validation fails.
      */
-    public function validateRequestBody($event): void
+    public function validateRequestBody(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        $requestContentType = $request->headers->get('Content-Type');
+        $requestContentType = current(HeaderUtils::split($request->headers->get('Content-Type', ''), ';'));
 
         $routeOptions = $event->getRequest()->attributes->get('_nijens_openapi');
 
@@ -92,7 +87,7 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         }
 
         if ($requestContentType !== 'application/json') {
-            throw new BadJsonRequestHttpException("The request content-type should be 'application/json'.");
+            throw new BadJsonRequestHttpException("The request content-type must be 'application/json'.");
         }
 
         $requestBody = $request->getContent();
