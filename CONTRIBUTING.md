@@ -32,16 +32,16 @@ This project follows the [Symfony code standards](https://symfony.com/doc/curren
 Code style standards are best fixed with the [PHP Coding Standards Fixer](https://cs.symfony.com/).
 Please check your code before creating a commit by running the following command:
 
-``` bash
+```bash
 make code-style-fix
 ```
 
 
 ## Running Tests
-Run the entire test suite with the following command to see if everything works like it should after your changes:
+Run the entire test suite with the following commands to see if everything works like it should after your changes:
 
-``` bash
-make test
+```bash
+make switch-symfony version=5.3 test
 ```
 
 If you'd like to test your changes against an older Symfony version (eg. 4.4), you can do so by using the following command:
