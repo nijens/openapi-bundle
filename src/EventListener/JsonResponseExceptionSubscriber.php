@@ -63,6 +63,10 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
             return;
         }
 
+        if ($exception instanceof Exception === false) {
+            $exception = new Exception($exception->getMessage(), $exception->getCode(), $exception);
+        }
+
         $event->setResponse($this->responseBuilder->build($exception));
     }
 }
