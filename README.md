@@ -171,13 +171,13 @@ The OpenAPI bundle is licensed under the MIT License. Please see the [LICENSE fi
 [ico-version]: https://img.shields.io/packagist/v/nijens/openapi-bundle.svg
 [ico-pre-release-version]: https://img.shields.io/packagist/vpre/nijens/openapi-bundle.svg
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg
-[ico-build]: https://travis-ci.com/nijens/openapi-bundle.svg?branch=master
+[ico-build]: https://github.com/nijens/openapi-bundle/actions/workflows/continuous-integration.yaml/badge.svg
 [ico-coverage]: https://coveralls.io/repos/nijens/openapi-bundle/badge.svg?branch=master
 [ico-code-quality]: https://scrutinizer-ci.com/g/nijens/openapi-bundle/badges/quality-score.png?b=master
 
 [link-version]: https://packagist.org/packages/nijens/openapi-bundle
 [link-license]: LICENSE
-[link-build]: https://travis-ci.com/nijens/openapi-bundle
+[link-build]: https://github.com/nijens/openapi-bundle/actions/workflows/continuous-integration.yaml
 [link-coverage]: https://coveralls.io/r/nijens/openapi-bundle?branch=master
 [link-code-quality]: https://scrutinizer-ci.com/g/nijens/openapi-bundle/?branch=master
 [link-author]: https://github.com/niels-nijens
