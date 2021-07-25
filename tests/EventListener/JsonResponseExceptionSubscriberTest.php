@@ -21,7 +21,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -129,19 +128,9 @@ class JsonResponseExceptionSubscriberTest extends TestCase
         $this->assertSame($response, $event->getResponse());
     }
 
-    /**
-     * Creates an exception event. The type of event is created based on which
-     * Symfony version is being tested.
-     *
-     * @return GetResponseForExceptionEvent|ExceptionEvent
-     */
-    private function createExceptionEvent(Request $request, Exception $exception)
+    private function createExceptionEvent(Request $request, Exception $exception): ExceptionEvent
     {
         $kernelMock = $this->createMock(HttpKernelInterface::class);
-
-        if (class_exists('Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent')) {
-            return new GetResponseForExceptionEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST, $exception);
-        }
 
         return new ExceptionEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST, $exception);
     }
