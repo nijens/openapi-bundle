@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Functional\App\Controller;
 
+use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface;
 use Nijens\OpenapiBundle\Tests\Functional\App\Model\Pet;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -51,7 +52,7 @@ class GetPetController
 
         $serializationContext = $this->serializationContextBuilder->getContextForSchemaObject(
             'Pet',
-            $request->attributes->get('_nijens_openapi')['openapi_resource']
+            $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
         );
 
         return JsonResponse::fromJsonString(
