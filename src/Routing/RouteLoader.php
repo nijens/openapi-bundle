@@ -31,7 +31,7 @@ class RouteLoader extends FileLoader
     /**
      * @var string
      */
-    const TYPE = 'openapi';
+    public const TYPE = 'openapi';
 
     /**
      * @var SchemaLoaderInterface

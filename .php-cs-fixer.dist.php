@@ -8,10 +8,10 @@ $finder = PhpCsFixer\Finder::create()
         )
     );
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setRules(array(
         '@Symfony' => true,
-        'yoda_style' => null, // Do not enforce Yoda style (add unit tests instead...)
+        'yoda_style' => false, // Do not enforce Yoda style (add unit tests instead...)
         'ordered_imports' => true,
         'header_comment' => array(
             'header' => <<<EOF
