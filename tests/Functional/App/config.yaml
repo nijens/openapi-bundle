@@ -6,6 +6,8 @@ framework:
         utf8: true
         strict_requirements: true
 
+    serializer: ~
+
     session:
         handler_id: ~
         # storage_id: session.storage.mock_file
@@ -20,3 +22,9 @@ services:
         arguments:
             - ~
             - '%kernel.logs_dir%/%kernel.environment%.log'
+
+    Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetController:
+        arguments:
+            - '@Symfony\Component\Serializer\SerializerInterface'
+        tags:
+            - 'controller.service_arguments'
