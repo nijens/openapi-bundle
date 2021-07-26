@@ -153,6 +153,50 @@ class SerializationContextBuilderTest extends TestCase
         );
     }
 
+    public function testCanCreateContextForCombinedObjectSchema(): void
+    {
+        $schema = $this->convertToObject([
+            'components' => [
+                'schemas' => [
+                    'Pet' => [
+                        'allOf' => [
+                            [
+                                'type' => 'object',
+                                'properties' => [
+                                    'id' => [
+                                        'type' => 'integer',
+                                        'format' => 'int64',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'type' => 'object',
+                                'properties' => [
+                                    'name' => [
+                                        'type' => 'string',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => [
+                    'id',
+                    'name',
+                ],
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
+        );
+    }
+
     private function convertToObject(array $schema): stdClass
     {
         return json_decode(json_encode($schema));

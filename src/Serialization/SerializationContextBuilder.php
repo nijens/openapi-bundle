@@ -61,6 +61,10 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
             $schemaObject = $jsonPointer->get($schemaObject->getPointer());
         }
 
+        if (isset($schemaObject->allOf)) {
+            return $this->getAttributeContextFromCombinedSchemaObject($schemaObject);
+        }
+
         switch ($schemaObject->type) {
             case 'object':
                 return $this->getAttributeContextFromSchemaObjectProperties($schemaObject);
@@ -69,6 +73,16 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
         }
 
         return [];
+    }
+
+    private function getAttributeContextFromCombinedSchemaObject(stdClass $schemaObject): array
+    {
+        $context = [];
+        foreach ($schemaObject->allOf as $allOfSchemaObject) {
+            $context = array_merge($context, $this->getAttributeContextFromSchemaObject($allOfSchemaObject));
+        }
+
+        return $context;
     }
 
     private function getAttributeContextFromSchemaObjectProperties(stdClass $schemaObject): array
