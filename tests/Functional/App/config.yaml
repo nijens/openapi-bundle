@@ -26,5 +26,6 @@ services:
     Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetController:
         arguments:
             - '@Symfony\Component\Serializer\SerializerInterface'
+            - '@Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface'
         tags:
             - 'controller.service_arguments'

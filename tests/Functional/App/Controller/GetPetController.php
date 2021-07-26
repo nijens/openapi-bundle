@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Functional\App\Controller;
 
+use Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface;
 use Nijens\OpenapiBundle\Tests\Functional\App\Model\Pet;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,17 +32,30 @@ class GetPetController
      */
     private $serializer;
 
-    public function __construct(SerializerInterface $serializer)
-    {
+    /**
+     * @var SerializationContextBuilderInterface
+     */
+    private $serializationContextBuilder;
+
+    public function __construct(
+        SerializerInterface $serializer,
+        SerializationContextBuilderInterface $serializationContextBuilder
+    ) {
         $this->serializer = $serializer;
+        $this->serializationContextBuilder = $serializationContextBuilder;
     }
 
     public function __invoke(Request $request): JsonResponse
     {
         $pet = new Pet(1, 'Cat');
 
+        $serializationContext = $this->serializationContextBuilder->getContextForSchemaObject(
+            'Pet',
+            $request->attributes->get('_nijens_openapi')['openapi_resource']
+        );
+
         return JsonResponse::fromJsonString(
-            $this->serializer->serialize($pet, 'json')
+            $this->serializer->serialize($pet, 'json', $serializationContext)
         );
     }
 }
