@@ -65,6 +65,10 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
             return $this->getAttributeContextFromCombinedSchemaObject($schemaObject);
         }
 
+        if (isset($schemaObject->type) === false) {
+            return [];
+        }
+
         switch ($schemaObject->type) {
             case 'object':
                 return $this->getAttributeContextFromSchemaObjectProperties($schemaObject);
