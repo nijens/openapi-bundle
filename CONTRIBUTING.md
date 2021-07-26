@@ -38,10 +38,10 @@ make code-style-fix
 
 
 ## Running Tests
-Run the entire test suite with the following commands to see if everything works like it should after your changes:
+Run the entire test suite with the following command to see if everything works like it should after your changes:
 
 ```bash
-make switch-symfony version=5.3 test
+make test
 ```
 
 If you'd like to test your changes against an older Symfony version (eg. 4.4), you can do so by using the following command:
