@@ -16,6 +16,7 @@ namespace Nijens\OpenapiBundle\Serialization;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\Reference;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
+use stdClass;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -50,6 +51,9 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
         ];
     }
 
+    /**
+     * @param stdClass|Reference $schemaObject
+     */
     private function getAttributeContextFromSchemaObject($schemaObject): array
     {
         if ($schemaObject instanceof Reference) {
@@ -59,22 +63,27 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
 
         switch ($schemaObject->type) {
             case 'object':
-                $objectContext = [];
-                foreach ($schemaObject->properties as $propertyKey => $property) {
-                    $propertyContext = $this->getAttributeContextFromSchemaObject($property);
-                    if (empty($propertyContext)) {
-                        $objectContext[] = $propertyKey;
-                        continue;
-                    }
-
-                    $objectContext[$propertyKey] = $propertyContext;
-                }
-
-                return $objectContext;
+                return $this->getAttributeContextFromSchemaObjectProperties($schemaObject);
             case 'array':
                 return $this->getAttributeContextFromSchemaObject($schemaObject->items);
         }
 
         return [];
+    }
+
+    private function getAttributeContextFromSchemaObjectProperties(stdClass $schemaObject): array
+    {
+        $objectContext = [];
+        foreach ($schemaObject->properties as $propertyKey => $property) {
+            $propertyContext = $this->getAttributeContextFromSchemaObject($property);
+            if (empty($propertyContext)) {
+                $objectContext[] = $propertyKey;
+                continue;
+            }
+
+            $objectContext[$propertyKey] = $propertyContext;
+        }
+
+        return $objectContext;
     }
 }
