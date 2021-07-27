@@ -20,6 +20,7 @@ use Nijens\OpenapiBundle\Json\Loader\ChainLoader;
 use Nijens\OpenapiBundle\Json\Loader\JsonLoader;
 use Nijens\OpenapiBundle\Json\Loader\YamlLoader;
 use Nijens\OpenapiBundle\Json\SchemaLoader;
+use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
@@ -74,7 +75,7 @@ class RouteLoaderTest extends TestCase
         $this->assertSame([Request::METHOD_GET], $route->getMethods());
         $this->assertSame(
             __DIR__.'/../Resources/specifications/route-loader-minimal.json',
-            $route->getDefaults()['_nijens_openapi']['openapi_resource']
+            $route->getDefaults()[RouteContext::REQUEST_ATTRIBUTE][RouteContext::RESOURCE]
         );
     }
 
@@ -92,7 +93,7 @@ class RouteLoaderTest extends TestCase
         $this->assertSame([Request::METHOD_GET], $route->getMethods());
         $this->assertSame(
             __DIR__.'/../Resources/specifications/route-loader-minimal.yaml',
-            $route->getDefaults()['_nijens_openapi']['openapi_resource']
+            $route->getDefaults()[RouteContext::REQUEST_ATTRIBUTE][RouteContext::RESOURCE]
         );
     }
 
@@ -110,7 +111,7 @@ class RouteLoaderTest extends TestCase
         $this->assertSame([Request::METHOD_GET], $route->getMethods());
         $this->assertSame(
             __DIR__.'/../Resources/specifications/route-loader-minimal.yml',
-            $route->getDefaults()['_nijens_openapi']['openapi_resource']
+            $route->getDefaults()[RouteContext::REQUEST_ATTRIBUTE][RouteContext::RESOURCE]
         );
     }
 
@@ -124,7 +125,7 @@ class RouteLoaderTest extends TestCase
     }
 
     /**
-     * Tests if {@see RouteLoader::load} adds a 'openapi_json_request_validation_pointer' option
+     * Tests if {@see RouteLoader::load} adds a {@see RouteContext::JSON_REQUEST_VALIDATION_POINTER} option
      * when the request body of an operation can be validated.
      *
      * @depends testLoadMinimalFromJson
@@ -137,7 +138,7 @@ class RouteLoaderTest extends TestCase
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame(
             '/paths/~1pets/put/requestBody/content/application~1json/schema',
-            $route->getDefaults()['_nijens_openapi']['openapi_json_request_validation_pointer']
+            $route->getDefaults()[RouteContext::REQUEST_ATTRIBUTE][RouteContext::JSON_REQUEST_VALIDATION_POINTER]
         );
     }
 

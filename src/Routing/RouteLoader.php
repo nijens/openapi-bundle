@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -113,7 +115,7 @@ class RouteLoader extends FileLoader
     ): void {
         $defaults = [];
         $openApiConfiguration = [
-            'openapi_resource' => $resource,
+            RouteContext::RESOURCE => $resource,
         ];
 
         if (isset($operation->{'x-symfony-controller'})) {
@@ -121,7 +123,7 @@ class RouteLoader extends FileLoader
         }
 
         if (isset($operation->requestBody->content->{'application/json'})) {
-            $openApiConfiguration['openapi_json_request_validation_pointer'] = sprintf(
+            $openApiConfiguration[RouteContext::JSON_REQUEST_VALIDATION_POINTER] = sprintf(
                 '/paths/%s/%s/requestBody/content/%s/schema',
                 $jsonPointer->escape($path),
                 $requestMethod,
@@ -129,7 +131,7 @@ class RouteLoader extends FileLoader
             );
         }
 
-        $defaults['_nijens_openapi'] = $openApiConfiguration;
+        $defaults[RouteContext::REQUEST_ATTRIBUTE] = $openApiConfiguration;
 
         $route = new Route($path, $defaults, []);
         $route->setMethods($requestMethod);
@@ -180,7 +182,7 @@ class RouteLoader extends FileLoader
             '/{catchall}',
             [
                 '_controller' => CatchAllController::CONTROLLER_REFERENCE,
-                '_nijens_openapi' => ['openapi_resource' => $resource],
+                RouteContext::REQUEST_ATTRIBUTE => [RouteContext::RESOURCE => $resource],
             ],
             ['catchall' => '.*']
         );

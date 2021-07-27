@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -16,6 +18,7 @@ use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
+use Nijens\OpenapiBundle\Routing\RouteContext;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -74,15 +77,15 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $requestContentType = current(HeaderUtils::split($request->headers->get('Content-Type', ''), ';'));
 
-        $routeOptions = $event->getRequest()->attributes->get('_nijens_openapi');
+        $routeOptions = $event->getRequest()->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
 
         // Not an openAPI route.
-        if (isset($routeOptions['openapi_resource']) === false) {
+        if (isset($routeOptions[RouteContext::RESOURCE]) === false) {
             return;
         }
 
         // No need for validation.
-        if (isset($routeOptions['openapi_json_request_validation_pointer']) === false) {
+        if (isset($routeOptions[RouteContext::JSON_REQUEST_VALIDATION_POINTER]) === false) {
             return;
         }
 
@@ -94,8 +97,8 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
         $decodedJsonRequestBody = $this->validateJsonRequestBody($requestBody);
 
         $this->validateJsonAgainstSchema(
-            $routeOptions['openapi_resource'],
-            $routeOptions['openapi_json_request_validation_pointer'],
+            $routeOptions[RouteContext::RESOURCE],
+            $routeOptions[RouteContext::JSON_REQUEST_VALIDATION_POINTER],
             $decodedJsonRequestBody
         );
     }
