@@ -89,5 +89,11 @@
 
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="Nijens\OpenapiBundle\Serialization\SerializationContextBuilder">
+            <argument type="service" id="nijens_openapi.json.schema_loader"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface" alias="Nijens\OpenapiBundle\Serialization\SerializationContextBuilder"/>
     </services>
 </container>

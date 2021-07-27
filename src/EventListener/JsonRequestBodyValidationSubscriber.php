@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -16,9 +18,10 @@ use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
+use Nijens\OpenapiBundle\Routing\RouteContext;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -59,48 +62,43 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
     /**
      * Constructs a new JsonRequestBodyValidationSubscriber instance.
      */
-    public function __construct(
-        JsonParser $jsonParser,
-        SchemaLoaderInterface $schemaLoader,
-        Validator $jsonValidator
-    ) {
+    public function __construct(JsonParser $jsonParser, SchemaLoaderInterface $schemaLoader, Validator $jsonValidator)
+    {
         $this->jsonParser = $jsonParser;
         $this->schemaLoader = $schemaLoader;
         $this->jsonValidator = $jsonValidator;
     }
 
     /**
-     * Validates the body of a request to an OpenAPI specification route. Throws an exception when validation failed.
-     *
-     * @param GetResponseEvent|RequestEvent $event
+     * Validates the body of a request to an OpenAPI specification route. Throws an exception when validation fails.
      */
-    public function validateRequestBody($event): void
+    public function validateRequestBody(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        $requestContentType = $request->headers->get('Content-Type');
+        $requestContentType = current(HeaderUtils::split($request->headers->get('Content-Type', ''), ';'));
 
-        $routeOptions = $event->getRequest()->attributes->get('_nijens_openapi');
+        $routeOptions = $event->getRequest()->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
 
         // Not an openAPI route.
-        if (isset($routeOptions['openapi_resource']) === false) {
+        if (isset($routeOptions[RouteContext::RESOURCE]) === false) {
             return;
         }
 
         // No need for validation.
-        if (isset($routeOptions['openapi_json_request_validation_pointer']) === false) {
+        if (isset($routeOptions[RouteContext::JSON_REQUEST_VALIDATION_POINTER]) === false) {
             return;
         }
 
         if ($requestContentType !== 'application/json') {
-            throw new BadJsonRequestHttpException("The request content-type should be 'application/json'.");
+            throw new BadJsonRequestHttpException("The request content-type must be 'application/json'.");
         }
 
         $requestBody = $request->getContent();
         $decodedJsonRequestBody = $this->validateJsonRequestBody($requestBody);
 
         $this->validateJsonAgainstSchema(
-            $routeOptions['openapi_resource'],
-            $routeOptions['openapi_json_request_validation_pointer'],
+            $routeOptions[RouteContext::RESOURCE],
+            $routeOptions[RouteContext::JSON_REQUEST_VALIDATION_POINTER],
             $decodedJsonRequestBody
         );
     }

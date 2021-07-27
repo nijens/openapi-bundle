@@ -17,6 +17,11 @@ ifndef version
 	@exit 1
 endif
 
+ifneq ($(version), 5.3)
+	sed -i -e "s/\(\s\+\)# \(storage_id:\)/\1\2/" tests/Functional/App/config.yaml
+	sed -i -e "s/\(\s\+\)\(storage_factory_id:\)/\1# \2/" tests/Functional/App/config.yaml
+endif
+
 	composer require "symfony/symfony:$(version).*" --dev --no-update
 	composer update symfony/* --prefer-dist --no-progress
 .PHONY: switch-symfony-version
@@ -42,7 +47,7 @@ validate-dependencies: ## Validates the Composer configuration and lockfile.
 .PHONY: validate-dependencies
 
 clean-dependencies: ## Clears any changes made to the Composer configuration and removes installed dependencies.
-	@git checkout -- composer.*
+	@git checkout -- composer.* tests/Functional/App/config.yaml
 	@git clean -xf vendor
 .PHONY: clean-dependencies
 

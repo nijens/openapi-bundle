@@ -19,7 +19,6 @@ use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
-use Symfony\Component\Routing\RouteCollectionBuilder;
 
 /**
  * Micro Symfony application for functional testing of the OpenAPI bundle.
@@ -81,7 +80,7 @@ class Kernel extends BaseKernel
     /**
      * {@inheritdoc}
      */
-    protected function configureRoutes(RouteCollectionBuilder $routes)
+    protected function configureRoutes($routes)
     {
         $routes->import(__DIR__.'/routing.yaml');
     }

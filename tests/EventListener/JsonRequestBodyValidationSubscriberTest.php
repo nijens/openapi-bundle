@@ -18,13 +18,13 @@ use Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber;
 use Nijens\OpenapiBundle\Exception\BadJsonRequestHttpException;
 use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
+use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Seld\JsonLint\JsonParser;
 use Seld\JsonLint\ParsingException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -152,11 +152,33 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request();
         $request->headers->set('Content-Type', 'application/json');
-        $request->attributes->set('_nijens_openapi', [
-            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
-        ]);
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+            ]
+        );
 
         $event = $this->createRequestEvent($request);
+
+        $this->subscriber->validateRequestBody($event);
+    }
+
+    public function testCannotValidateRequestBodyWhenRequestContentTypeNotSet(): void
+    {
+        $request = new Request();
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->expectException(BadJsonRequestHttpException::class);
+        $this->expectExceptionMessage("The request content-type must be 'application/json'.");
 
         $this->subscriber->validateRequestBody($event);
     }
@@ -175,15 +197,18 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request();
         $request->headers->set('Content-Type', 'application/xml');
-        $request->attributes->set('_nijens_openapi', [
-            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
-            'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
-        ]);
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+            ]
+        );
 
         $event = $this->createRequestEvent($request);
 
         $this->expectException(BadJsonRequestHttpException::class);
-        $this->expectExceptionMessage("The request content-type should be 'application/json'.");
+        $this->expectExceptionMessage("The request content-type must be 'application/json'.");
 
         $this->subscriber->validateRequestBody($event);
     }
@@ -206,10 +231,13 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request([], [], [], [], [], [], $requestBody);
         $request->headers->set('Content-Type', 'application/json');
-        $request->attributes->set('_nijens_openapi', [
-            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
-            'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
-        ]);
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+            ]
+        );
 
         $event = $this->createRequestEvent($request);
 
@@ -247,10 +275,13 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
 
         $request = new Request([], [], [], [], [], [], $requestBody);
         $request->headers->set('Content-Type', 'application/json');
-        $request->attributes->set('_nijens_openapi', [
-            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
-            'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
-        ]);
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+            ]
+        );
 
         $event = $this->createRequestEvent($request);
 
@@ -288,8 +319,10 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
     /**
      * Tests if {@see JsonRequestBodyValidationSubscriber::validateRequestBody} does not throw exceptions
      * on successful validation.
+     *
+     * @dataProvider provideRequestContentTypes
      */
-    public function testValidateRequestBodySuccessful(): void
+    public function testValidateRequestBodySuccessful(string $requestContentType): void
     {
         $requestBody = '{"name": "Dog"}';
 
@@ -302,30 +335,34 @@ class JsonRequestBodyValidationSubscriberTest extends TestCase
             ->willReturn(json_decode(file_get_contents(__DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json')));
 
         $request = new Request([], [], [], [], [], [], $requestBody);
-        $request->headers->set('Content-Type', 'application/json');
-        $request->attributes->set('_nijens_openapi', [
-            'openapi_resource' => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
-            'openapi_json_request_validation_pointer' => '/paths/~1pets/put/requestBody/content/application~1json/schema',
-        ]);
+        $request->headers->set('Content-Type', $requestContentType);
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+            ]
+        );
 
         $event = $this->createRequestEvent($request);
 
         $this->subscriber->validateRequestBody($event);
     }
 
+    public function provideRequestContentTypes(): array
+    {
+        return [
+            ['application/json'],
+            ['application/json; charset=utf-8'],
+        ];
+    }
+
     /**
-     * Creates a request event. The type of event is created based on which
-     * Symfony version is being tested.
-     *
-     * @return GetResponseEvent|RequestEvent
+     * Creates a request event.
      */
-    private function createRequestEvent(Request $request)
+    private function createRequestEvent(Request $request): RequestEvent
     {
         $kernelMock = $this->createMock(HttpKernelInterface::class);
-
-        if (class_exists('Symfony\Component\HttpKernel\Event\GetResponseEvent')) {
-            return new GetResponseEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
-        }
 
         return new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
     }

@@ -31,6 +31,18 @@ tags:
           description: Find out more about our store
           url: http://swagger.io
 paths:
+    /error/trigger-error:
+        get:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::triggerError'
+    /error/throw-error:
+        get:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwError'
+    /error/throw-http-exception:
+        get:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwHttpException'
+    /error/throw-exception:
+        get:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwException'
     /pet:
         put:
             tags:
@@ -166,6 +178,7 @@ paths:
                       - read:pets
     /pet/{petId}:
         get:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetController'
             tags:
                 - pet
             summary: Find pet by ID

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -11,10 +13,11 @@
 
 namespace Nijens\OpenapiBundle\EventListener;
 
+use Exception;
+use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -49,28 +52,22 @@ class JsonResponseExceptionSubscriber implements EventSubscriberInterface
 
     /**
      * Converts the exception to a JSON response.
-     *
-     * @param GetResponseForExceptionEvent|ExceptionEvent $event
      */
-    public function onKernelExceptionTransformToJsonResponse($event): void
+    public function onKernelExceptionTransformToJsonResponse(ExceptionEvent $event): void
     {
-        $routeOptions = $event->getRequest()->attributes->get('_nijens_openapi');
+        $routeOptions = $event->getRequest()->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
 
-        if (isset($routeOptions['openapi_resource']) === false) {
+        if (isset($routeOptions[RouteContext::RESOURCE]) === false) {
             return;
         }
 
-        $exception = null;
-        if ($event instanceof GetResponseForExceptionEvent) {
-            $exception = $event->getException();
-        }
-
-        if ($event instanceof ExceptionEvent) {
-            $exception = $event->getThrowable();
-        }
-
+        $exception = $event->getThrowable();
         if ($exception === null) {
             return;
+        }
+
+        if ($exception instanceof Exception === false) {
+            $exception = new Exception($exception->getMessage(), $exception->getCode(), $exception);
         }
 
         $event->setResponse($this->responseBuilder->build($exception));
