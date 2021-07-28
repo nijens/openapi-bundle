@@ -146,6 +146,71 @@ class SerializationContextBuilderTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider provideObjectSchemaWithAdditionalProperties
+     */
+    public function testCanCreateContextForObjectSchemaWithAdditionalProperties(
+        stdClass $schema,
+        array $expectedAttributes
+    ): void {
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => $expectedAttributes,
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
+        );
+    }
+
+    public function provideObjectSchemaWithAdditionalProperties(): iterable
+    {
+        yield [
+            $this->convertToObject([
+                'components' => [
+                    'schemas' => [
+                        'Pet' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'translations' => [
+                                    'type' => 'object',
+                                    'additionalProperties' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'name' => [
+                                                'type' => 'string',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+            [
+                'translations' => [
+                    'name',
+                ],
+            ],
+        ];
+
+        yield [
+            $this->convertToObject([
+                'components' => [
+                    'schemas' => [
+                        'Pet' => [
+                            'type' => 'object',
+                            'additionalProperties' => false,
+                        ],
+                    ],
+                ],
+            ]),
+            [],
+        ];
+    }
+
     public function testCannotAddPropertyOfObjectTypeWithoutPropertiesToContext(): void
     {
         $schema = $this->convertToObject([

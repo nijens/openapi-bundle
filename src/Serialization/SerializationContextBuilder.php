@@ -102,6 +102,13 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
             $objectContext[] = $propertyKey;
         }
 
+        if (isset($schemaObject->additionalProperties) && $schemaObject->additionalProperties !== false) {
+            $objectContext = array_merge(
+                $objectContext,
+                $this->getAttributeContextFromSchemaObject($schemaObject->additionalProperties)
+            );
+        }
+
         return $objectContext;
     }
 
