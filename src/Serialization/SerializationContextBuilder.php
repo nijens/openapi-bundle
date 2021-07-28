@@ -56,10 +56,7 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
      */
     private function getAttributeContextFromSchemaObject($schemaObject): array
     {
-        if ($schemaObject instanceof Reference) {
-            $jsonPointer = new JsonPointer($schemaObject->getJsonSchema());
-            $schemaObject = $jsonPointer->get($schemaObject->getPointer());
-        }
+        $schemaObject = $this->dereference($schemaObject);
 
         if (isset($schemaObject->allOf)) {
             return $this->getAttributeContextFromCombinedSchemaObject($schemaObject);
@@ -92,16 +89,50 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
     private function getAttributeContextFromSchemaObjectProperties(stdClass $schemaObject): array
     {
         $objectContext = [];
-        foreach ($schemaObject->properties as $propertyKey => $property) {
+        $properties = $schemaObject->properties ?? [];
+        foreach ($properties as $propertyKey => $property) {
             $propertyContext = $this->getAttributeContextFromSchemaObject($property);
-            if (empty($propertyContext)) {
-                $objectContext[] = $propertyKey;
+
+            if ($this->isType($property, 'object') || count($propertyContext) > 0) {
+                $objectContext[$propertyKey] = $propertyContext;
+
                 continue;
             }
 
-            $objectContext[$propertyKey] = $propertyContext;
+            $objectContext[] = $propertyKey;
+        }
+
+        if (isset($schemaObject->additionalProperties) && $schemaObject->additionalProperties !== false) {
+            $objectContext = array_merge(
+                $objectContext,
+                $this->getAttributeContextFromSchemaObject($schemaObject->additionalProperties)
+            );
         }
 
         return $objectContext;
+    }
+
+    /**
+     * @param stdClass|Reference $schemaObject
+     */
+    private function dereference($schemaObject): stdClass
+    {
+        if ($schemaObject instanceof Reference === false) {
+            return $schemaObject;
+        }
+
+        $jsonPointer = new JsonPointer($schemaObject->getJsonSchema());
+
+        return $jsonPointer->get($schemaObject->getPointer());
+    }
+
+    /**
+     * @param stdClass|Reference $schemaObject
+     */
+    private function isType($schemaObject, string $type): bool
+    {
+        $schemaObject = $this->dereference($schemaObject);
+
+        return $schemaObject->type === $type;
     }
 }

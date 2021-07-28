@@ -85,6 +85,9 @@ class SerializationContextBuilderTest extends TestCase
                             'name' => [
                                 'type' => 'string',
                             ],
+                            'owner' => [
+                                '$ref' => '#/components/schemas/Human',
+                            ],
                         ],
                     ],
                     'Human' => [
@@ -114,6 +117,132 @@ class SerializationContextBuilderTest extends TestCase
                         'firstName',
                         'lastName',
                     ],
+                ],
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
+        );
+    }
+
+    public function testCanCreateContextForObjectSchemaWithoutProperties(): void
+    {
+        $schema = $this->convertToObject([
+            'components' => [
+                'schemas' => [
+                    'Pet' => [
+                        'type' => 'object',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => [],
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
+        );
+    }
+
+    /**
+     * @dataProvider provideObjectSchemaWithAdditionalProperties
+     */
+    public function testCanCreateContextForObjectSchemaWithAdditionalProperties(
+        stdClass $schema,
+        array $expectedAttributes
+    ): void {
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => $expectedAttributes,
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
+        );
+    }
+
+    public function provideObjectSchemaWithAdditionalProperties(): iterable
+    {
+        yield [
+            $this->convertToObject([
+                'components' => [
+                    'schemas' => [
+                        'Pet' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'translations' => [
+                                    'type' => 'object',
+                                    'additionalProperties' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'name' => [
+                                                'type' => 'string',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]),
+            [
+                'translations' => [
+                    'name',
+                ],
+            ],
+        ];
+
+        yield [
+            $this->convertToObject([
+                'components' => [
+                    'schemas' => [
+                        'Pet' => [
+                            'type' => 'object',
+                            'additionalProperties' => false,
+                        ],
+                    ],
+                ],
+            ]),
+            [],
+        ];
+    }
+
+    public function testCannotAddPropertyOfObjectTypeWithoutPropertiesToContext(): void
+    {
+        $schema = $this->convertToObject([
+            'components' => [
+                'schemas' => [
+                    'Pet' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                            'owner' => [
+                                '$ref' => '#/components/schemas/Human',
+                            ],
+                        ],
+                    ],
+                    'Human' => [
+                        'type' => 'object',
+                    ],
+                ],
+            ],
+        ]);
+        $schema->components->schemas->Pet->properties->owner = new Reference('#/components/schemas/Human', $schema);
+
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => [
+                    'name',
+                    'owner' => [],
                 ],
             ],
             $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
@@ -150,6 +279,54 @@ class SerializationContextBuilderTest extends TestCase
                 ],
             ],
             $this->serializationContextBuilder->getContextForSchemaObject('PetList', '')
+        );
+    }
+
+    public function testCanCreateContextForArraySchemaInObjectSchema(): void
+    {
+        $schema = $this->convertToObject([
+            'components' => [
+                'schemas' => [
+                    'Pet' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                            'owners' => [
+                                'type' => 'array',
+                                'items' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'firstName' => [
+                                            'type' => 'string',
+                                        ],
+                                        'lastName' => [
+                                            'type' => 'string',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => [
+                    'name',
+                    'owners' => [
+                        'firstName',
+                        'lastName',
+                    ],
+                ],
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
         );
     }
 
