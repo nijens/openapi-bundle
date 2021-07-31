@@ -12,6 +12,7 @@ This bundle supports a design-first methodology for creating an API with Symfony
 
 * [Loading the path items and operations of an OpenAPI specification as routes](#routing)
 * [Validation of JSON request bodies to those routes](#validation-of-json-request-bodies)
+* [OpenAPI-based serialization context for the Symfony Serializer](#openapi-based-serialization-context-for-the-symfony-serializer)
 * [Exception handling](#exception-handling)
 
 ## Installation
@@ -137,6 +138,45 @@ All validation error responses will return a response body similar to the follow
         "The property iAmRequired is required",
         "The property iAmExtra is not defined and the definition does not allow additional properties"
     ]
+}
+```
+
+### OpenAPI-based serialization context for the Symfony Serializer
+⚠ _**Please note:** This feature is still experimental. The API might change in a future minor version._
+
+The `SerializationContextBuilder` helps you with creating a serialization context for the Symfony Serializer.
+It allows you to easily create a JSON response from an object or entity based on your OpenAPI specification.
+
+The following example shows how to use the serialization context builder by leveraging the request attributes added
+by the routing.
+
+```php
+<?php
+
+use Nijens\OpenapiBundle\Routing\RouteContext;
+use Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
+
+class ExampleController
+{
+    public function __invoke(
+        Request $request,
+        SerializerInterface $serializer,
+        SerializationContextBuilderInterface $serializationContextBuilder
+    ): JsonResponse {
+        $pet = new Pet();
+
+        $serializationContext = $serializationContextBuilder->getContextForSchemaObject(
+            'Pet',
+            $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
+        );
+
+        return JsonResponse::fromJsonString(
+            $serializer->serialize($pet, 'json', $serializationContext)
+        );
+    }
 }
 ```
 
