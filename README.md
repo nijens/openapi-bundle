@@ -9,9 +9,11 @@
 Helps you create a REST API from your OpenAPI specification.
 
 This bundle supports a design-first methodology for creating an API with Symfony by providing the following tools:
-* Loading the [path items](https://swagger.io/specification/#pathItemObject) and [operations](https://swagger.io/specification/#operationObject) of an OpenAPI specification as routes.
-* Validating the incoming JSON request bodies to those routes.
-* Exception handling.
+
+* [Loading the path items and operations of an OpenAPI specification as routes](#routing)
+* [Validation of JSON request bodies to those routes](#validation-of-json-request-bodies)
+* [OpenAPI-based serialization context for the Symfony Serializer](#openapi-based-serialization-context-for-the-symfony-serializer)
+* [Exception handling](#exception-handling)
 
 ## Installation
 
@@ -64,17 +66,21 @@ class AppKernel extends Kernel
 ```
 
 ## Usage
-Before starting with the implementation of the bundle, you should take the time to design your API according 
+Before starting with the implementation of the bundle, you should take the time to design your API according
 to the OpenAPI specification.
 
 The following resources can help you with designing the specification:
 * [OpenAPI specification version 3](https://swagger.io/specification)
 * [Swagger specification editor](https://editor.swagger.io)
 
-### Routing and validation
-This bundle provides a route loader and request validator that is able to load operations from your OpenAPI specification
+### Routing
+This bundle provides a route loader that can load [path items](https://swagger.io/specification/#pathItemObject)
+and [operations](https://swagger.io/specification/#operationObject) from your OpenAPI specification.
+
+You load your OpenAPI specification by configuring it in the routing of your application:
+
 ```yaml
-# config/routes/openapi.yaml or app/config/routes.yml
+# app/config/routes.yml
 
 api:
     prefix: /api
@@ -82,9 +88,6 @@ api:
     type: openapi
     name_prefix: "api_"
 ```
-
-When the operations of the path items have a `requestBody` property configured with the content-type 'application/json', 
-the bundle validates the incoming request bodies for those routes in the specification.
 
 #### Configuring a controller for a route
 A Symfony controller for a route is configured by adding the `x-symfony-controller` property to an operation within your OpenAPI specification.
@@ -116,9 +119,14 @@ A Symfony controller for a route is configured by adding the `x-symfony-controll
 
 The value of the `x-symfony-controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
 
+### Validation of JSON request bodies
+When the operations of the path items have a `requestBody` property configured with the content-type `application/json`,
+the bundle validates the incoming request bodies for those routes in the specification.
+
+
 #### Default validation error responses
 The following error responses can occur when validation fails during a request made to a route managed by the OpenAPI bundle:
-* `400 Bad Request`: when the request content type is not `application/json`
+* `400 Bad Request`: when the request content-type is not `application/json`
 * `400 Bad Request`: when the JSON within the request body is invalid
 * `422 Unprocessable Entity`: when the JSON within the request body does not validate with the JSON schema of the route
 
@@ -133,12 +141,59 @@ All validation error responses will return a response body similar to the follow
 }
 ```
 
-#### Customizing validation responses
-If your project requires a different formatting of the response or perhaps different response codes, the default
+### OpenAPI-based serialization context for the Symfony Serializer
+⚠ _**Please note:** This feature is still experimental. The API might change in a future minor version._
+
+The `SerializationContextBuilder` helps you with creating a serialization context for the Symfony Serializer.
+It allows you to easily create a JSON response from an object or entity based on your OpenAPI specification.
+
+The following example shows how to use the serialization context builder by leveraging the request attributes added
+by the routing.
+
+```php
+<?php
+
+use Nijens\OpenapiBundle\Routing\RouteContext;
+use Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\SerializerInterface;
+
+class ExampleController
+{
+    public function __invoke(
+        Request $request,
+        SerializerInterface $serializer,
+        SerializationContextBuilderInterface $serializationContextBuilder
+    ): JsonResponse {
+        $pet = new Pet();
+
+        $serializationContext = $serializationContextBuilder->getContextForSchemaObject(
+            'Pet',
+            $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
+        );
+
+        return JsonResponse::fromJsonString(
+            $serializer->serialize($pet, 'json', $serializationContext)
+        );
+    }
+}
+```
+
+### Exception handling
+For the path prefix, where you load your OpenAPI specification into, exception handling activates.
+The exception handling will transform every exception into a JSON representation. Exceptions that extend
+from the `Symfony\Component\HttpKernel\Exception\HttpException` allow you to control the status code of the
+exception response.
+
+Every other exception will return a `500 Internal Server Error`.
+
+#### Customizing exception handling
+If your project requires different formatting of the response or perhaps different response codes, the default
 response builder can be overridden. Following the ["How to Decorate Services" guide from Symfony](https://symfony.com/doc/current/service_container/service_decoration.html),
-you can define your own service which implements `ExceptionJsonResponseBuilderInterface` and handles the error response
+you can create your own service which implements `ExceptionJsonResponseBuilderInterface` and handles the error response
 building instead of `nijens_openapi.service.exception_json_response_builder`. When validation against the schema fails,
-an exception will be thrown which implements `HttpExceptionInterface`. The `getErrors()` method will provide a
+an exception is thrown, which implements `HttpExceptionInterface`. The `getErrors()` method will provide a
 multi-dimensional array similar to this:
 ```php
 [
@@ -163,7 +218,7 @@ multi-dimensional array similar to this:
 
 * Author: [Niels Nijens][link-author]
 
-Also see the list of [contributors][link-contributors] who participated in this project.
+Also, see the list of [contributors][link-contributors] who participated in this project.
 
 ## License
 The OpenAPI bundle is licensed under the MIT License. Please see the [LICENSE file][link-license] for details.
