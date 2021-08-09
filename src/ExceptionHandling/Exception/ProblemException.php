@@ -24,6 +24,10 @@ use Throwable;
  */
 class ProblemException extends Exception implements ProblemExceptionInterface
 {
+    private const DEFAULT_TYPE_URI = 'about:blank';
+
+    private const DEFAULT_TITLE = 'An error occurred.';
+
     /**
      * @var string
      */
@@ -151,8 +155,8 @@ class ProblemException extends Exception implements ProblemExceptionInterface
     public static function fromHttpException(
         HttpExceptionInterface $exception,
         ?int $statusCode = null,
-        string $typeUri = 'about:blank',
-        string $title = 'An error occurred.',
+        string $typeUri = self::DEFAULT_TYPE_URI,
+        string $title = self::DEFAULT_TITLE,
         string $instanceUri = null
     ): self {
         if ($statusCode === null) {
@@ -173,8 +177,8 @@ class ProblemException extends Exception implements ProblemExceptionInterface
     public static function fromThrowable(
         Throwable $throwable,
         int $statusCode = 500,
-        string $typeUri = 'about:blank',
-        string $title = 'An error occurred.',
+        string $typeUri = self::DEFAULT_TYPE_URI,
+        string $title = self::DEFAULT_TITLE,
         string $instanceUri = null
     ): self {
         return new static($typeUri, $title, $statusCode, $throwable->getMessage(), $throwable, $instanceUri);
