@@ -91,6 +91,24 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer">
+            <argument>~</argument>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformerInterface" alias="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer"/>
+
+        <service id="Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber">
+            <argument type="service" id="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformerInterface"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJsonResponseSubscriber">
+            <argument type="service" id="serializer"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="Nijens\OpenapiBundle\Serialization\SerializationContextBuilder">
             <argument type="service" id="nijens_openapi.json.schema_loader"/>
         </service>

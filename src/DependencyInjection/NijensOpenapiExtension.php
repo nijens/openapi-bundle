@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace Nijens\OpenapiBundle\DependencyInjection;
 
 use Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber;
+use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJsonResponseSubscriber;
+use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber;
+use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -37,16 +40,22 @@ class NijensOpenapiExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $this->registerExceptionHandlingConfiguration($config, $container);
+        $this->registerExceptionHandlingConfiguration($config['exception_handling'], $container);
     }
 
     private function registerExceptionHandlingConfiguration(array $config, ContainerBuilder $container): void
     {
-        if ($config['enabled'] === false) {
+        $definition = $container->getDefinition(ThrowableToProblemExceptionTransformer::class);
+        $definition->replaceArgument(0, $config['exceptions']);
+
+        if ($config['enabled'] !== true) {
+            $container->removeDefinition(ThrowableToProblemExceptionSubscriber::class);
+            $container->removeDefinition(ProblemExceptionToJsonResponseSubscriber::class);
+        }
+
+        if ($config['enabled'] !== null) {
             $container->removeDefinition(JsonResponseExceptionSubscriber::class);
             $container->removeDefinition('nijens_openapi.service.exception_json_response_builder');
-
-            return;
         }
     }
 }
