@@ -97,6 +97,46 @@ class ProblemException extends Exception implements ProblemExceptionInterface
         return $this->headers;
     }
 
+    public function withTypeUri(string $typeUri): ProblemExceptionInterface
+    {
+        $exception = $this->clone();
+        $exception->typeUri = $typeUri;
+
+        return $exception;
+    }
+
+    public function withTitle(string $title): ProblemExceptionInterface
+    {
+        $exception = $this->clone();
+        $exception->title = $title;
+
+        return $exception;
+    }
+
+    public function withInstanceUri(string $instanceUri): ProblemExceptionInterface
+    {
+        $exception = $this->clone();
+        $exception->instanceUri = $instanceUri;
+
+        return $exception;
+    }
+
+    public function withStatusCode(int $statusCode): ProblemExceptionInterface
+    {
+        $exception = $this->clone();
+        $exception->statusCode = $statusCode;
+
+        return $exception;
+    }
+
+    public function withHeaders(array $headers): ProblemExceptionInterface
+    {
+        $exception = $this->clone();
+        $exception->headers = $headers;
+
+        return $exception;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -138,5 +178,18 @@ class ProblemException extends Exception implements ProblemExceptionInterface
         string $instanceUri = null
     ): self {
         return new static($typeUri, $title, $statusCode, $throwable->getMessage(), $throwable, $instanceUri);
+    }
+
+    private function clone(): self
+    {
+        return new static(
+            $this->getTypeUri(),
+            $this->getTitle(),
+            $this->getStatusCode(),
+            $this->getMessage(),
+            $this->getPrevious(),
+            $this->getInstanceUri(),
+            $this->getHeaders()
+        );
     }
 }

@@ -36,4 +36,17 @@ interface ProblemExceptionInterface extends Throwable, JsonSerializable
     public function getStatusCode(): int;
 
     public function getHeaders(): array;
+
+    public function withTypeUri(string $typeUri): self;
+
+    public function withTitle(string $title): self;
+
+    public function withInstanceUri(string $instanceUri): self;
+
+    public function withStatusCode(int $statusCode): self;
+
+    /**
+     * @param array<string, string> $headers
+     */
+    public function withHeaders(array $headers): self;
 }
