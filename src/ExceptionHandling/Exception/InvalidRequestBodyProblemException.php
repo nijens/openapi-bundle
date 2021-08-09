@@ -18,7 +18,7 @@ use Throwable;
 final class InvalidRequestBodyProblemException extends ProblemException
 {
     /**
-     * @var array
+     * @var ViolationInterface[]
      */
     private $violations;
 
