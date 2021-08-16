@@ -43,6 +43,9 @@ paths:
     /error/throw-exception:
         get:
             x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwException'
+    /error/throw-invalid-argument-exception:
+        get:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwInvalidArgumentException'
     /pet:
         put:
             tags:
