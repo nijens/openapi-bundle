@@ -31,7 +31,7 @@ class ProblemExceptionNormalizer implements ContextAwareNormalizerInterface, Nor
 
     private const ALREADY_CALLED = 'nijens_openapi.problem_exception_normalizer.already_called';
 
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = [])
     {
         if ($object instanceof ProblemExceptionInterface === false) {
             throw new InvalidArgumentException(sprintf('The object must implement "%s".', ProblemExceptionInterface::class));
@@ -44,7 +44,7 @@ class ProblemExceptionNormalizer implements ContextAwareNormalizerInterface, Nor
         return array_filter($data);
     }
 
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, $format = null, array $context = []): bool
     {
         if (isset($context[self::ALREADY_CALLED])) {
             return false;
