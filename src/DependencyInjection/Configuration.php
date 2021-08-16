@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder('framework');
+        $treeBuilder = new TreeBuilder('nijens_openapi');
         $rootNode = $treeBuilder->getRootNode();
 
         $this->addExceptionsSection($rootNode);
