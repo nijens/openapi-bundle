@@ -102,6 +102,10 @@
             <argument type="tagged_iterator" tag="serializer.encoder"/>
         </service>
 
+        <service id="Nijens\OpenapiBundle\ExceptionHandling\Normalizer\ProblemExceptionNormalizer">
+            <tag name="nijens_openapi.serializer.normalizer" priority="32"/>
+        </service>
+
         <service id="nijens_openapi.serializer.normalizer.json" class="Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer">
             <tag name="nijens_openapi.serializer.normalizer" priority="0"/>
         </service>
