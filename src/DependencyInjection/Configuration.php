@@ -13,9 +13,12 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\DependencyInjection;
 
+use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidContentTypeProblemException;
+use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestBodyProblemException;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Validates and merges configuration from the configuration files.
@@ -25,6 +28,17 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     public const BUNDLE_NAME = 'nijens/openapi-bundle';
+
+    public const DEFAULT_EXCEPTION_HANDLING_EXCEPTIONS = [
+        InvalidContentTypeProblemException::class => [
+            'status_code' => Response::HTTP_UNSUPPORTED_MEDIA_TYPE,
+            'title' => 'The content type is not supported.',
+        ],
+        InvalidRequestBodyProblemException::class => [
+            'status_code' => Response::HTTP_BAD_REQUEST,
+            'title' => 'The provided request body contains errors.',
+        ],
+    ];
 
     public function getConfigTreeBuilder(): TreeBuilder
     {

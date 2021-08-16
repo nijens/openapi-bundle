@@ -46,7 +46,10 @@ class NijensOpenapiExtension extends Extension
     private function registerExceptionHandlingConfiguration(array $config, ContainerBuilder $container): void
     {
         $definition = $container->getDefinition(ThrowableToProblemExceptionTransformer::class);
-        $definition->replaceArgument(0, $config['exceptions']);
+        $definition->replaceArgument(
+            0,
+            array_replace_recursive(Configuration::DEFAULT_EXCEPTION_HANDLING_EXCEPTIONS, $config['exceptions'])
+        );
 
         if ($config['enabled'] !== true) {
             $container->removeDefinition(ThrowableToProblemExceptionSubscriber::class);
