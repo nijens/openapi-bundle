@@ -11,7 +11,9 @@
 
 namespace Nijens\OpenapiBundle;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 
 /**
  * OpenapiBundle.
@@ -20,4 +22,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class NijensOpenapiBundle extends Bundle
 {
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(
+            new SerializerPass('nijens_openapi.serializer', 'nijens_openapi.serializer.normalizer')
+        );
+    }
 }

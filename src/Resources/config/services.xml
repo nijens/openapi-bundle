@@ -97,6 +97,15 @@
             <argument>~</argument>
         </service>
 
+        <service id="nijens_openapi.serializer" class="Symfony\Component\Serializer\Serializer">
+            <argument type="tagged_iterator" tag="nijens_openapi.serializer.normalizer"/>
+            <argument type="tagged_iterator" tag="serializer.encoder"/>
+        </service>
+
+        <service id="nijens_openapi.serializer.normalizer.json" class="Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer">
+            <tag name="nijens_openapi.serializer.normalizer" priority="0"/>
+        </service>
+
         <service id="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformerInterface" alias="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer"/>
 
         <service id="Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber">
@@ -106,7 +115,7 @@
         </service>
 
         <service id="Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJsonResponseSubscriber">
-            <argument type="service" id="serializer"/>
+            <argument type="service" id="nijens_openapi.serializer"/>
 
             <tag name="kernel.event_subscriber"/>
         </service>
