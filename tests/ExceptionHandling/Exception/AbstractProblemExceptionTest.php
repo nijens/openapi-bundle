@@ -33,6 +33,7 @@ abstract class AbstractProblemExceptionTest extends TestCase
         $exception = $this->exception->withTypeUri($typeUri);
 
         static::assertNotSame($this->exception, $exception);
+        static::assertProblemExceptionEqualsExcludingProperty($this->exception, $exception, 'type');
         static::assertSame($typeUri, $exception->getTypeUri());
     }
 
@@ -43,6 +44,7 @@ abstract class AbstractProblemExceptionTest extends TestCase
         $exception = $this->exception->withTitle($title);
 
         static::assertNotSame($this->exception, $exception);
+        static::assertProblemExceptionEqualsExcludingProperty($this->exception, $exception, 'title');
         static::assertSame($title, $exception->getTitle());
     }
 
@@ -53,6 +55,7 @@ abstract class AbstractProblemExceptionTest extends TestCase
         $exception = $this->exception->withInstanceUri($instanceUri);
 
         static::assertNotSame($this->exception, $exception);
+        static::assertProblemExceptionEqualsExcludingProperty($this->exception, $exception, 'instance');
         static::assertSame($instanceUri, $exception->getInstanceUri());
     }
 
@@ -63,6 +66,7 @@ abstract class AbstractProblemExceptionTest extends TestCase
         $exception = $this->exception->withStatusCode($statusCode);
 
         static::assertNotSame($this->exception, $exception);
+        static::assertProblemExceptionEqualsExcludingProperty($this->exception, $exception, 'status');
         static::assertSame($statusCode, $exception->getStatusCode());
     }
 
@@ -73,6 +77,23 @@ abstract class AbstractProblemExceptionTest extends TestCase
         $exception = $this->exception->withHeaders($headers);
 
         static::assertNotSame($this->exception, $exception);
+        static::assertProblemExceptionEqualsExcludingProperty($this->exception, $exception, 'headers');
         static::assertSame($headers, $exception->getHeaders());
+    }
+
+    /**
+     * Asserts that two {@see ProblemExceptionInterface} implementations are equal not including the excluded property.
+     */
+    public static function assertProblemExceptionEqualsExcludingProperty(
+        ProblemExceptionInterface $expected,
+        ProblemExceptionInterface $actual,
+        string $excludedProperty
+    ): void {
+        $expected = $expected->jsonSerialize();
+        $actual = $actual->jsonSerialize();
+
+        unset($expected[$excludedProperty], $actual[$excludedProperty]);
+
+        static::assertSame($expected, $actual);
     }
 }
