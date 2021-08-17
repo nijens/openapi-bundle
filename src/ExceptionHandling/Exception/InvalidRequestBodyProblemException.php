@@ -42,6 +42,17 @@ final class InvalidRequestBodyProblemException extends ProblemException
         return $this->violations;
     }
 
+    /**
+     * @param ViolationInterface[] $violations
+     */
+    public function withViolations(array $violations): ProblemExceptionInterface
+    {
+        $exception = $this->clone();
+        $exception->violations = $violations;
+
+        return $exception;
+    }
+
     public function jsonSerialize(): array
     {
         $data = parent::jsonSerialize();

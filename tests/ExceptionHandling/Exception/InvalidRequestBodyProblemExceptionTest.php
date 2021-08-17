@@ -39,6 +39,17 @@ class InvalidRequestBodyProblemExceptionTest extends AbstractProblemExceptionTes
         );
     }
 
+    public function testCanSetViolations(): void
+    {
+        $violations = [new Violation('valid_json', 'Invalid JSON string.')];
+
+        $exception = $this->exception->withViolations($violations);
+
+        static::assertNotSame($this->exception, $exception);
+        static::assertProblemExceptionEqualsExcludingProperty($this->exception, $exception, 'violations');
+        static::assertSame($violations, $exception->getViolations());
+    }
+
     public function testCanCreateFromHttpException(): void
     {
         $httpException = new MethodNotAllowedHttpException(['GET'], 'Not allowed to POST to this endpoint.');
