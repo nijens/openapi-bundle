@@ -14,6 +14,8 @@ namespace Nijens\OpenapiBundle\Exception;
 /**
  * HttpExceptionInterface.
  *
+ * @deprecated since 1.3, to be removed in 2.0. Use a ProblemExceptionInterface implementation instead.
+ *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
 interface HttpExceptionInterface

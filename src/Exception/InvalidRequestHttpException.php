@@ -16,6 +16,8 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 /**
  * InvalidRequestHttpException.
  *
+ * @deprecated since 1.3, to be removed in 2.0. Use InvalidRequestBodyProblemException instead.
+ *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
 class InvalidRequestHttpException extends UnprocessableEntityHttpException implements HttpExceptionInterface

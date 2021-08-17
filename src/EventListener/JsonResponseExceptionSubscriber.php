@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Transforms an exception to a JSON response for OpenAPI routes.
+ *
+ * @deprecated since 1.3, to be removed in 2.0. Use the new exception handling system instead.
  */
 class JsonResponseExceptionSubscriber implements EventSubscriberInterface
 {

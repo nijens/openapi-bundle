@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Builds a JSON response to an exception for OpenAPI routes.
  *
+ * @deprecated since 1.3, to be removed in 2.0. Use the new exception handling system instead.
+ *
  * @author David Cochrum <dcochrum@sonnysdirect.com>
  */
 class ExceptionJsonResponseBuilder implements ExceptionJsonResponseBuilderInterface
