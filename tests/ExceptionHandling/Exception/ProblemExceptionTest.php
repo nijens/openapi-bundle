@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -13,72 +15,16 @@ namespace Nijens\OpenapiBundle\Tests\ExceptionHandling\Exception;
 
 use Error;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\ProblemException;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Tests the {@see ProblemException}.
  */
-class ProblemExceptionTest extends TestCase
+class ProblemExceptionTest extends AbstractProblemExceptionTest
 {
-    /**
-     * @var ProblemException
-     */
-    private $exception;
-
     protected function setUp(): void
     {
         $this->exception = new ProblemException('about:blank', 'Error', 500);
-    }
-
-    public function testCanSetTypeUri(): void
-    {
-        $typeUri = 'https://example.com/error';
-
-        $exception = $this->exception->withTypeUri($typeUri);
-
-        static::assertNotSame($this->exception, $exception);
-        static::assertSame($typeUri, $exception->getTypeUri());
-    }
-
-    public function testCanSetTitle(): void
-    {
-        $title = 'An error occurred';
-
-        $exception = $this->exception->withTitle($title);
-
-        static::assertNotSame($this->exception, $exception);
-        static::assertSame($title, $exception->getTitle());
-    }
-
-    public function testCanSetInstanceUri(): void
-    {
-        $instanceUri = 'https://example.com/instance/123';
-
-        $exception = $this->exception->withInstanceUri($instanceUri);
-
-        static::assertNotSame($this->exception, $exception);
-        static::assertSame($instanceUri, $exception->getInstanceUri());
-    }
-
-    public function testCanSetStatusCode(): void
-    {
-        $statusCode = 400;
-
-        $exception = $this->exception->withStatusCode($statusCode);
-
-        static::assertNotSame($this->exception, $exception);
-        static::assertSame($statusCode, $exception->getStatusCode());
-    }
-
-    public function testCanSetHeaders(): void
-    {
-        $headers = ['Allow' => 'GET'];
-
-        $exception = $this->exception->withHeaders($headers);
-
-        static::assertNotSame($this->exception, $exception);
-        static::assertSame($headers, $exception->getHeaders());
     }
 
     public function testCanCreateFromHttpException(): void
