@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -12,7 +14,7 @@
 namespace Nijens\OpenapiBundle\ExceptionHandling\Exception;
 
 /**
- * Default violation implementation as part of {@see InvalidRequestBodyProblemException}.
+ * Default violation implementation as part of the {@see InvalidRequestBodyProblemException}.
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
@@ -21,7 +23,7 @@ class Violation implements ViolationInterface
     /**
      * @var string
      */
-    private $propertyPath;
+    private $constraint;
 
     /**
      * @var string
@@ -29,15 +31,15 @@ class Violation implements ViolationInterface
     private $message;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $constraint;
+    private $propertyPath;
 
-    public function __construct(string $propertyPath, string $message, string $constraint)
+    public function __construct(string $constraint, string $message, ?string $propertyPath = null)
     {
-        $this->propertyPath = $propertyPath;
-        $this->message = $message;
         $this->constraint = $constraint;
+        $this->message = $message;
+        $this->propertyPath = $propertyPath;
     }
 
     public function getPropertyPath(): string
@@ -58,18 +60,18 @@ class Violation implements ViolationInterface
     public function jsonSerialize(): array
     {
         return [
-            'property' => $this->getPropertyPath(),
-            'message' => $this->getMessage(),
             'constraint' => $this->getConstraint(),
+            'message' => $this->getMessage(),
+            'property' => $this->getPropertyPath(),
         ];
     }
 
     public static function fromArray(array $violation): self
     {
         return new static(
-            $violation['property'] ?? $violation['propertyPath'] ?? '',
+            $violation['constraint'] ?? '',
             $violation['message'] ?? '',
-            $violation['constraint'] ?? ''
+            $violation['property'] ?? $violation['propertyPath'] ?? null
         );
     }
 }
