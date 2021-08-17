@@ -49,4 +49,12 @@ final class InvalidRequestBodyProblemException extends ProblemException
 
         return $data;
     }
+
+    protected function clone()
+    {
+        $clone = parent::clone();
+        $clone->violations = $this->violations;
+
+        return $clone;
+    }
 }

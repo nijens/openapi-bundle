@@ -184,7 +184,10 @@ class ProblemException extends Exception implements ProblemExceptionInterface
         return new static($typeUri, $title, $statusCode, $throwable->getMessage(), $throwable, $instanceUri);
     }
 
-    private function clone(): self
+    /**
+     * @return self
+     */
+    protected function clone()
     {
         return new static(
             $this->getTypeUri(),
