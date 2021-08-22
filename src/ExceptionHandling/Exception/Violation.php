@@ -42,7 +42,7 @@ class Violation implements ViolationInterface
         $this->propertyPath = $propertyPath;
     }
 
-    public function getPropertyPath(): string
+    public function getPropertyPath(): ?string
     {
         return $this->propertyPath;
     }

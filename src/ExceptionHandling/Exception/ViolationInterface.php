@@ -22,7 +22,7 @@ use JsonSerializable;
  */
 interface ViolationInterface extends JsonSerializable
 {
-    public function getPropertyPath(): string;
+    public function getPropertyPath(): ?string;
 
     public function getMessage(): string;
 
