@@ -24,7 +24,7 @@ use Throwable;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class ThrowableToProblemExceptionTransformer implements ThrowableToProblemExceptionTransformerInterface
+final class ThrowableToProblemExceptionTransformer implements ThrowableToProblemExceptionTransformerInterface
 {
     /**
      * @var array<string, array>
