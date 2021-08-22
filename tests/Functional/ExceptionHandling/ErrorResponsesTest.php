@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Nijens\OpenapiBundle\Tests\Functional;
+namespace Nijens\OpenapiBundle\Tests\Functional\ExceptionHandling;
 
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -19,7 +19,12 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ExceptionHandlingTest extends WebTestCase
+/**
+ * Functional testing of error responses created by the exception handling feature.
+ *
+ * @author Niels Nijens <nijens.niels@gmail.com>
+ */
+class ErrorResponsesTest extends WebTestCase
 {
     /**
      * @var KernelBrowser
@@ -125,44 +130,6 @@ class ExceptionHandlingTest extends WebTestCase
         static::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         static::assertJsonStringEqualsJsonString(
             '{"type":"https://example.com/invalid-error","title":"The request was invalid.","status":400,"detail":"No valid request body provided.","instance":"/api/error/throw-invalid-argument-exception"}',
-            $this->client->getResponse()->getContent()
-        );
-    }
-
-    public function testCanReturnProblemJsonObjectWhenRouteIsNotFound(): void
-    {
-        $this->client->request(
-            Request::METHOD_GET,
-            '/api/does-not-exist',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ]
-        );
-
-        static::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-        static::assertJsonStringEqualsJsonString(
-            '{"type":"about:blank","title":"An error occurred.","status":404,"detail":"No route found for \'GET /api/does-not-exist\'."}',
-            $this->client->getResponse()->getContent()
-        );
-    }
-
-    public function testCanReturnProblemJsonObjectWhenRouteMethodIsNotAllowed(): void
-    {
-        $this->client->request(
-            Request::METHOD_GET,
-            '/api/pet',
-            [],
-            [],
-            [
-                'CONTENT_TYPE' => 'application/json',
-            ]
-        );
-
-        static::assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
-        static::assertJsonStringEqualsJsonString(
-            '{"type":"about:blank","title":"An error occurred.","status":405,"detail":"No route found for \'GET /api/pet\': Method Not Allowed (Allowed: PUT, POST)."}',
             $this->client->getResponse()->getContent()
         );
     }
