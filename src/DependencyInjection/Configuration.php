@@ -36,7 +36,7 @@ class Configuration implements ConfigurationInterface
         ],
         InvalidRequestBodyProblemException::class => [
             'status_code' => Response::HTTP_BAD_REQUEST,
-            'title' => 'The provided request body contains errors.',
+            'title' => 'The request body contains errors.',
         ],
     ];
 
