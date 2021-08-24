@@ -97,6 +97,10 @@
             <argument>~</argument>
         </service>
 
+        <service id="Nijens\OpenapiBundle\ExceptionHandling\DeprecatedExceptionToProblemExceptionTransformer" decorates="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer">
+            <argument type="service" id="Nijens\OpenapiBundle\ExceptionHandling\DeprecatedExceptionToProblemExceptionTransformer.inner"/>
+        </service>
+
         <service id="nijens_openapi.serializer" class="Symfony\Component\Serializer\Serializer">
             <argument type="tagged_iterator" tag="nijens_openapi.serializer.normalizer"/>
             <argument type="tagged_iterator" tag="serializer.encoder"/>
