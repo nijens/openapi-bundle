@@ -15,6 +15,7 @@ namespace Nijens\OpenapiBundle\ExceptionHandling\Normalizer;
 
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\ProblemExceptionInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
@@ -25,7 +26,7 @@ use Throwable;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class ProblemExceptionNormalizer implements ContextAwareNormalizerInterface, NormalizerAwareInterface
+final class ProblemExceptionNormalizer implements ContextAwareNormalizerInterface, NormalizerAwareInterface
 {
     use NormalizerAwareTrait;
 
@@ -37,11 +38,15 @@ class ProblemExceptionNormalizer implements ContextAwareNormalizerInterface, Nor
             throw new InvalidArgumentException(sprintf('The object must implement "%s".', ProblemExceptionInterface::class));
         }
 
+        if (isset($context[self::ALREADY_CALLED])) {
+            throw new LogicException(sprintf('The normalizer "%s" can only be called once.', self::class));
+        }
+
         $context[self::ALREADY_CALLED] = true;
 
         $data = $this->normalizer->normalize($object, $format, $context);
 
-        return array_filter($data);
+        return $this->unsetKeysWithNullValue($data);
     }
 
     public function supportsNormalization($data, $format = null, array $context = []): bool
@@ -51,5 +56,20 @@ class ProblemExceptionNormalizer implements ContextAwareNormalizerInterface, Nor
         }
 
         return $data instanceof ProblemExceptionInterface;
+    }
+
+    private function unsetKeysWithNullValue(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[$key] = $this->unsetKeysWithNullValue($value);
+            }
+
+            if ($value === null) {
+                unset($data[$key]);
+            }
+        }
+
+        return $data;
     }
 }
