@@ -36,14 +36,8 @@ class ProblemExceptionNormalizerTest extends TestCase
 
     protected function setUp(): void
     {
-        $anotherNormalizer = $this->createMock(NormalizerInterface::class);
-        $anotherNormalizer->method('normalize')
-            ->willReturnCallback(function (JsonSerializable $data) {
-                return json_decode(json_encode($data), true);
-            });
-
-        $this->normalizer = new ProblemExceptionNormalizer();
-        $this->normalizer->setNormalizer($anotherNormalizer);
+        $this->normalizer = new ProblemExceptionNormalizer(true);
+        $this->createAndSetNormalizerAwareness($this->normalizer);
     }
 
     public function testSupportsProblemException(): void
@@ -87,6 +81,23 @@ class ProblemExceptionNormalizerTest extends TestCase
                 'title' => 'An error occurred.',
                 'status' => 500,
                 'detail' => '',
+            ],
+            $this->normalizer->normalize($throwable)
+        );
+    }
+
+    public function testCanPreventInformationDisclosureByRemovingDetails(): void
+    {
+        $this->normalizer = new ProblemExceptionNormalizer(false);
+        $this->createAndSetNormalizerAwareness($this->normalizer);
+
+        $throwable = ProblemException::fromThrowable(new Error('Syntax error.'));
+
+        static::assertSame(
+            [
+                'type' => 'about:blank',
+                'title' => 'An error occurred.',
+                'status' => 500,
             ],
             $this->normalizer->normalize($throwable)
         );
@@ -150,5 +161,16 @@ class ProblemExceptionNormalizerTest extends TestCase
             null,
             ['nijens_openapi.problem_exception_normalizer.already_called' => true]
         );
+    }
+
+    private function createAndSetNormalizerAwareness(ProblemExceptionNormalizer $normalizer): void
+    {
+        $normalizerForAwareness = $this->createMock(NormalizerInterface::class);
+        $normalizerForAwareness->method('normalize')
+            ->willReturnCallback(function (JsonSerializable $data) {
+                return json_decode(json_encode($data), true);
+            });
+
+        $normalizer->setNormalizer($normalizerForAwareness);
     }
 }

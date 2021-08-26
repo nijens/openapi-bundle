@@ -107,6 +107,8 @@
         </service>
 
         <service id="Nijens\OpenapiBundle\ExceptionHandling\Normalizer\ProblemExceptionNormalizer">
+            <argument>%kernel.debug%</argument>
+
             <tag name="nijens_openapi.serializer.normalizer" priority="32"/>
         </service>
 
