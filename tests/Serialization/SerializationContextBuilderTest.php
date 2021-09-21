@@ -374,6 +374,68 @@ class SerializationContextBuilderTest extends TestCase
         );
     }
 
+    public function testCanCreateContextForReferencedCombinedObjectSchema(): void
+    {
+        $schema = $this->convertToObject([
+            'components' => [
+                'schemas' => [
+                    'Pet' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                            'owner' => [
+                                '$ref' => '#/components/schemas/Human',
+                            ],
+                        ],
+                    ],
+                    'Robot' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => [
+                                'type' => 'integer',
+                            ],
+                        ],
+                    ],
+                    'Human' => [
+                        'allOf' => [
+                            [
+                                '$ref' => '#/components/schemas/Robot',
+                            ],
+                            [
+                                'type' => 'object',
+                                'properties' => [
+                                    'name' => [
+                                        'type' => 'string',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $schema->components->schemas->Pet->properties->owner = new Reference('#/components/schemas/Human', $schema);
+        $schema->components->schemas->Human->allOf[0] = new Reference('#/components/schemas/Robot', $schema);
+
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => [
+                    'name',
+                    'owner' => [
+                        'id',
+                        'name',
+                    ],
+                ],
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
+        );
+    }
+
     public function testCanCreateContextForUnimplementedJsonSchemaKeywordsWithoutErrors(): void
     {
         $schema = $this->convertToObject([
