@@ -142,6 +142,6 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
             return false;
         }
 
-        return $schemaObject->type === $type;
+        return isset($schemaObject->type) && $schemaObject->type === $type;
     }
 }
