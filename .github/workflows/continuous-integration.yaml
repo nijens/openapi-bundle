@@ -9,18 +9,18 @@ jobs:
 
         strategy:
             matrix:
-                php-version: ['7.3', '7.4']
-                symfony-version: ['4.4', '5.0', '5.1', '5.2']
+                php-version: ['7.4', '8.0', '8.1']
+                symfony-version: ['4.4', '5.0', '5.1', '5.2', '5.3', '5.4']
                 test-options: ['']
                 coverage: [false]
                 include:
-                    - php-version: '7.4'
-                      symfony-version: '5.3'
+                    - php-version: '8.1'
+                      symfony-version: '5.4'
                       coverage: true
                       test-options: '-with-coverage'
                       minimum-coverage-percentage: 95
-                    - php-version: '8.0'
-                      symfony-version: '5.3'
+                    - php-version: '8.1'
+                      symfony-version: '5.4'
 
         steps:
             - uses: actions/checkout@v2
@@ -83,7 +83,7 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: '7.4'
+                  php-version: '8.1'
                   coverage: none
 
             - name: Validate composer.json and composer.lock
@@ -99,7 +99,7 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: '7.4'
+                  php-version: '8.1'
                   coverage: none
 
             - name: Detect dependency cache directory
