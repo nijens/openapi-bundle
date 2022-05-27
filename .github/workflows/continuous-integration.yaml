@@ -70,7 +70,6 @@ jobs:
               with:
                   filename: coverage.cobertura.xml
                   badge: true
-                  format: markdown
                   fail_below_min: true
                   hide_branch_rate: true
                   output: both
@@ -81,7 +80,7 @@ jobs:
               if: ${{ matrix.coverage == true && github.event_name == 'pull_request' }}
               with:
                 recreate: true
-                path: code-coverage-results.md
+                path: coverage.txt
 
     lockfile-integrity:
         name: Composer lockfile integrity

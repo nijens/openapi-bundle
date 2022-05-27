@@ -31,7 +31,7 @@ test: install ## Run the unit tests.
 .PHONY: tests
 
 test-with-coverage: install ## Run the unit tests with coverage report in Cobertura XML format.
-	./vendor/bin/phpunit --coverage-cobertura coverage.cobertura.xml
+	./vendor/bin/phpunit --coverage-cobertura coverage.cobertura.xml --coverage-text=coverage.txt
 .PHONY: tests-with-coverage
 
 code-style-fix: install ## Fix the code style.
