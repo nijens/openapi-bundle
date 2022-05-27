@@ -23,7 +23,7 @@ ifeq ($(filter $(version),5.3 5.4 6.0 6.1),)
 endif
 
 	composer require "symfony/symfony:$(version).*" --dev --no-update
-	composer update symfony/* --prefer-dist --with-all-dependencies --no-progress
+	composer update symfony/* monolog/monolog --prefer-dist --with-all-dependencies --no-progress
 .PHONY: switch-symfony-version
 
 test: install ## Run the unit tests.
