@@ -81,6 +81,7 @@ jobs:
               with:
                 recreate: true
                 path: coverage.txt
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     lockfile-integrity:
         name: Composer lockfile integrity
