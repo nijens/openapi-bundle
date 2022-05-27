@@ -6,6 +6,8 @@ framework:
         utf8: true
         strict_requirements: true
 
+    http_method_override: false
+
     serializer: ~
 
     session:
