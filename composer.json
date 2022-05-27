@@ -28,6 +28,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
+        "masterminds/html5": "^2.7",
         "monolog/monolog": "^2.6",
         "php-coveralls/php-coveralls": "^2.1",
         "phpunit/phpunit": "^9.3",
