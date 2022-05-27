@@ -138,7 +138,7 @@ class CatchAllControllerTest extends TestCase
         try {
             $this->controller->__invoke($request);
             $this->fail();
-        } catch (NotFoundHttpException | MethodNotAllowedHttpException $exception) {
+        } catch (NotFoundHttpException|MethodNotAllowedHttpException $exception) {
         }
 
         $this->assertCount(2, $this->routeCollection);
