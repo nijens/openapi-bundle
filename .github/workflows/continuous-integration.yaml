@@ -10,7 +10,7 @@ jobs:
         strategy:
             matrix:
                 php-version: ['7.4', '8.0', '8.1']
-                symfony-version: ['4.4', '5.0', '5.1', '5.2', '5.3', '5.4']
+                symfony-version: ['4.4', '5.0', '5.1', '5.2', '5.3', '5.4', '6.0', '6.1']
                 test-options: ['']
                 coverage: [false]
                 include:
@@ -21,6 +21,21 @@ jobs:
                       minimum-coverage-percentage: 95
                     - php-version: '8.1'
                       symfony-version: '5.4'
+                exclude:
+                    - php-version: '7.4'
+                      symfony-version: '6.0'
+                    - php-version: '7.4'
+                      symfony-version: '6.1'
+                    - php-version: '8.0'
+                      symfony-version: '5.0'
+                    - php-version: '8.0'
+                      symfony-version: '6.1'
+                    - php-version: '8.1'
+                      symfony-version: '5.0'
+                    - php-version: '8.1'
+                      symfony-version: '5.1'
+                    - php-version: '8.1'
+                      symfony-version: '5.2'
 
         steps:
             - uses: actions/checkout@v2
