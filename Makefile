@@ -17,7 +17,7 @@ ifndef version
 	@exit 1
 endif
 
-ifneq ($(version), 5.3)
+ifeq ($(filter $(version),5.3 5.4),)
 	sed -i -e "s/\(\s\+\)# \(storage_id:\)/\1\2/" tests/Functional/App/config.yaml
 	sed -i -e "s/\(\s\+\)\(storage_factory_id:\)/\1# \2/" tests/Functional/App/config.yaml
 endif
