@@ -163,7 +163,7 @@ class RouteLoader extends FileLoader
     }
 
     /**
-     * Creates a route name based on the path.
+     * Creates a route name based on the path and request method.
      */
     private function createRouteName(string $path, string $requestMethod): string
     {
