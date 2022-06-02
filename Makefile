@@ -17,13 +17,13 @@ ifndef version
 	@exit 1
 endif
 
-ifneq ($(version), 5.3)
+ifeq ($(filter $(version),5.3 5.4 6.0 6.1),)
 	sed -i -e "s/\(\s\+\)# \(storage_id:\)/\1\2/" tests/Functional/App/config.yaml
 	sed -i -e "s/\(\s\+\)\(storage_factory_id:\)/\1# \2/" tests/Functional/App/config.yaml
 endif
 
 	composer require "symfony/symfony:$(version).*" --dev --no-update
-	composer update symfony/* --prefer-dist --no-progress
+	composer update symfony/* monolog/monolog --prefer-dist --with-all-dependencies --no-progress
 .PHONY: switch-symfony-version
 
 test: install ## Run the unit tests.

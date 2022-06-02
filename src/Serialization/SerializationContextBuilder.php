@@ -132,7 +132,16 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
     private function isType($schemaObject, string $type): bool
     {
         $schemaObject = $this->dereference($schemaObject);
+        if (isset($schemaObject->allOf)) {
+            foreach ($schemaObject->allOf as $allOfSchemaObject) {
+                if ($this->isType($allOfSchemaObject, $type)) {
+                    return true;
+                }
+            }
 
-        return $schemaObject->type === $type;
+            return false;
+        }
+
+        return isset($schemaObject->type) && $schemaObject->type === $type;
     }
 }
