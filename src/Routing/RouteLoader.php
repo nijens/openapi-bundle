@@ -137,7 +137,7 @@ class RouteLoader extends FileLoader
         $route->setMethods($requestMethod);
 
         $collection->add(
-            $this->createRouteName($path, $requestMethod, $operation->operationId ?? null),
+            $operation->operationId ?? $this->createRouteName($path, $requestMethod),
             $route
         );
     }
@@ -163,14 +163,10 @@ class RouteLoader extends FileLoader
     }
 
     /**
-     * Creates a route name based on the path and request method or by operation id.
+     * Creates a route name based on the path.
      */
-    private function createRouteName(string $path, string $requestMethod, ?string $operationId = null): string
+    private function createRouteName(string $path, string $requestMethod): string
     {
-        if ($operationId !== null) {
-            return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $operationId));
-        }
-
         return sprintf('%s_%s',
             trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $path), '_'),
             $requestMethod
