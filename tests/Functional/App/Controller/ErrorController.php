@@ -15,6 +15,7 @@ namespace Nijens\OpenapiBundle\Tests\Functional\App\Controller;
 
 use Error;
 use Exception;
+use InvalidArgumentException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class ErrorController
@@ -37,5 +38,10 @@ class ErrorController
     public function throwException()
     {
         throw new Exception('This is an exception thrown by the OpenAPI bundle test suite.');
+    }
+
+    public function throwInvalidArgumentException()
+    {
+        throw new InvalidArgumentException('No valid request body provided.');
     }
 }

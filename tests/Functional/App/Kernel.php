@@ -75,12 +75,13 @@ class Kernel extends BaseKernel
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
     {
         $loader->load(__DIR__.'/config.yaml');
+        $loader->load(__DIR__.sprintf('/bundle.%s.yaml', $this->getEnvironment()));
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function configureRoutes($routes)
+    protected function configureRoutes($routes): void
     {
         $routes->import(__DIR__.'/routing.yaml');
     }

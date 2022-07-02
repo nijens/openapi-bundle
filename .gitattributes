@@ -2,6 +2,8 @@
 /**                 export-ignore
 
 # Exclude the following files from removal of releases with '-export-ignore'.
+/docs               -export-ignore
+/docs/**            -export-ignore
 /src                -export-ignore
 /src/**             -export-ignore
 /composer.json      -export-ignore

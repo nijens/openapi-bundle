@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * Formats a response to an exception for OpenAPI routes.
  *
+ * @deprecated since 1.3, to be removed in 2.0. Use the new exception handling system instead.
+ *
  * @author David Cochrum <dcochrum@sonnysdirect.com>
  */
 interface ExceptionJsonResponseBuilderInterface

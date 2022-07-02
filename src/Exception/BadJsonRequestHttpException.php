@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 /**
  * BadJsonRequestHttpException.
  *
+ * @deprecated since 1.3, to be removed in 2.0. Use InvalidRequestBodyProblemException instead.
+ *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
 class BadJsonRequestHttpException extends BadRequestHttpException implements HttpExceptionInterface

@@ -1,0 +1,9 @@
+nijens_openapi:
+    exception_handling:
+        enabled: true
+        exceptions:
+            InvalidArgumentException:
+                status_code: 400
+                type_uri: https://example.com/invalid-error
+                title: The request was invalid.
+                add_instance_uri: true
