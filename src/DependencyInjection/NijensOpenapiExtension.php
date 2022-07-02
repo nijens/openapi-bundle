@@ -18,9 +18,11 @@ use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJso
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Loads and manages the bundle configuration and services.
@@ -37,10 +39,24 @@ class NijensOpenapiExtension extends Extension
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
 
+        $this->loadDeprecatedServices($loader);
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->registerExceptionHandlingConfiguration($config['exception_handling'], $container);
+    }
+
+    /**
+     * Loads the deprecated services file with backwards compatibility for XML Schema.
+     */
+    private function loadDeprecatedServices(XmlFileLoader $loader): void
+    {
+        $deprecatedServicesFileSuffix = '';
+        if ($this->getSymfonyVersion() >= 50100) {
+            $deprecatedServicesFileSuffix = '_5.1';
+        }
+        $loader->load(sprintf('services_deprecated%s.xml', $deprecatedServicesFileSuffix));
     }
 
     private function registerExceptionHandlingConfiguration(array $config, ContainerBuilder $container): void
@@ -60,5 +76,21 @@ class NijensOpenapiExtension extends Extension
             $container->removeDefinition(JsonResponseExceptionSubscriber::class);
             $container->removeDefinition('nijens_openapi.service.exception_json_response_builder');
         }
+    }
+
+    private function getSymfonyVersion(): int
+    {
+        $kernel = new class('symfony_version', false) extends Kernel {
+            public function registerBundles(): iterable
+            {
+                return [];
+            }
+
+            public function registerContainerConfiguration(LoaderInterface $loader)
+            {
+            }
+        };
+
+        return $kernel::VERSION_ID;
     }
 }

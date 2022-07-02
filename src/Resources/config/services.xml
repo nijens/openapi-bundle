@@ -11,7 +11,6 @@
         <parameter key="nijens_openapi.json.validator.class">JsonSchema\Validator</parameter>
         <parameter key="nijens_openapi.json.validator.factory.class">JsonSchema\Constraints\Factory</parameter>
         <parameter key="nijens_openapi.event_subscriber.json_request_body_validation.class">Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber</parameter>
-        <parameter key="nijens_openapi.service.exception_json_response_builder.class">Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilder</parameter>
     </parameters>
 
     <services>
@@ -77,20 +76,6 @@
             <argument type="service" id="nijens_openapi.json.validator"/>
 
             <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="nijens_openapi.service.exception_json_response_builder" class="%nijens_openapi.service.exception_json_response_builder.class%">
-            <argument>%kernel.debug%</argument>
-
-            <deprecated><!-- package="nijens/openapi-bundle" version="1.3" -->The "%service_id%" service is deprecated since nijens/openapi-bundle 1.3 and will be removed in 2.0.</deprecated>
-        </service>
-
-        <service id="Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber">
-            <argument type="service" id="nijens_openapi.service.exception_json_response_builder"/>
-
-            <tag name="kernel.event_subscriber"/>
-
-            <deprecated><!-- package="nijens/openapi-bundle" version="1.3" -->The "%service_id%" service is deprecated since nijens/openapi-bundle 1.3 and will be removed in 2.0.</deprecated>
         </service>
 
         <service id="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer">
