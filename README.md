@@ -11,7 +11,7 @@ Helps you create a REST API from your OpenAPI specification.
 This bundle supports a design-first methodology for creating an API with Symfony by providing the following tools:
 
 * [Loading the path items and operations of an OpenAPI specification as routes](#routing)
-* [Validation of JSON request bodies to those routes](#validation-of-json-request-bodies)
+* [Validation of a JSON request body to those routes](#validation-of-a-json-request-body)
 * [OpenAPI-based serialization context for the Symfony Serializer](#openapi-based-serialization-context-for-the-symfony-serializer)
 * [Exception handling](#exception-handling)
 
@@ -119,27 +119,17 @@ A Symfony controller for a route is configured by adding the `x-symfony-controll
 
 The value of the `x-symfony-controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
 
-### Validation of JSON request bodies
+### Validation of a JSON request body
 When the operations of the path items have a `requestBody` property configured with the content-type `application/json`,
 the bundle validates the incoming request bodies for those routes in the specification.
 
+The following exceptions can be thrown when validation fails during a request made to a route managed by the OpenAPI bundle:
+* `BadJsonRequestHttpException`: when the request content-type is not `application/json`
+* `BadJsonRequestHttpException`: when the JSON within the request body is invalid
+* `InvalidRequestHttpException`: when the JSON within the request body does not validate with the JSON schema of the route
 
-#### Default validation error responses
-The following error responses can occur when validation fails during a request made to a route managed by the OpenAPI bundle:
-* `400 Bad Request`: when the request content-type is not `application/json`
-* `400 Bad Request`: when the JSON within the request body is invalid
-* `422 Unprocessable Entity`: when the JSON within the request body does not validate with the JSON schema of the route
-
-All validation error responses will return a response body similar to the following:
-```json
-{
-    "message": "Validation of JSON request body failed.",
-    "errors": [
-        "The property iAmRequired is required",
-        "The property iAmExtra is not defined and the definition does not allow additional properties"
-    ]
-}
-```
+The exceptions will be converted to JSON responses by the [exception handling](#exception-handling) component
+of this bundle.
 
 ### OpenAPI-based serialization context for the Symfony Serializer
 ⚠ _**Please note:** This feature is still experimental. The API might change in a future minor version._
@@ -181,38 +171,49 @@ class ExampleController
 ```
 
 ### Exception handling
-For the path prefix, where you load your OpenAPI specification into, exception handling activates.
-The exception handling will transform every exception into a JSON representation. Exceptions that extend
-from the `Symfony\Component\HttpKernel\Exception\HttpException` allow you to control the status code of the
-exception response.
+By default, the [previous exception handling component](docs/previous-exception-handling.md) is enabled.
+To enable the new exception handling component, add the following YAML configuration.
 
-Every other exception will return a `500 Internal Server Error`.
-
-#### Customizing exception handling
-If your project requires different formatting of the response or perhaps different response codes, the default
-response builder can be overridden. Following the ["How to Decorate Services" guide from Symfony](https://symfony.com/doc/current/service_container/service_decoration.html),
-you can create your own service which implements `ExceptionJsonResponseBuilderInterface` and handles the error response
-building instead of `nijens_openapi.service.exception_json_response_builder`. When validation against the schema fails,
-an exception is thrown, which implements `HttpExceptionInterface`. The `getErrors()` method will provide a
-multi-dimensional array similar to this:
-```php
-[
-    [
-        'property' => 'iAmRequired',
-        'pointer' => '/iAmRequired',
-        'message' => 'The property iAmRequired is required',
-        'constraint' => 'required',
-        'context' => 1,
-    ],
-    [
-        'property' => '',
-        'pointer' => '',
-        'message' => 'The property iAmExtra is not defined and the definition does not allow additional properties',
-        'constraint' => 'additionalProp',
-        'context' => 1,
-    ],
-];
+```yaml
+# config/packages/nijens_openapi.yaml
+nijens_openapi:
+    exception_handling:
+        enabled: true
 ```
+
+The new exception handling component uses the [Problem Details JSON Object](https://datatracker.ietf.org/doc/html/rfc7807#section-3)
+format to turn an exception (or `Throwable`) into a clear error response.
+
+If you want to implement your own exception handling? Simply change `enabled` to `false`. This will disable the
+exception handling component of the bundle.
+
+#### Customizing the Problem Details JSON Object response of an exception
+Through the exception handling configuration of the bundle you are able to modify the response status code and
+problem JSON response body of any `Throwable`. See the following example for more information.
+
+```yaml
+# config/packages/nijens_openapi.yaml
+nijens_openapi:
+    exception_handling:
+        enabled: true
+        exceptions:
+            InvalidArgumentException:                       # The fully qualified classname of the exception.
+                status_code: 400                            # Modify the response status code of the exception response.
+
+                type_uri: https://example.com/invalid-error # Add a unique type URI to the Problem Details.
+                                                            # This could be a URL to additional documentation about
+                                                            # the error.
+
+                title: The request was invalid.             # Add a clear human-readable title property to the
+                                                            # Problem Details.
+
+                add_instance_uri: true                      # Add the current route as instance_uri property to
+                                                            # the Problem Details.
+```
+
+To help you include the Problem Details JSON object in your OpenAPI document, we provide an
+[OpenAPI template](src/Resources/specifications/openapi_problemdetails.yaml) with schemas
+for the specific Problem Details JSON objects this bundle creates.
 
 ## Credits and acknowledgements
 
