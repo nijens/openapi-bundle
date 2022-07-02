@@ -44,7 +44,7 @@ jobs:
           number: ${{ steps.finder.outputs.pr }}
           hide_and_recreate: true
           hide_classify: "OUTDATED"
-          path: code-coverage-results.md
+          path: coverage.txt
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 

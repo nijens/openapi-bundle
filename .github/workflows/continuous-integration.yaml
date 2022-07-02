@@ -78,7 +78,9 @@ jobs:
             - uses: actions/upload-artifact@v2
               with:
                 name: coverage
-                path: code-coverage-results.md
+                path: |
+                  coverage.txt
+                  code-coverage-results.md
 
     lockfile-integrity:
         name: Composer lockfile integrity
