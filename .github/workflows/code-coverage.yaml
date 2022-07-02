@@ -35,13 +35,14 @@ jobs:
       - name: Unzip coverage artifact
         run: unzip coverage.zip
 
-      - uses: jwalton/gh-find-current-pr@v1
-        id: finder
+      - id: pull-request
+        run: |
+          echo "::set-output name=number::$(cat pull-request-number)"
 
       - name: Add coverage PR comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          number: ${{ steps.finder.outputs.pr }}
+          number: ${{ steps.pull-request.outputs.number }}
           hide_and_recreate: true
           hide_classify: "OUTDATED"
           path: coverage.txt
