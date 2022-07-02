@@ -102,6 +102,8 @@
         </service>
 
         <service id="nijens_openapi.serializer" class="Symfony\Component\Serializer\Serializer">
+            <factory class="Nijens\OpenapiBundle\DependencyInjection\ServiceFactory" method="createSerializer"/>
+
             <argument type="tagged_iterator" tag="nijens_openapi.serializer.normalizer"/>
             <argument type="tagged_iterator" tag="serializer.encoder"/>
         </service>
