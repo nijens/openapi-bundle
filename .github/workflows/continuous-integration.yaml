@@ -75,10 +75,17 @@ jobs:
                   output: both
                   thresholds: '50 95'
 
+            - name: Save pull request number
+              if: ${{ matrix.coverage == true }}
+              run: |
+                echo ${{ github.event.number }} > pull-request-number
+
             - uses: actions/upload-artifact@v2
+              if: ${{ matrix.coverage == true }}
               with:
                 name: coverage
                 path: |
+                  pull-request-number
                   coverage.txt
                   code-coverage-results.md
 
