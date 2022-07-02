@@ -137,7 +137,7 @@ class RouteLoader extends FileLoader
         $route->setMethods($requestMethod);
 
         $collection->add(
-            $this->createRouteName($path, $requestMethod),
+            $operation->operationId ?? $this->createRouteName($path, $requestMethod),
             $route
         );
     }
