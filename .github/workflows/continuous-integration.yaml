@@ -18,7 +18,6 @@ jobs:
                       symfony-version: '5.4'
                       coverage: true
                       test-options: '-with-coverage'
-                      minimum-coverage-percentage: 95
                     - php-version: '8.1'
                       symfony-version: '5.4'
                 exclude:
@@ -64,29 +63,24 @@ jobs:
             - name: Run PHPUnit
               run: make test${{ matrix.test-options }}
 
-            - name: Parse PHPUnit coverage
+            - name: Code Coverage Summary
+              uses: irongut/CodeCoverageSummary@v1.2.0
               if: ${{ matrix.coverage == true }}
-              id: coverage
-              run: ./.github/bin/parse-coverage coverage-xml/index.xml ${{ matrix.minimum-coverage-percentage }}
+              with:
+                  filename: coverage.cobertura.xml
+                  format: markdown
+                  badge: true
+                  fail_below_min: true
+                  hide_branch_rate: true
+                  output: both
+                  thresholds: '50 95'
 
-#            - name: Add coverage check run
-#              uses: octokit/request-action@v2.x
-#              if: ${{ matrix.coverage == true }}
-#              with:
-#                  route: POST /repos/:repository/check-runs
-#                  repository: ${{ github.repository }}
-#                  mediaType: |
-#                    previews:
-#                      - antiope
-#                  name: Code coverage
-#                  head_sha: ${{ github.sha }}
-#                  conclusion: ${{ steps.coverage.outputs.conclusion }}
-#                  status: completed
-#                  output: |
-#                    title: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
-#                    summary: Coverage at ${{ steps.coverage.outputs.percentage }}% (required minimum coverage is ${{ matrix.minimum-coverage-percentage }}%)
-#              env:
-#                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - uses: actions/upload-artifact@v2
+              with:
+                name: coverage
+                path: |
+                  coverage.txt
+                  code-coverage-results.md
 
     lockfile-integrity:
         name: Composer lockfile integrity

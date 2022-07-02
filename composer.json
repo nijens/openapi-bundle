@@ -30,7 +30,6 @@
         "friendsofphp/php-cs-fixer": "^3.0",
         "masterminds/html5": "^2.7",
         "monolog/monolog": "^1.27 || ^2.6 || ^3.0",
-        "php-coveralls/php-coveralls": "^2.1",
         "phpunit/phpunit": "^9.3",
         "symfony/browser-kit": "^4.4 || ^5.0 || ^6.0",
         "symfony/phpunit-bridge": "^4.4 || ^5.0 || ^6.0"
