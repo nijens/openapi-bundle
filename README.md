@@ -41,23 +41,21 @@ of the Composer documentation.
 #### Step 2: Enable the Bundle
 
 Then, enable the bundle by adding it to the list of registered bundles
-in the `app/AppKernel.php` file of your project:
+in the `src/Kernel.php` file of your project:
 
 ```php
 <?php
-// app/AppKernel.php
+// src/Kernel.php
 
 // ...
-class AppKernel extends Kernel
+class Kernel extends BaseKernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
-        $bundles = array(
+        return [
             // ...
             new Nijens\OpenapiBundle\NijensOpenapiBundle(),
-        );
-
-        // ...
+        ];
     }
 
     // ...
@@ -90,6 +88,25 @@ api:
 
 #### Configuring a controller for a route
 A Symfony controller for a route is configured by adding the `x-symfony-controller` property to an operation within your OpenAPI specification.
+
+```yaml
+paths:
+    /pets/{uuid}:
+        put:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Controller\PetController::put'
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Pet'
+            responses:
+                '200':
+                    description: 'Returns the stored pet.'
+```
+
+<details>
+<summary>JSON example</summary>
+
 ```json
 {
     "paths": {
@@ -115,6 +132,8 @@ A Symfony controller for a route is configured by adding the `x-symfony-controll
     }
 }
 ```
+
+</details>
 
 The value of the `x-symfony-controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
 
