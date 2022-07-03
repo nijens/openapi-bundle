@@ -42,13 +42,8 @@ class RouteLoaderTest extends TestCase
      */
     protected function setUp(): void
     {
-        $fileLocator = new FileLocator([
-            __DIR__.'/../Resources/specifications',
-        ]);
-        $loader = new ChainLoader([new JsonLoader(), new YamlLoader()]);
-        $dereferencer = new Dereferencer(new JsonPointer(), $loader);
-
-        $schemaLoader = new SchemaLoader($loader, $dereferencer);
+        $fileLocator = $this->createFileLocator();
+        $schemaLoader = $this->createSchemaLoader();
 
         $this->routeLoader = new RouteLoader($fileLocator, $schemaLoader);
     }
@@ -155,5 +150,33 @@ class RouteLoaderTest extends TestCase
 
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('Nijens\OpenapiBundle\Controller\FooController::bar', $route->getDefault('_controller'));
+    }
+
+    public function testCanUseOperationIdAsRouteName(): void
+    {
+        $fileLocator = $this->createFileLocator();
+        $schemaLoader = $this->createSchemaLoader();
+
+        $this->routeLoader = new RouteLoader($fileLocator, $schemaLoader, true);
+
+        $routes = $this->routeLoader->load('route-loader-symfony-controller.json', 'openapi');
+        $route = $routes->get('createPet');
+
+        $this->assertInstanceOf(Route::class, $route);
+    }
+
+    private function createFileLocator(): FileLocator
+    {
+        return new FileLocator([
+            __DIR__.'/../Resources/specifications',
+        ]);
+    }
+
+    private function createSchemaLoader(): SchemaLoader
+    {
+        $loader = new ChainLoader([new JsonLoader(), new YamlLoader()]);
+        $dereferencer = new Dereferencer(new JsonPointer(), $loader);
+
+        return new SchemaLoader($loader, $dereferencer);
     }
 }

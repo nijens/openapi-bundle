@@ -17,6 +17,7 @@ use Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJsonResponseSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
+use Nijens\OpenapiBundle\Routing\RouteLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -44,6 +45,7 @@ class NijensOpenapiExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $this->registerRoutingConfiguration($config['routing'], $container);
         $this->registerExceptionHandlingConfiguration($config['exception_handling'], $container);
     }
 
@@ -57,6 +59,12 @@ class NijensOpenapiExtension extends Extension
             $deprecatedServicesFileSuffix = '_5.1';
         }
         $loader->load(sprintf('services_deprecated%s.xml', $deprecatedServicesFileSuffix));
+    }
+
+    private function registerRoutingConfiguration(array $config, ContainerBuilder $container): void
+    {
+        $definition = $container->getDefinition(RouteLoader::class);
+        $definition->replaceArgument(2, $config['operation_id_as_route_name']);
     }
 
     private function registerExceptionHandlingConfiguration(array $config, ContainerBuilder $container): void

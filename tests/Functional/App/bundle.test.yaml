@@ -1,1 +1,3 @@
 nijens_openapi:
+    routing:
+        operation_id_as_route_name: true
