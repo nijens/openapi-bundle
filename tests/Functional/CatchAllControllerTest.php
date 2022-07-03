@@ -76,14 +76,14 @@ class CatchAllControllerTest extends WebTestCase
     {
         $this->client->request(
             Request::METHOD_GET,
-            '/api/pet',
+            '/api/pets',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json']
         );
 
         $expectedJsonResponseBody = [
-            'message' => "No route found for 'GET /api/pet': Method Not Allowed (Allowed: PUT, POST).",
+            'message' => "No route found for 'GET /api/pets': Method Not Allowed (Allowed: POST).",
         ];
 
         $response = $this->client->getResponse();

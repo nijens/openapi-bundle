@@ -46,6 +46,9 @@ class GetPetController
         $this->serializationContextBuilder = $serializationContextBuilder;
     }
 
+    /**
+     * Handles GET /api/pets/{petId}.
+     */
     public function __invoke(Request $request): JsonResponse
     {
         $pet = new Pet(1, 'Cat');
