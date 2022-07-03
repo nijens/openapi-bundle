@@ -137,6 +137,20 @@ paths:
 
 The value of the `x-symfony-controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
 
+#### Using the operationId of an operation as the name of the Symfony route
+Within an OpenAPI document, you can give each operation an
+[operationId](https://spec.openapis.org/oas/latest.html#fixed-fields-7) to better identify it.
+To use the `operationId` as the name for a loaded Symfony route, add the following bundle configuration:
+
+```yaml
+# config/packages/nijens_openapi.yaml
+nijens_openapi:
+    routing:
+        operation_id_as_route_name: true
+```
+
+Using the `operationId` for your routes gives you more control over the API route names and allows you to better use them with a `UrlGenerator`.
+
 ### Validation of a JSON request body
 When the operations of the path items have a `requestBody` property configured with the content-type `application/json`,
 the bundle validates the incoming request bodies for those routes in the specification.
