@@ -3,7 +3,6 @@
 [![Latest version on Packagist][ico-version]][link-version]
 [![Software License][ico-license]][link-license]
 [![Build Status][ico-build]][link-build]
-[![Coverage Status][ico-coverage]][link-coverage]
 [![Code Quality][ico-code-quality]][link-code-quality]
 
 Helps you create a REST API from your OpenAPI specification.
@@ -228,8 +227,7 @@ The OpenAPI bundle is licensed under the MIT License. Please see the [LICENSE fi
 [ico-pre-release-version]: https://img.shields.io/packagist/vpre/nijens/openapi-bundle.svg
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg
 [ico-build]: https://github.com/nijens/openapi-bundle/actions/workflows/continuous-integration.yaml/badge.svg
-[ico-coverage]: https://coveralls.io/repos/nijens/openapi-bundle/badge.svg?branch=master
-[ico-code-quality]: https://scrutinizer-ci.com/g/nijens/openapi-bundle/badges/quality-score.png?b=master
+[ico-code-quality]: https://scrutinizer-ci.com/g/nijens/openapi-bundle/badges/quality-score.png?b=main
 
 [link-version]: https://packagist.org/packages/nijens/openapi-bundle
 [link-license]: LICENSE
