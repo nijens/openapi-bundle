@@ -215,18 +215,19 @@ nijens_openapi:
     exception_handling:
         enabled: true
         exceptions:
-            InvalidArgumentException:                       # The fully qualified classname of the exception.
-                status_code: 400                            # Modify the response status code of the exception response.
+            InvalidArgumentException:               # The fully qualified classname of the exception.
+                status_code: 400                    # Modify the response status code of
+                                                    # the exception response.
 
-                type_uri: https://example.com/invalid-error # Add a unique type URI to the Problem Details.
-                                                            # This could be a URL to additional documentation about
-                                                            # the error.
+                type_uri: https://example.com/error # Add a unique type URI to the Problem Details.
+                                                    # This could be a URL to additional documentation
+                                                    # about the error.
 
-                title: The request was invalid.             # Add a clear human-readable title property to the
-                                                            # Problem Details.
+                title: The request was invalid.     # Add a clear human-readable title property
+                                                    # to the Problem Details.
 
-                add_instance_uri: true                      # Add the current route as instance_uri property to
-                                                            # the Problem Details.
+                add_instance_uri: true              # Add the current route as instance_uri property
+                                                    # to the Problem Details.
 ```
 
 To help you include the Problem Details JSON object in your OpenAPI document, we provide an
