@@ -5,7 +5,6 @@
 
     <parameters>
         <parameter key="nijens_openapi.controller.catch_all.class">Nijens\OpenapiBundle\Controller\CatchAllController</parameter>
-        <parameter key="nijens_openapi.routing.loader.class">Nijens\OpenapiBundle\Routing\RouteLoader</parameter>
         <parameter key="nijens_openapi.json.parser.class">Seld\JsonLint\JsonParser</parameter>
         <parameter key="nijens_openapi.json.schema_loader.class">Nijens\OpenapiBundle\Json\SchemaLoader</parameter>
         <parameter key="nijens_openapi.json.validator.class">JsonSchema\Validator</parameter>
@@ -20,9 +19,10 @@
             <tag name="controller.service_arguments"/>
         </service>
 
-        <service id="nijens_openapi.routing.loader" class="%nijens_openapi.routing.loader.class%">
+        <service id="Nijens\OpenapiBundle\Routing\RouteLoader">
             <argument type="service" id="file_locator"/>
             <argument type="service" id="nijens_openapi.json.schema_loader"/>
+            <argument>~</argument>
 
             <tag name="routing.loader"/>
         </service>

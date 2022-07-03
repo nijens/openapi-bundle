@@ -45,9 +45,25 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('nijens_openapi');
         $rootNode = $treeBuilder->getRootNode();
 
+        $this->addRoutingSection($rootNode);
         $this->addExceptionsSection($rootNode);
 
         return $treeBuilder;
+    }
+
+    private function addRoutingSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode->children()
+            ->arrayNode('routing')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('operation_id_as_route_name')
+                        ->info('Toggle using the path item operation ID from the OpenAPI documents as route name.')
+                        ->defaultFalse()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
     }
 
     private function addExceptionsSection(ArrayNodeDefinition $rootNode): void
