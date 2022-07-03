@@ -131,6 +131,10 @@ class RouteLoader extends FileLoader
             $defaults['_controller'] = $operation->{'x-symfony-controller'};
         }
 
+        if (isset($operation->{'x-symfony-deserialization-object'})) {
+            $openApiConfiguration[RouteContext::DESERIALIZATION_OBJECT] = $operation->{'x-symfony-deserialization-object'};
+        }
+
         if (isset($operation->requestBody->content->{'application/json'})) {
             $openApiConfiguration[RouteContext::JSON_REQUEST_VALIDATION_POINTER] = sprintf(
                 '/paths/%s/%s/requestBody/content/%s/schema',

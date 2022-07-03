@@ -53,19 +53,15 @@ paths:
         - pet
 
     post:
-      summary: Updates a pet in the store with form data
-      operationId: updatePetWithForm
+      x-symfony-deserialization-object: 'Nijens\OpenapiBundle\Tests\Functional\App\Model\UpdatePet'
+      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\UpdatePetController'
+      summary: Updates a pet in the store.
+      operationId: updatePet
       requestBody:
         content:
-          application/x-www-form-urlencoded:
+          application/json:
             schema:
-              properties:
-                name:
-                  type: string
-                  description: Updated name of the pet
-                status:
-                  type: string
-                  description: Updated status of the pet
+              $ref: '#/components/schemas/Pet'
       responses:
         405:
           description: Invalid input

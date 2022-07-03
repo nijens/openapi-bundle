@@ -101,6 +101,8 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
             $routeOptions[RouteContext::JSON_REQUEST_VALIDATION_POINTER],
             $decodedJsonRequestBody
         );
+
+        $event->getRequest()->attributes->set('_nijens_openapi_validated', true);
     }
 
     /**

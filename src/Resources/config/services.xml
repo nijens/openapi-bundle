@@ -70,6 +70,12 @@
             </call>
         </service>
 
+        <service id="Nijens\OpenapiBundle\Deserialization\EventSubscriber\JsonRequestBodyDeserializationSubscriber">
+            <argument type="service" id="nijens_openapi.serializer"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="nijens_openapi.event_subscriber.json_request_body_validation" class="%nijens_openapi.event_subscriber.json_request_body_validation.class%">
             <argument type="service" id="nijens_openapi.json.parser"/>
             <argument type="service" id="nijens_openapi.json.schema_loader"/>
@@ -97,6 +103,14 @@
             <argument>%kernel.debug%</argument>
 
             <tag name="nijens_openapi.serializer.normalizer" priority="32"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Deserialization\ArgumentResolver\DeserializedObjectArgumentResolver">
+            <tag name="controller.argument_value_resolver" priority="100"/>
+        </service>
+
+        <service id="nijens_openapi.serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
+            <tag name="nijens_openapi.serializer.normalizer" priority="-32"/>
         </service>
 
         <service id="nijens_openapi.serializer.normalizer.json" class="Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer">
