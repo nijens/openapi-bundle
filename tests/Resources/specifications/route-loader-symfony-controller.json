@@ -7,6 +7,7 @@
     "paths": {
         "/pets/{uuid}": {
             "put": {
+                "operationId": "createPet",
                 "requestBody": {
                     "content": {
                         "application/json": {

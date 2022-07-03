@@ -41,13 +41,22 @@ class RouteLoader extends FileLoader
     private $schemaLoader;
 
     /**
+     * @var bool
+     */
+    private $useOperationIdAsRouteName;
+
+    /**
      * Constructs a new RouteLoader instance.
      */
-    public function __construct(FileLocatorInterface $locator, SchemaLoaderInterface $schemaLoader)
-    {
+    public function __construct(
+        FileLocatorInterface $locator,
+        SchemaLoaderInterface $schemaLoader,
+        bool $useOperationIdAsRouteName = false
+    ) {
         parent::__construct($locator);
 
         $this->schemaLoader = $schemaLoader;
+        $this->useOperationIdAsRouteName = $useOperationIdAsRouteName;
     }
 
     /**
@@ -136,8 +145,13 @@ class RouteLoader extends FileLoader
         $route = new Route($path, $defaults, []);
         $route->setMethods($requestMethod);
 
+        $routeName = null;
+        if ($this->useOperationIdAsRouteName && isset($operation->operationId)) {
+            $routeName = $operation->operationId;
+        }
+
         $collection->add(
-            $operation->operationId ?? $this->createRouteName($path, $requestMethod),
+            $routeName ?? $this->createRouteName($path, $requestMethod),
             $route
         );
     }
