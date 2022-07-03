@@ -71,7 +71,7 @@ The following resources can help you with designing the specification:
 * [Swagger specification editor](https://editor.swagger.io)
 
 ### Routing
-This bundle provides a route loader that can load [path items](https://swagger.io/specification/#pathItemObject)
+This bundle provides a route loader that loads [path items](https://swagger.io/specification/#pathItemObject)
 and [operations](https://swagger.io/specification/#operationObject) from your OpenAPI specification.
 
 You load your OpenAPI specification by configuring it in the routing of your application:
@@ -146,7 +146,7 @@ The following exceptions can be thrown when validation fails during a request ma
 * `BadJsonRequestHttpException`: when the JSON within the request body is invalid
 * `InvalidRequestHttpException`: when the JSON within the request body does not validate with the JSON schema of the route
 
-The exceptions will be converted to JSON responses by the [exception handling](#exception-handling) component
+The exceptions are converted to JSON responses by the [exception handling](#exception-handling) component
 of this bundle.
 
 ### OpenAPI-based serialization context for the Symfony Serializer
@@ -202,11 +202,11 @@ nijens_openapi:
 The new exception handling component uses the [Problem Details JSON Object](https://datatracker.ietf.org/doc/html/rfc7807#section-3)
 format to turn an exception (or `Throwable`) into a clear error response.
 
-If you want to implement your own exception handling? Simply change `enabled` to `false`. This will disable the
+If you want to implement your own exception handling? Change `enabled` to `false`. It will disable the
 exception handling component of the bundle.
 
 #### Customizing the Problem Details JSON Object response of an exception
-Through the exception handling configuration of the bundle you are able to modify the response status code and
+Through the exception handling configuration of the bundle, you can modify the response status code and
 problem JSON response body of any `Throwable`. See the following example for more information.
 
 ```yaml
