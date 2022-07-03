@@ -3,7 +3,6 @@
 [![Latest version on Packagist][ico-version]][link-version]
 [![Software License][ico-license]][link-license]
 [![Build Status][ico-build]][link-build]
-[![Coverage Status][ico-coverage]][link-coverage]
 [![Code Quality][ico-code-quality]][link-code-quality]
 
 Helps you create a REST API from your OpenAPI specification.
@@ -42,23 +41,21 @@ of the Composer documentation.
 #### Step 2: Enable the Bundle
 
 Then, enable the bundle by adding it to the list of registered bundles
-in the `app/AppKernel.php` file of your project:
+in the `src/Kernel.php` file of your project:
 
 ```php
 <?php
-// app/AppKernel.php
+// src/Kernel.php
 
 // ...
-class AppKernel extends Kernel
+class Kernel extends BaseKernel
 {
-    public function registerBundles()
+    public function registerBundles(): iterable
     {
-        $bundles = array(
+        return [
             // ...
             new Nijens\OpenapiBundle\NijensOpenapiBundle(),
-        );
-
-        // ...
+        ];
     }
 
     // ...
@@ -74,7 +71,7 @@ The following resources can help you with designing the specification:
 * [Swagger specification editor](https://editor.swagger.io)
 
 ### Routing
-This bundle provides a route loader that can load [path items](https://swagger.io/specification/#pathItemObject)
+This bundle provides a route loader that loads [path items](https://swagger.io/specification/#pathItemObject)
 and [operations](https://swagger.io/specification/#operationObject) from your OpenAPI specification.
 
 You load your OpenAPI specification by configuring it in the routing of your application:
@@ -91,6 +88,25 @@ api:
 
 #### Configuring a controller for a route
 A Symfony controller for a route is configured by adding the `x-symfony-controller` property to an operation within your OpenAPI specification.
+
+```yaml
+paths:
+    /pets/{uuid}:
+        put:
+            x-symfony-controller: 'Nijens\OpenapiBundle\Controller\PetController::put'
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Pet'
+            responses:
+                '200':
+                    description: 'Returns the stored pet.'
+```
+
+<details>
+<summary>JSON example</summary>
+
 ```json
 {
     "paths": {
@@ -117,6 +133,8 @@ A Symfony controller for a route is configured by adding the `x-symfony-controll
 }
 ```
 
+</details>
+
 The value of the `x-symfony-controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
 
 ### Validation of a JSON request body
@@ -128,7 +146,7 @@ The following exceptions can be thrown when validation fails during a request ma
 * `BadJsonRequestHttpException`: when the JSON within the request body is invalid
 * `InvalidRequestHttpException`: when the JSON within the request body does not validate with the JSON schema of the route
 
-The exceptions will be converted to JSON responses by the [exception handling](#exception-handling) component
+The exceptions are converted to JSON responses by the [exception handling](#exception-handling) component
 of this bundle.
 
 ### OpenAPI-based serialization context for the Symfony Serializer
@@ -184,11 +202,11 @@ nijens_openapi:
 The new exception handling component uses the [Problem Details JSON Object](https://datatracker.ietf.org/doc/html/rfc7807#section-3)
 format to turn an exception (or `Throwable`) into a clear error response.
 
-If you want to implement your own exception handling? Simply change `enabled` to `false`. This will disable the
+If you want to implement your own exception handling? Change `enabled` to `false`. It will disable the
 exception handling component of the bundle.
 
 #### Customizing the Problem Details JSON Object response of an exception
-Through the exception handling configuration of the bundle you are able to modify the response status code and
+Through the exception handling configuration of the bundle, you can modify the response status code and
 problem JSON response body of any `Throwable`. See the following example for more information.
 
 ```yaml
@@ -197,18 +215,19 @@ nijens_openapi:
     exception_handling:
         enabled: true
         exceptions:
-            InvalidArgumentException:                       # The fully qualified classname of the exception.
-                status_code: 400                            # Modify the response status code of the exception response.
+            InvalidArgumentException:               # The fully qualified classname of the exception.
+                status_code: 400                    # Modify the response status code of
+                                                    # the exception response.
 
-                type_uri: https://example.com/invalid-error # Add a unique type URI to the Problem Details.
-                                                            # This could be a URL to additional documentation about
-                                                            # the error.
+                type_uri: https://example.com/error # Add a unique type URI to the Problem Details.
+                                                    # This could be a URL to additional documentation
+                                                    # about the error.
 
-                title: The request was invalid.             # Add a clear human-readable title property to the
-                                                            # Problem Details.
+                title: The request was invalid.     # Add a clear human-readable title property
+                                                    # to the Problem Details.
 
-                add_instance_uri: true                      # Add the current route as instance_uri property to
-                                                            # the Problem Details.
+                add_instance_uri: true              # Add the current route as instance_uri property
+                                                    # to the Problem Details.
 ```
 
 To help you include the Problem Details JSON object in your OpenAPI document, we provide an
@@ -228,8 +247,7 @@ The OpenAPI bundle is licensed under the MIT License. Please see the [LICENSE fi
 [ico-pre-release-version]: https://img.shields.io/packagist/vpre/nijens/openapi-bundle.svg
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg
 [ico-build]: https://github.com/nijens/openapi-bundle/actions/workflows/continuous-integration.yaml/badge.svg
-[ico-coverage]: https://coveralls.io/repos/nijens/openapi-bundle/badge.svg?branch=master
-[ico-code-quality]: https://scrutinizer-ci.com/g/nijens/openapi-bundle/badges/quality-score.png?b=master
+[ico-code-quality]: https://scrutinizer-ci.com/g/nijens/openapi-bundle/badges/quality-score.png?b=main
 
 [link-version]: https://packagist.org/packages/nijens/openapi-bundle
 [link-license]: LICENSE

@@ -17,7 +17,7 @@ use Nijens\OpenapiBundle\Json\Exception\InvalidJsonPointerException;
 use stdClass;
 
 /**
- * JSON Pointer.
+ * Query a {@see stdClass} using JSON Pointer.
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
