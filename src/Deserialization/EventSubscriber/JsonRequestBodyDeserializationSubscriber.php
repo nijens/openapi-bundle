@@ -2,9 +2,20 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the OpenapiBundle package.
+ *
+ * (c) Niels Nijens <nijens.niels@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Nijens\OpenapiBundle\Deserialization\EventSubscriber;
 
+use Nijens\OpenapiBundle\Deserialization\DeserializationContext;
 use Nijens\OpenapiBundle\Routing\RouteContext;
+use Nijens\OpenapiBundle\Validation\ValidationContext;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -17,7 +28,7 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
      */
     private $serializer;
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => [
@@ -38,15 +49,19 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
         // TODO Add defaults from OpenAPI schema.
 
         $routeContext = $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
-        $requestBodyValidated = $request->attributes->get('_nijens_openapi_validated', false);
+        $validationContext = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE);
 
-        if ($requestBodyValidated === false || isset($routeContext[RouteContext::DESERIALIZATION_OBJECT]) === false) {
+        if ($validationContext === null || isset($routeContext[RouteContext::DESERIALIZATION_OBJECT]) === false) {
             return;
         }
 
         $request->attributes->set(
-            'data',
-            $this->serializer->deserialize($request->getContent(), $routeContext[RouteContext::DESERIALIZATION_OBJECT], 'json')
+            DeserializationContext::REQUEST_ATTRIBUTE,
+            $this->serializer->deserialize(
+                $validationContext[ValidationContext::REQUEST_BODY],
+                $routeContext[RouteContext::DESERIALIZATION_OBJECT],
+                $request->getPreferredFormat('json')
+            )
         );
     }
 }
