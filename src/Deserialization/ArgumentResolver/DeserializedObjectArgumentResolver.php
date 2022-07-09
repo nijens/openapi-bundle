@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the OpenapiBundle package.
  *
@@ -11,6 +13,7 @@
 
 namespace Nijens\OpenapiBundle\Deserialization\ArgumentResolver;
 
+use Nijens\OpenapiBundle\Deserialization\Attribute\DeserializedObject;
 use Nijens\OpenapiBundle\Deserialization\DeserializationContext;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,8 +29,15 @@ class DeserializedObjectArgumentResolver implements ArgumentValueResolverInterfa
         }
 
         $routeContext = $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
+        if (isset($routeContext[RouteContext::DESERIALIZATION_OBJECT]) === false) {
+            return false;
+        }
 
-        return isset($routeContext[RouteContext::DESERIALIZATION_OBJECT]) && $routeContext[RouteContext::DESERIALIZATION_OBJECT] === $argument->getType();
+        if ($routeContext[RouteContext::DESERIALIZATION_OBJECT] !== $argument->getType() && count($argument->getAttributes(DeserializedObject::class, ArgumentMetadata::IS_INSTANCEOF)) === 0) {
+            return false;
+        }
+
+        return true;
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable

@@ -65,4 +65,60 @@ class DeserializationTest extends WebTestCase
             $this->client->getResponse()->getContent()
         );
     }
+
+    public function testCanDeserializeRequestBodyIntoArrayOfObjects(): void
+    {
+        $jsonRequestBody = [
+            [
+                'id' => 1,
+                'name' => 'Cat',
+                'photoUrls' => [
+                    'https://example.com/photos/cat.jpg',
+                ],
+            ],
+            [
+                'id' => 2,
+                'name' => 'Dog',
+                'photoUrls' => [
+                    'https://example.com/photos/dog.jpg',
+                ],
+            ],
+        ];
+
+        $this->client->request(
+            Request::METHOD_PATCH,
+            '/api/pets',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode($jsonRequestBody)
+        );
+
+        $expectedJsonResponseBody = [
+            [
+                'id' => 1,
+                'name' => 'Cat',
+                'status' => 'available',
+                'photoUrls' => [
+                    'https://example.com/photos/cat.jpg',
+                ],
+            ],
+            [
+                'id' => 2,
+                'name' => 'Dog',
+                'status' => 'available',
+                'photoUrls' => [
+                    'https://example.com/photos/dog.jpg',
+                ],
+            ],
+        ];
+
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+        self::assertJsonStringEqualsJsonString(
+            json_encode($expectedJsonResponseBody),
+            $this->client->getResponse()->getContent()
+        );
+    }
 }

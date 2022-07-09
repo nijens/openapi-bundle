@@ -38,3 +38,10 @@ services:
             - '@Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface'
         tags:
             - 'controller.service_arguments'
+
+    Nijens\OpenapiBundle\Tests\Functional\App\Controller\UpdatePetsController:
+        arguments:
+            - '@Symfony\Component\Serializer\SerializerInterface'
+            - '@Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface'
+        tags:
+            - 'controller.service_arguments'

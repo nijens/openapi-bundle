@@ -69,7 +69,7 @@ class CatchAllControllerTest extends WebTestCase
 
         static::assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
         static::assertJsonStringEqualsJsonString(
-            '{"type":"about:blank","title":"An error occurred.","status":405,"detail":"No route found for \'GET /api/pets\': Method Not Allowed (Allowed: POST)."}',
+            '{"type":"about:blank","title":"An error occurred.","status":405,"detail":"No route found for \'GET /api/pets\': Method Not Allowed (Allowed: POST, PATCH)."}',
             $this->client->getResponse()->getContent()
         );
     }
