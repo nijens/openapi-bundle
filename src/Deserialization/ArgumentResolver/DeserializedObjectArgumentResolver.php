@@ -33,7 +33,7 @@ class DeserializedObjectArgumentResolver implements ArgumentValueResolverInterfa
             return false;
         }
 
-        if ($routeContext[RouteContext::DESERIALIZATION_OBJECT] !== $argument->getType() && count($argument->getAttributes(DeserializedObject::class, ArgumentMetadata::IS_INSTANCEOF)) === 0) {
+        if ($routeContext[RouteContext::DESERIALIZATION_OBJECT] !== $argument->getType() && $this->hasDeserializedObjectAttribute($argument) === false) {
             return false;
         }
 
@@ -43,5 +43,14 @@ class DeserializedObjectArgumentResolver implements ArgumentValueResolverInterfa
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         yield $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE);
+    }
+
+    private function hasDeserializedObjectAttribute(ArgumentMetadata $argument): bool
+    {
+        if (method_exists($argument, 'getAttributes')) {
+            return count($argument->getAttributes(DeserializedObject::class, ArgumentMetadata::IS_INSTANCEOF)) === 0;
+        }
+
+        return false;
     }
 }
