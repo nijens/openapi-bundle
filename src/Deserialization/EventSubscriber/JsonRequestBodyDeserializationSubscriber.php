@@ -60,7 +60,7 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
             $this->serializer->deserialize(
                 $validationContext[ValidationContext::REQUEST_BODY],
                 $routeContext[RouteContext::DESERIALIZATION_OBJECT],
-                $request->getPreferredFormat('json')
+                $request->getContentType()
             )
         );
     }
