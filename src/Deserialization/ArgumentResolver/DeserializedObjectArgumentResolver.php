@@ -29,15 +29,19 @@ class DeserializedObjectArgumentResolver implements ArgumentValueResolverInterfa
         }
 
         $routeContext = $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
-        if (isset($routeContext[RouteContext::DESERIALIZATION_OBJECT]) === false) {
-            return false;
+        if ($this->isDeserializationObjectType($argument, $routeContext)) {
+            return true;
         }
 
-        if ($routeContext[RouteContext::DESERIALIZATION_OBJECT] !== $argument->getType() && $this->hasDeserializedObjectAttribute($argument) === false) {
-            return false;
+        if ($this->hasDeserializedObjectAttribute($argument)) {
+            return true;
         }
 
-        return true;
+        if ($this->isDeserializationObjectArgumentName($argument, $routeContext)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
@@ -45,12 +49,30 @@ class DeserializedObjectArgumentResolver implements ArgumentValueResolverInterfa
         yield $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE);
     }
 
+    private function isDeserializationObjectType(ArgumentMetadata $argument, ?array $routeContext): bool
+    {
+        if (isset($routeContext[RouteContext::DESERIALIZATION_OBJECT]) === false) {
+            return false;
+        }
+
+        return $routeContext[RouteContext::DESERIALIZATION_OBJECT] === $argument->getType();
+    }
+
     private function hasDeserializedObjectAttribute(ArgumentMetadata $argument): bool
     {
         if (method_exists($argument, 'getAttributes')) {
-            return count($argument->getAttributes(DeserializedObject::class, ArgumentMetadata::IS_INSTANCEOF)) === 0;
+            return count($argument->getAttributes(DeserializedObject::class, ArgumentMetadata::IS_INSTANCEOF)) > 0;
         }
 
         return false;
+    }
+
+    private function isDeserializationObjectArgumentName(ArgumentMetadata $argument, ?array $routeContext): bool
+    {
+        if (isset($routeContext[RouteContext::DESERIALIZATION_OBJECT_ARGUMENT_NAME]) === false) {
+            return false;
+        }
+
+        return $routeContext[RouteContext::DESERIALIZATION_OBJECT_ARGUMENT_NAME] === $argument->getName();
     }
 }

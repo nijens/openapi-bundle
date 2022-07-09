@@ -33,6 +33,7 @@ paths:
       x-openapi-bundle:
         controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\UpdatePetsController'
         deserializationObject: 'Nijens\OpenapiBundle\Tests\Functional\App\Model\UpdatePet[]'
+        deserializationObjectArgumentName: 'updatePets'
         additionalRouteAttributes:
           responseSerializationSchemaObject: 'Pet'
       summary: Batch update multiple pets in the store.

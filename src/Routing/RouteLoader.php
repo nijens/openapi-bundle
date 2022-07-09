@@ -168,6 +168,10 @@ class RouteLoader extends FileLoader
             $openapiRouteContext[RouteContext::DESERIALIZATION_OBJECT] = $operation->{'x-openapi-bundle'}->deserializationObject;
         }
 
+        if (isset($operation->{'x-openapi-bundle'}->deserializationObjectArgumentName)) {
+            $openapiRouteContext[RouteContext::DESERIALIZATION_OBJECT_ARGUMENT_NAME] = $operation->{'x-openapi-bundle'}->deserializationObjectArgumentName;
+        }
+
         if (isset($operation->{'x-openapi-bundle'}->additionalRouteAttributes)) {
             $additionalRouteAttributes = get_object_vars($operation->{'x-openapi-bundle'}->additionalRouteAttributes);
             foreach ($additionalRouteAttributes as $key => $value) {

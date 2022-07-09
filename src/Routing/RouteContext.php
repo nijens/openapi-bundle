@@ -29,4 +29,6 @@ final class RouteContext
     public const JSON_REQUEST_VALIDATION_POINTER = 'openapi_json_request_validation_pointer';
 
     public const DESERIALIZATION_OBJECT = 'openapi_deserialization_object';
+
+    public const DESERIALIZATION_OBJECT_ARGUMENT_NAME = 'deserialization_object_argument_name';
 }
