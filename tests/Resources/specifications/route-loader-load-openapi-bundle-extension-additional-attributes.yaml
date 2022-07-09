@@ -1,0 +1,45 @@
+openapi: 3.0.0
+
+info:
+  title: OpenAPI document for x-openapi-bundle specification extension with additional route attributes test.
+  version: 0.1.0
+
+paths:
+  /pets:
+    post:
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\CreatePetController'
+        deserializationObject: 'Nijens\OpenapiBundle\Tests\Functional\App\Model\CreatePet'
+        additionalRouteAttributes:
+          responseSerializationSchemaObject: 'Pet'
+          foo: 'bar'
+      summary: Add a new pet to the store.
+      operationId: addPet
+      requestBody:
+        description: Pet object that needs to be added to the store.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+        required: true
+      responses:
+        '201':
+          description: Successfully added a new pet to the store.
+        '400':
+          description: Invalid input.
+      tags:
+        - pet
+
+components:
+  schemas:
+    Pet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          readOnly: true
+          example: 1
+        name:
+          type: string
+          example: Dog

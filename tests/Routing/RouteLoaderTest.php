@@ -22,6 +22,8 @@ use Nijens\OpenapiBundle\Json\Loader\YamlLoader;
 use Nijens\OpenapiBundle\Json\SchemaLoader;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
+use Nijens\OpenapiBundle\Tests\Functional\App\Controller\CreatePetController;
+use Nijens\OpenapiBundle\Tests\Functional\App\Controller\UpdatePetController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
@@ -163,6 +165,55 @@ class RouteLoaderTest extends TestCase
         $route = $routes->get('createPet');
 
         $this->assertInstanceOf(Route::class, $route);
+    }
+
+    public function testCanLoadRouteWithControllerFromOpenapiBundleSpecificationExtension(): void
+    {
+        $routes = $this->routeLoader->load('route-loader-load-openapi-bundle-extension.yaml', 'openapi');
+        $route = $routes->get('pets_post');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertSame(CreatePetController::class, $route->getDefault('_controller'));
+    }
+
+    public function testCanLoadRouteWithAdditionalRouteAttributesFromOpenapiBundleSpecificationExtension(): void
+    {
+        $routes = $this->routeLoader->load(
+            'route-loader-load-openapi-bundle-extension-additional-attributes.yaml',
+            'openapi'
+        );
+        $route = $routes->get('pets_post');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertSame('Pet', $route->getDefault('responseSerializationSchemaObject'));
+        static::assertSame('bar', $route->getDefault('foo'));
+    }
+
+    public function testCanLoadRouteWithDeprecatedSpecificationExtensionWhenControllerInOpenapiBundleSpecificationExtensionDoesNotExist(): void
+    {
+        $routes = $this->routeLoader->load(
+            'route-loader-load-openapi-bundle-extension-backward-compatibility.yaml',
+            'openapi'
+        );
+        $route = $routes->get('pets_get');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertSame(
+            'Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetsController',
+            $route->getDefault('_controller')
+        );
+    }
+
+    public function testCannotLoadRouteWithDeprecatedSpecificationExtensionWhenControllerInOpenapiBundleSpecificationExtensionExists(): void
+    {
+        $routes = $this->routeLoader->load(
+            'route-loader-load-openapi-bundle-extension-backward-compatibility.yaml',
+            'openapi'
+        );
+        $route = $routes->get('pets_post');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertSame(UpdatePetController::class, $route->getDefault('_controller'));
     }
 
     private function createFileLocator(): FileLocator
