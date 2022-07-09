@@ -40,12 +40,16 @@ class UpdatePetController
         $this->serializationContextBuilder = $serializationContextBuilder;
     }
 
-    public function __invoke(Request $request, $petId, UpdatePet $pet): JsonResponse
-    {
+    public function __invoke(
+        Request $request,
+        string $petId,
+        UpdatePet $pet,
+        string $responseSerializationSchemaObject
+    ): JsonResponse {
         $pet->setId((int) $petId);
 
         $serializationContext = $this->serializationContextBuilder->getContextForSchemaObject(
-            'Pet',
+            $responseSerializationSchemaObject,
             $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
         );
 

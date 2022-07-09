@@ -53,8 +53,11 @@ paths:
         - pet
 
     post:
-      x-symfony-deserialization-object: 'Nijens\OpenapiBundle\Tests\Functional\App\Model\UpdatePet'
-      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\UpdatePetController'
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\UpdatePetController'
+        deserializationObject: 'Nijens\OpenapiBundle\Tests\Functional\App\Model\UpdatePet'
+        additionalRouteAttributes:
+          responseSerializationSchemaObject: 'Pet'
       summary: Updates a pet in the store.
       operationId: updatePet
       requestBody:
@@ -63,8 +66,14 @@ paths:
             schema:
               $ref: '#/components/schemas/Pet'
       responses:
-        405:
-          description: Invalid input
+        200:
+          description: Successfully updated the pet in the store.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        400:
+          description: Invalid input.
       tags:
         - pet
 
