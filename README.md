@@ -177,33 +177,20 @@ of this bundle.
 Adding the `deserializationObject` property to the `x-openapi-bundle` specification extension of an operation activates
 the request body deserialization.
 
-```yaml
-paths:
-  /pets:
-    post:
-      x-openapi-bundle:
-        controller: 'App\Controller\CreatePetController'
-        deserializationObject: 'App\Command\CreatePet'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Pet'
-      responses:
-        '200':
-          description: 'Returns the stored pet.'
-```
+When the request body is successfully validated against the JSON schema within your OpenAPI document,
+it will deserialize the request body into the configured deserialization object.
 
-```php
+The deserialized object is injected into the controller based on:
 
-class CreatePetController
-{
-    public __invoke(App\Command\CreatePet $createPet)
-    {
-    }
-}
+1. The type hint of the argument in the controller method.
 
-```
+2. The `#[DeserializedObject]` parameter attribute. (supported since PHP 8.0)
+
+   This method is the recommended way, as it supports argument resolving for both array deserialization
+   and mixed argument types.
+
+3. The `deserializationObjectArgumentName` property that can be added to the `x-openapi-bundle`
+   specification extension.
 
 #### Learn more
 
