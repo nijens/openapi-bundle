@@ -1,6 +1,29 @@
 # How to use a single controller with the Symfony Messenger component
 
+## 1. Install the OpenAPI bundle and additional Symfony components
+
+```shell
+composer require nijens/openapi-bundle symfony/messenger symfony/validator
+```
+
+## 2. Configure the bundle
+
 ```yaml
+# config/packages/nijens_openapi.yaml
+
+nijens_openapi:
+    routing:
+        operation_id_as_route_name: true
+
+    exception_handling:
+        enabled: true
+```
+
+## 3. Create an OpenAPI document
+
+```yaml
+# config/openapi.yaml
+
 openapi: 3.0.1
 info:
   title: Pet store
@@ -64,6 +87,20 @@ paths:
         '400':
           description: Invalid input.
 ```
+
+## 4. Load your OpenAPI document
+
+```yaml
+# config/routes.yaml
+
+api:
+    prefix: /api
+    resource: ../openapi.yaml
+    type: openapi
+    name_prefix: "api_"
+```
+
+## 5. Create the controller
 
 ```php
 
