@@ -46,8 +46,6 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
     {
         $request = $event->getRequest();
 
-        // TODO Add defaults from OpenAPI schema.
-
         $routeContext = $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
         $validationContext = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE);
 
