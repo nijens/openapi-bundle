@@ -123,16 +123,14 @@ class RouteLoader extends FileLoader
         stdClass $operation
     ): void {
         $defaults = [];
-        $openApiConfiguration = [
+        $openapiRouteContext = [
             RouteContext::RESOURCE => $resource,
         ];
 
-        if (isset($operation->{'x-symfony-controller'})) {
-            $defaults['_controller'] = $operation->{'x-symfony-controller'};
-        }
+        $this->parseOpenapiBundleSpecificationExtension($operation, $defaults, $openapiRouteContext);
 
         if (isset($operation->requestBody->content->{'application/json'})) {
-            $openApiConfiguration[RouteContext::JSON_REQUEST_VALIDATION_POINTER] = sprintf(
+            $openapiRouteContext[RouteContext::JSON_REQUEST_VALIDATION_POINTER] = sprintf(
                 '/paths/%s/%s/requestBody/content/%s/schema',
                 $jsonPointer->escape($path),
                 $requestMethod,
@@ -140,7 +138,7 @@ class RouteLoader extends FileLoader
             );
         }
 
-        $defaults[RouteContext::REQUEST_ATTRIBUTE] = $openApiConfiguration;
+        $defaults[RouteContext::REQUEST_ATTRIBUTE] = $openapiRouteContext;
 
         $route = new Route($path, $defaults, []);
         $route->setMethods($requestMethod);
@@ -154,6 +152,32 @@ class RouteLoader extends FileLoader
             $routeName ?? $this->createRouteName($path, $requestMethod),
             $route
         );
+    }
+
+    private function parseOpenapiBundleSpecificationExtension(stdClass $operation, array &$defaults, array &$openapiRouteContext): void
+    {
+        if (isset($operation->{'x-openapi-bundle'}->controller)) {
+            $defaults['_controller'] = $operation->{'x-openapi-bundle'}->controller;
+        }
+
+        if (isset($defaults['_controller']) === false && isset($operation->{'x-symfony-controller'})) {
+            $defaults['_controller'] = $operation->{'x-symfony-controller'};
+        }
+
+        if (isset($operation->{'x-openapi-bundle'}->deserializationObject)) {
+            $openapiRouteContext[RouteContext::DESERIALIZATION_OBJECT] = $operation->{'x-openapi-bundle'}->deserializationObject;
+        }
+
+        if (isset($operation->{'x-openapi-bundle'}->deserializationObjectArgumentName)) {
+            $openapiRouteContext[RouteContext::DESERIALIZATION_OBJECT_ARGUMENT_NAME] = $operation->{'x-openapi-bundle'}->deserializationObjectArgumentName;
+        }
+
+        if (isset($operation->{'x-openapi-bundle'}->additionalRouteAttributes)) {
+            $additionalRouteAttributes = get_object_vars($operation->{'x-openapi-bundle'}->additionalRouteAttributes);
+            foreach ($additionalRouteAttributes as $key => $value) {
+                $defaults[$key] = $value;
+            }
+        }
     }
 
     /**

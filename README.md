@@ -10,7 +10,8 @@ Helps you create a REST API from your OpenAPI specification.
 This bundle supports a design-first methodology for creating an API with Symfony by providing the following tools:
 
 * [Loading the path items and operations of an OpenAPI specification as routes](#routing)
-* [Validation of a JSON request body to those routes](#validation-of-a-json-request-body)
+* [Validation of a JSON request body to those routes](#validate-a-json-request-body)
+* [Deserialization of a validated JSON request body into an object](#deserialize-a-json-request-body)
 * [OpenAPI-based serialization context for the Symfony Serializer](#openapi-based-serialization-context-for-the-symfony-serializer)
 * [Exception handling](#exception-handling)
 
@@ -72,70 +73,77 @@ The following resources can help you with designing the specification:
 
 ### Routing
 This bundle provides a route loader that loads [path items](https://swagger.io/specification/#pathItemObject)
-and [operations](https://swagger.io/specification/#operationObject) from your OpenAPI specification.
+and [operations](https://swagger.io/specification/#operationObject) from your OpenAPI document.
 
-You load your OpenAPI specification by configuring it in the routing of your application:
+You load your OpenAPI document by configuring it in the routing of your application:
 
 ```yaml
 # app/config/routes.yml
 
 api:
     prefix: /api
-    resource: ../openapi.json # or ../openapi.yaml
+    resource: ../openapi.yaml # or ../openapi.json
     type: openapi
     name_prefix: "api_"
 ```
 
+Within the OpenAPI document we will use the `x-openapi-bundle` specification extension to add additional configuration
+to the operations defined in the document.
+
 #### Configuring a controller for a route
-A Symfony controller for a route is configured by adding the `x-symfony-controller` property to an operation within your OpenAPI specification.
+A Symfony controller for a route is configured by adding the `controller` property to the `x-openapi-bundle`
+specification extension within an operation within your OpenAPI document.
 
 ```yaml
 paths:
-    /pets/{uuid}:
-        put:
-            x-symfony-controller: 'Nijens\OpenapiBundle\Controller\PetController::put'
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/Pet'
-            responses:
-                '200':
-                    description: 'Returns the stored pet.'
+  /pets/{uuid}:
+    put:
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Controller\PetController::put'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+      responses:
+        '200':
+          description: 'Returns the stored pet.'
 ```
 
 <details>
-<summary>JSON example</summary>
+<summary>Example of an OpenAPI document in JSON format</summary>
 
 ```json
 {
-    "paths": {
-        "/pets/{uuid}": {
-            "put": {
-                "x-symfony-controller": "Nijens\\OpenapiBundle\\Controller\\PetController::put",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/Pet"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Returns the stored pet."
-                    }
-                }
+  "paths": {
+    "/pets/{uuid}": {
+      "put": {
+        "x-openapi-bundle": {
+          "controller": "Nijens\\OpenapiBundle\\Controller\\PetController::put"
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pet"
+              }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the stored pet."
+          }
         }
+      }
     }
+  }
 }
 ```
 
 </details>
 
-The value of the `x-symfony-controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
+The value of the `controller` property is the same as you would normally add to a [Symfony route](https://symfony.com/doc/current/routing.html#creating-routes).
 
 #### Using the operationId of an operation as the name of the Symfony route
 Within an OpenAPI document, you can give each operation an
@@ -149,9 +157,10 @@ nijens_openapi:
         operation_id_as_route_name: true
 ```
 
-Using the `operationId` for your routes gives you more control over the API route names and allows you to better use them with a `UrlGenerator`.
+Using the `operationId` for your routes gives you more control over the API route names and allows you to better use
+them with a `UrlGenerator`.
 
-### Validation of a JSON request body
+### Validate a JSON request body
 When the operations of the path items have a `requestBody` property configured with the content-type `application/json`,
 the bundle validates the incoming request bodies for those routes in the specification.
 
@@ -162,6 +171,30 @@ The following exceptions can be thrown when validation fails during a request ma
 
 The exceptions are converted to JSON responses by the [exception handling](#exception-handling) component
 of this bundle.
+
+### Deserialize a JSON request body
+
+Adding the `deserializationObject` property to the `x-openapi-bundle` specification extension of an operation activates
+the request body deserialization.
+
+When the request body is successfully validated against the JSON schema within your OpenAPI document,
+it will deserialize the request body into the configured deserialization object.
+
+The deserialized object is injected into the controller based on:
+
+1. The type hint of the argument in the controller method.
+
+2. The `#[DeserializedObject]` parameter attribute. (supported since PHP 8.0)
+
+   This method is the recommended way, as it supports argument resolving for both array deserialization
+   and mixed argument types.
+
+3. The `deserializationObjectArgumentName` property that can be added to the `x-openapi-bundle`
+   specification extension.
+
+#### Learn more
+
+* [How to use a single controller with the Symfony Messenger component](docs/deserialization/how-to-use-a-single-controller-with-the-symfony-messenger-component.md)
 
 ### OpenAPI-based serialization context for the Symfony Serializer
 ⚠ _**Please note:** This feature is still experimental. The API might change in a future minor version._

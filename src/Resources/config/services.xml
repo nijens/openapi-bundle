@@ -64,10 +64,19 @@
         </service>
 
         <service id="nijens_openapi.json.validator.factory" class="%nijens_openapi.json.validator.factory.class%">
+            <call method="setConfig">
+                <argument type="constant">JsonSchema\Constraints\Constraint::CHECK_MODE_APPLY_DEFAULTS</argument>
+            </call>
             <call method="setConstraintClass">
                 <argument>type</argument>
                 <argument>Nijens\OpenapiBundle\Json\Schema\Constraint\TypeConstraint</argument>
             </call>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Deserialization\EventSubscriber\JsonRequestBodyDeserializationSubscriber">
+            <argument type="service" id="nijens_openapi.serializer"/>
+
+            <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="nijens_openapi.event_subscriber.json_request_body_validation" class="%nijens_openapi.event_subscriber.json_request_body_validation.class%">
@@ -86,6 +95,10 @@
             <argument type="service" id="Nijens\OpenapiBundle\ExceptionHandling\DeprecatedExceptionToProblemExceptionTransformer.inner"/>
         </service>
 
+        <service id="Nijens\OpenapiBundle\Deserialization\ArgumentResolver\DeserializedObjectArgumentResolver">
+            <tag name="controller.argument_value_resolver" priority="100"/>
+        </service>
+
         <service id="nijens_openapi.serializer" class="Symfony\Component\Serializer\Serializer">
             <factory class="Nijens\OpenapiBundle\DependencyInjection\ServiceFactory" method="createSerializer"/>
 
@@ -96,10 +109,18 @@
         <service id="Nijens\OpenapiBundle\ExceptionHandling\Normalizer\ProblemExceptionNormalizer">
             <argument>%kernel.debug%</argument>
 
-            <tag name="nijens_openapi.serializer.normalizer" priority="32"/>
+            <tag name="nijens_openapi.serializer.normalizer" priority="64"/>
         </service>
 
         <service id="nijens_openapi.serializer.normalizer.json" class="Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer">
+            <tag name="nijens_openapi.serializer.normalizer" priority="32"/>
+        </service>
+
+        <service id="nijens_openapi.serializer.normalizer.array" class="Symfony\Component\Serializer\Normalizer\ArrayDenormalizer">
+            <tag name="nijens_openapi.serializer.normalizer" priority="0"/>
+        </service>
+
+        <service id="nijens_openapi.serializer.normalizer.object" class="Symfony\Component\Serializer\Normalizer\ObjectNormalizer">
             <tag name="nijens_openapi.serializer.normalizer" priority="0"/>
         </service>
 

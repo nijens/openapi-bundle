@@ -39,7 +39,7 @@ class ValidationResponsesTest extends WebTestCase
     {
         $this->client->request(
             Request::METHOD_POST,
-            '/api/pet',
+            '/api/pets',
             [],
             [],
             [
@@ -72,7 +72,7 @@ class ValidationResponsesTest extends WebTestCase
     {
         $this->client->request(
             Request::METHOD_POST,
-            '/api/pet',
+            '/api/pets',
             [],
             [],
             [

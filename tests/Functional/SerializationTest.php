@@ -31,7 +31,7 @@ class SerializationTest extends WebTestCase
 
     public function testCanSerializeObjectWithOpenApiSchemaObject(): void
     {
-        $this->client->request(Request::METHOD_GET, '/api/pet/1');
+        $this->client->request(Request::METHOD_GET, '/api/pets/1');
 
         static::assertResponseIsSuccessful();
 

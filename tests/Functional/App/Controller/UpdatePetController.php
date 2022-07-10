@@ -15,18 +15,12 @@ namespace Nijens\OpenapiBundle\Tests\Functional\App\Controller;
 
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface;
-use Nijens\OpenapiBundle\Tests\Functional\App\Model\Pet;
+use Nijens\OpenapiBundle\Tests\Functional\App\Model\UpdatePet;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
 
-/**
- * Controller for functional testing the successful serialization of an object based on a schema object of
- * the OpenAPI specification.
- *
- * @author Niels Nijens <nijens.niels@gmail.com>
- */
-class GetPetController
+class UpdatePetController
 {
     /**
      * @var SerializerInterface
@@ -46,15 +40,16 @@ class GetPetController
         $this->serializationContextBuilder = $serializationContextBuilder;
     }
 
-    /**
-     * Handles GET /api/pets/{petId}.
-     */
-    public function __invoke(Request $request): JsonResponse
-    {
-        $pet = new Pet(1, 'Cat');
+    public function __invoke(
+        Request $request,
+        string $petId,
+        UpdatePet $pet,
+        string $responseSerializationSchemaObject
+    ): JsonResponse {
+        $pet->setId((int) $petId);
 
         $serializationContext = $this->serializationContextBuilder->getContextForSchemaObject(
-            'Pet',
+            $responseSerializationSchemaObject,
             $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
         );
 

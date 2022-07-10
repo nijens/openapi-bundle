@@ -20,12 +20,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class PetController
+class CreatePetController
 {
     /**
-     * Handles POST /api/pet.
+     * Handles POST /api/pets.
      */
-    public function create(): JsonResponse
+    public function __invoke(): JsonResponse
     {
         $data = [
             'id' => 1,

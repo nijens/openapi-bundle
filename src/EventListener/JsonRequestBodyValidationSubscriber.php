@@ -19,6 +19,7 @@ use Nijens\OpenapiBundle\Exception\InvalidRequestHttpException;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use Nijens\OpenapiBundle\Routing\RouteContext;
+use Nijens\OpenapiBundle\Validation\ValidationContext;
 use Seld\JsonLint\JsonParser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\HeaderUtils;
@@ -101,6 +102,14 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
             $routeOptions[RouteContext::JSON_REQUEST_VALIDATION_POINTER],
             $decodedJsonRequestBody
         );
+
+        $event->getRequest()->attributes->set(
+            ValidationContext::REQUEST_ATTRIBUTE,
+            [
+                ValidationContext::VALIDATED => true,
+                ValidationContext::REQUEST_BODY => json_encode($decodedJsonRequestBody),
+            ]
+        );
     }
 
     /**
@@ -125,7 +134,7 @@ class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface
      *
      * @param mixed $decodedJsonRequestBody
      */
-    private function validateJsonAgainstSchema(string $openApiResource, string $openApiValidationPointer, $decodedJsonRequestBody): void
+    private function validateJsonAgainstSchema(string $openApiResource, string $openApiValidationPointer, &$decodedJsonRequestBody): void
     {
         $schema = $this->schemaLoader->load($openApiResource);
 
