@@ -129,6 +129,18 @@ class RouteLoader extends FileLoader
 
         $this->parseOpenapiBundleSpecificationExtension($operation, $defaults, $openapiRouteContext);
 
+        $openapiRouteContext[RouteContext::REQUEST_BODY_REQUIRED] = false;
+        if (isset($operation->requestBody->required)) {
+            $openapiRouteContext[RouteContext::REQUEST_BODY_REQUIRED] = $operation->requestBody->required;
+        }
+
+        $openapiRouteContext[RouteContext::REQUEST_ALLOWED_CONTENT_TYPES] = [];
+        if (isset($operation->requestBody->content)) {
+            $openapiRouteContext[RouteContext::REQUEST_ALLOWED_CONTENT_TYPES] = array_keys(
+                get_object_vars($operation->requestBody->content)
+            );
+        }
+
         if (isset($operation->requestBody->content->{'application/json'})) {
             $openapiRouteContext[RouteContext::JSON_REQUEST_VALIDATION_POINTER] = sprintf(
                 '/paths/%s/%s/requestBody/content/%s/schema',

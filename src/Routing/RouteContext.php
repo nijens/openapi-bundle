@@ -26,6 +26,10 @@ final class RouteContext
 
     public const JSON_REQUEST_VALIDATION_POINTER = 'json_request_validation_pointer';
 
+    public const REQUEST_BODY_REQUIRED = 'request_body_required';
+
+    public const REQUEST_ALLOWED_CONTENT_TYPES = 'request_allowed_content_types';
+
     public const DESERIALIZATION_OBJECT = 'deserialization_object';
 
     public const DESERIALIZATION_OBJECT_ARGUMENT_NAME = 'deserialization_object_argument_name';
