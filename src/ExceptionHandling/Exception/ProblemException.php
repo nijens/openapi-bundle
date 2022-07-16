@@ -24,9 +24,9 @@ use Throwable;
  */
 class ProblemException extends Exception implements ProblemExceptionInterface
 {
-    private const DEFAULT_TYPE_URI = 'about:blank';
+    public const DEFAULT_TYPE_URI = 'about:blank';
 
-    private const DEFAULT_TITLE = 'An error occurred.';
+    public const DEFAULT_TITLE = 'An error occurred.';
 
     /**
      * @var string
