@@ -143,5 +143,13 @@
         </service>
 
         <service id="Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface" alias="Nijens\OpenapiBundle\Serialization\SerializationContextBuilder"/>
+
+        <service id="Nijens\OpenapiBundle\Validation\EventSubscriber\RequestValidationSubscriber">
+            <argument type="service" id="nijens_openapi.json.parser"/>
+            <argument type="service" id="nijens_openapi.json.schema_loader"/>
+            <argument type="service" id="nijens_openapi.json.validator"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 </container>
