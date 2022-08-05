@@ -14,6 +14,7 @@ namespace Nijens\OpenapiBundle\Tests\Validation\EventSubscriber;
 use JsonSchema\Validator;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidContentTypeProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestBodyProblemException;
+use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestParameterProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use Nijens\OpenapiBundle\Routing\RouteContext;
@@ -97,7 +98,222 @@ class RequestValidationSubscriberTest extends TestCase
         $this->subscriber->validateRequest($event);
     }
 
-    public function testCannotValidateRequestWithoutContentTypeAndRequestBodyIsNotRequired(): void
+    public function testCanValidateRequiredRequestParameter(): void
+    {
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $this->schemaLoaderMock->expects($this->never())
+            ->method('load');
+
+        $request = new Request();
+        $request->query->set('foo', 'bar');
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => (object) [
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => (object) [
+                            'type' => 'string',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->subscriber->validateRequest($event);
+    }
+
+    public function testCannotValidateRequiredRequestParameterWithoutValue(): void
+    {
+        $request = new Request();
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => (object) [
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => (object) [
+                            'type' => 'string',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->expectException(InvalidRequestParameterProblemException::class);
+        $this->expectExceptionMessage('Validation of query parameters failed.');
+
+        try {
+            $this->subscriber->validateRequest($event);
+        } catch (InvalidRequestParameterProblemException $exception) {
+            // Also assert contents of violations.
+            $this->assertEquals(
+                [
+                    new Violation('required_query_parameter', 'Query parameter foo is required.', 'foo'),
+                ],
+                $exception->getViolations()
+            );
+
+            throw $exception;
+        }
+    }
+
+    public function testCanValidateRequestParameterOfTypeBoolean(): void
+    {
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $request = new Request();
+        $request->query->set('foo', 'true');
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => (object) [
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => (object) [
+                            'type' => 'boolean',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->subscriber->validateRequest($event);
+    }
+
+    public function testCanValidateRequestParameterOfTypeString(): void
+    {
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $request = new Request();
+        $request->query->set('foo', 'bar');
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => (object) [
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => (object) [
+                            'type' => 'string',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->subscriber->validateRequest($event);
+    }
+
+    public function testCanValidateRequestParameterOfTypeInteger(): void
+    {
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $request = new Request();
+        $request->query->set('foo', '1');
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => (object) [
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => (object) [
+                            'type' => 'integer',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->subscriber->validateRequest($event);
+    }
+
+    public function testCannotValidateRequestParameterOfTypeIntegerWithInvalidValue(): void
+    {
+        $this->jsonParserMock->expects($this->never())
+            ->method('lint');
+
+        $request = new Request();
+        $request->query->set('foo', 'bar');
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => (object) [
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => (object) [
+                            'type' => 'integer',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->expectException(InvalidRequestParameterProblemException::class);
+        $this->expectExceptionMessage('Validation of query parameters failed.');
+
+        try {
+            $this->subscriber->validateRequest($event);
+        } catch (InvalidRequestParameterProblemException $exception) {
+            // Also assert contents of violations.
+            $this->assertEquals(
+                [
+                    new Violation('type', 'String value found, but an integer is required', 'foo'),
+                ],
+                $exception->getViolations()
+            );
+
+            throw $exception;
+        }
+    }
+
+    public function testCannotValidateRequestBodyWithoutContentTypeAndRequestBodyIsNotRequired(): void
     {
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
@@ -113,6 +329,7 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
         );
 
@@ -131,6 +348,7 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
         );
 
@@ -153,6 +371,7 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
         );
 
@@ -180,6 +399,7 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
         );
 
@@ -209,6 +429,7 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
         );
 
@@ -253,6 +474,7 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
         );
 
@@ -298,6 +520,7 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
         );
 
@@ -323,6 +546,7 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json', 'application/xml'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
         );
 

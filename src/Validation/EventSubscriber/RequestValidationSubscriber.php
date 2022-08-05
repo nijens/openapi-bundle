@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Validation\EventSubscriber;
 
+use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidContentTypeProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestBodyProblemException;
+use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestParameterProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\ProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
 use Nijens\OpenapiBundle\Json\JsonPointer;
@@ -76,8 +78,51 @@ class RequestValidationSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->validateRequestParameters($request);
         $this->validateRequestContentType($request);
         $this->validateJsonRequestBody($request);
+    }
+
+    private function validateRequestParameters(Request $request): void
+    {
+        $routeContext = $this->getRouteContext($request);
+
+        $violations = [];
+        foreach ($routeContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS] as $parameterName => $parameter) {
+            if ($request->query->has($parameterName) === false && $parameter->required ?? false) {
+                $violations[] = new Violation(
+                    'required_query_parameter',
+                    sprintf('Query parameter %s is required.', $parameterName),
+                    $parameterName
+                );
+
+                continue;
+            }
+
+            $parameterValue = $request->query->get($parameterName);
+
+            $this->jsonValidator->validate($parameterValue, $parameter->schema, Constraint::CHECK_MODE_COERCE_TYPES);
+            if ($this->jsonValidator->isValid() === false) {
+                $validationErrors = $this->jsonValidator->getErrors();
+                $this->jsonValidator->reset();
+
+                $violations = array_merge(
+                    $violations,
+                    array_map(
+                        function (array $validationError) use ($parameterName): Violation {
+                            $validationError['property'] = $parameterName;
+
+                            return Violation::fromArray($validationError);
+                        },
+                        $validationErrors
+                    )
+                );
+            }
+        }
+
+        if (count($violations) > 0) {
+            $this->throwInvalidRequestParameterProblemException($violations);
+        }
     }
 
     private function validateRequestContentType(Request $request): void
@@ -187,6 +232,18 @@ class RequestValidationSubscriber implements EventSubscriberInterface
 
             $this->throwInvalidRequestBodyProblemException($violations);
         }
+    }
+
+    private function throwInvalidRequestParameterProblemException(array $violations): void
+    {
+        $exception = new InvalidRequestParameterProblemException(
+            'about:blank',
+            'The request contains errors.',
+            Response::HTTP_BAD_REQUEST,
+            'Validation of query parameters failed.'
+        );
+
+        throw $exception->withViolations($violations);
     }
 
     /**
