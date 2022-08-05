@@ -137,7 +137,32 @@ class RouteLoaderTest extends TestCase
         static::assertSame('Nijens\OpenapiBundle\Controller\FooController::bar', $route->getDefault('_controller'));
     }
 
-    public function testCanLoadRoutesWithRouteContextForRequestValidation(): void
+    public function testCanLoadRoutesWithRouteContextForRequestParameterValidation(): void
+    {
+        $routes = $this->routeLoader->load('route-loader-request-validation.yaml', 'openapi');
+        $route = $routes->get('pets_get');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertEquals(
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/route-loader-request-validation.yaml',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => (object) [
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'schema' => (object) [
+                            'type' => 'string',
+                        ],
+                    ],
+                ],
+            ],
+            $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)
+        );
+    }
+
+    public function testCanLoadRoutesWithRouteContextForRequestBodyValidation(): void
     {
         $routes = $this->routeLoader->load('route-loader-request-validation.yaml', 'openapi');
         $route = $routes->get('pets_put');
@@ -148,6 +173,7 @@ class RouteLoaderTest extends TestCase
                 RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/route-loader-request-validation.yaml',
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
             ],
             $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)

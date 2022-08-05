@@ -107,7 +107,7 @@ class RouteLoader extends FileLoader
                 return;
             }
 
-            $this->parseOperation($jsonPointer, $resource, $collection, $path, $requestMethod, $operation);
+            $this->parseOperation($jsonPointer, $resource, $collection, $path, $requestMethod, $operation, $pathItem);
         }
     }
 
@@ -120,7 +120,8 @@ class RouteLoader extends FileLoader
         RouteCollection $collection,
         string $path,
         string $requestMethod,
-        stdClass $operation
+        stdClass $operation,
+        stdClass $pathItem
     ): void {
         $defaults = [];
         $openapiRouteContext = [
@@ -139,6 +140,19 @@ class RouteLoader extends FileLoader
             $openapiRouteContext[RouteContext::REQUEST_ALLOWED_CONTENT_TYPES] = array_keys(
                 get_object_vars($operation->requestBody->content)
             );
+        }
+
+        $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS] = [];
+        $parameters = array_merge(
+            $pathItem->parameters ?? [],
+            $operation->parameters ?? []
+        );
+        foreach ($parameters as $parameter) {
+            if ($parameter->in !== 'query') {
+                continue;
+            }
+
+            $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = $parameter;
         }
 
         if (isset($operation->requestBody->content->{'application/json'})) {

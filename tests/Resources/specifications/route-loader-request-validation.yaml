@@ -6,6 +6,21 @@ info:
 
 paths:
   /pets:
+    get:
+      parameters:
+        - name: foo
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the pets.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
     put:
       requestBody:
         content:
