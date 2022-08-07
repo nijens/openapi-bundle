@@ -213,6 +213,10 @@ class RouteLoader extends FileLoader
             $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = $parameter;
         }
 
+        if (isset($operation->requestBody->content->{'application/json'}->schema)) {
+            $openapiRouteContext[RouteContext::REQUEST_BODY_SCHEMA] = json_encode($operation->requestBody->content->{'application/json'}->schema);
+        }
+
         if (isset($operation->requestBody->content->{'application/json'})) {
             $openapiRouteContext[RouteContext::JSON_REQUEST_VALIDATION_POINTER] = sprintf(
                 '/paths/%s/%s/requestBody/content/%s/schema',

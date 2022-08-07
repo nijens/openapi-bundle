@@ -16,7 +16,6 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidContentTypeProblemEx
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestBodyProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestParameterProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
-use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Validation\EventSubscriber\RequestValidationSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -40,31 +39,15 @@ class RequestValidationSubscriberTest extends TestCase
      */
     private $jsonParserMock;
 
-    /**
-     * @var MockObject|SchemaLoaderInterface
-     */
-    private $schemaLoaderMock;
-
-    /**
-     * @var Validator
-     */
-    private $jsonValidator;
-
     protected function setUp(): void
     {
         $this->jsonParserMock = $this->getMockBuilder(JsonParser::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->schemaLoaderMock = $this->getMockBuilder(SchemaLoaderInterface::class)
-            ->getMock();
-
-        $this->jsonValidator = new Validator();
-
         $this->subscriber = new RequestValidationSubscriber(
             $this->jsonParserMock,
-            $this->schemaLoaderMock,
-            $this->jsonValidator
+            new Validator()
         );
     }
 
@@ -87,9 +70,6 @@ class RequestValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->schemaLoaderMock->expects($this->never())
-            ->method('load');
-
         $request = new Request();
         $request->headers->set('Content-Type', 'application/json');
 
@@ -102,9 +82,6 @@ class RequestValidationSubscriberTest extends TestCase
     {
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
-
-        $this->schemaLoaderMock->expects($this->never())
-            ->method('load');
 
         $request = new Request();
         $request->query->set('foo', 'bar');
@@ -318,9 +295,6 @@ class RequestValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->schemaLoaderMock->expects($this->never())
-            ->method('load');
-
         $request = new Request();
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
@@ -388,9 +362,6 @@ class RequestValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->schemaLoaderMock->expects($this->never())
-            ->method('load');
-
         $request = new Request();
         $request->headers->set('Content-Type', 'application/json');
         $request->attributes->set(
@@ -417,17 +388,13 @@ class RequestValidationSubscriberTest extends TestCase
             ->with($requestBody)
             ->willReturn(new ParsingException('An Invalid JSON error message'));
 
-        $this->schemaLoaderMock->expects($this->never())
-            ->method('load');
-
         $request = new Request([], [], [], [], [], [], $requestBody);
         $request->headers->set('Content-Type', 'application/json');
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
-                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
+                RouteContext::REQUEST_BODY_SCHEMA => $this->createRequestBodySchema(),
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
@@ -460,19 +427,13 @@ class RequestValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->schemaLoaderMock->expects($this->once())
-            ->method('load')
-            ->with(__DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json')
-            ->willReturn(json_decode(file_get_contents(__DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json')));
-
         $request = new Request([], [], [], [], [], [], $requestBody);
         $request->headers->set('Content-Type', 'application/json');
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
-                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
+                RouteContext::REQUEST_BODY_SCHEMA => $this->createRequestBodySchema(),
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
@@ -506,19 +467,13 @@ class RequestValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->schemaLoaderMock->expects($this->once())
-            ->method('load')
-            ->with(__DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json')
-            ->willReturn(json_decode(file_get_contents(__DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json')));
-
         $request = new Request([], [], [], [], [], [], $requestBody);
         $request->headers->set('Content-Type', 'application/json');
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
-                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
+                RouteContext::REQUEST_BODY_SCHEMA => $this->createRequestBodySchema(),
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
@@ -534,17 +489,13 @@ class RequestValidationSubscriberTest extends TestCase
         $this->jsonParserMock->expects($this->never())
             ->method('lint');
 
-        $this->schemaLoaderMock->expects($this->never())
-            ->method('load');
-
         $request = new Request();
         $request->headers->set('Content-Type', 'application/xml');
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::RESOURCE => __DIR__.'/../../Resources/specifications/json-request-body-validation-subscriber.json',
-                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
                 RouteContext::REQUEST_BODY_REQUIRED => true,
+                RouteContext::REQUEST_BODY_SCHEMA => $this->createRequestBodySchema(),
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json', 'application/xml'],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
             ]
@@ -563,5 +514,28 @@ class RequestValidationSubscriberTest extends TestCase
         $kernelMock = $this->createMock(HttpKernelInterface::class);
 
         return new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+    }
+
+    private function createRequestBodySchema(): string
+    {
+        return json_encode([
+            'type' => 'object',
+            'properties' => [
+                'id' => [
+                    'type' => 'integer',
+                    'format' => 'int32',
+                    'readOnly' => true,
+                    'example' => 1,
+                ],
+                'name' => [
+                  'type' => 'string',
+                  'example' => 'Dog',
+                ],
+            ],
+            'additionalProperties' => false,
+            'required' => [
+                'name',
+            ],
+        ]);
     }
 }

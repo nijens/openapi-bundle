@@ -26,9 +26,11 @@ final class RouteContext
 
     public const JSON_REQUEST_VALIDATION_POINTER = 'json_request_validation_pointer';
 
+    public const REQUEST_ALLOWED_CONTENT_TYPES = 'request_allowed_content_types';
+
     public const REQUEST_BODY_REQUIRED = 'request_body_required';
 
-    public const REQUEST_ALLOWED_CONTENT_TYPES = 'request_allowed_content_types';
+    public const REQUEST_BODY_SCHEMA = 'request_body_schema';
 
     public const REQUEST_VALIDATE_QUERY_PARAMETERS = 'request_validate_query_parameters';
 

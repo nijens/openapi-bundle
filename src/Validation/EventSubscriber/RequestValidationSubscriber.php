@@ -20,8 +20,6 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestBodyProblemEx
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestParameterProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\ProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
-use Nijens\OpenapiBundle\Json\JsonPointer;
-use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Validation\ValidationContext;
 use Seld\JsonLint\JsonParser;
@@ -46,11 +44,6 @@ class RequestValidationSubscriber implements EventSubscriberInterface
     private $jsonParser;
 
     /**
-     * @var SchemaLoaderInterface
-     */
-    private $schemaLoader;
-
-    /**
      * @var Validator
      */
     private $jsonValidator;
@@ -64,10 +57,9 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __construct(JsonParser $jsonParser, SchemaLoaderInterface $schemaLoader, Validator $jsonValidator)
+    public function __construct(JsonParser $jsonParser, Validator $jsonValidator)
     {
         $this->jsonParser = $jsonParser;
-        $this->schemaLoader = $schemaLoader;
         $this->jsonValidator = $jsonValidator;
     }
 
@@ -164,7 +156,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         }
 
         $routeContext = $this->getRouteContext($request);
-        if (isset($routeContext[RouteContext::JSON_REQUEST_VALIDATION_POINTER]) === false) {
+        if (isset($routeContext[RouteContext::REQUEST_BODY_SCHEMA]) === false) {
             return;
         }
 
@@ -172,8 +164,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         $decodedJsonRequestBody = $this->validateJsonSyntax($requestBody);
 
         $this->validateJsonAgainstSchema(
-            $routeContext[RouteContext::RESOURCE],
-            $routeContext[RouteContext::JSON_REQUEST_VALIDATION_POINTER],
+            json_decode($routeContext[RouteContext::REQUEST_BODY_SCHEMA]),
             $decodedJsonRequestBody
         );
 
@@ -210,13 +201,8 @@ class RequestValidationSubscriber implements EventSubscriberInterface
      *
      * @param array|stdClass|string|int|float|bool|null $decodedJsonRequestBody
      */
-    private function validateJsonAgainstSchema(string $openApiResource, string $openApiValidationPointer, &$decodedJsonRequestBody): void
+    private function validateJsonAgainstSchema(stdClass $jsonSchema, &$decodedJsonRequestBody): void
     {
-        $schema = $this->schemaLoader->load($openApiResource);
-
-        $jsonPointer = new JsonPointer($schema);
-        $jsonSchema = $jsonPointer->get($openApiValidationPointer);
-
         $this->jsonValidator->validate($decodedJsonRequestBody, $jsonSchema);
 
         if ($this->jsonValidator->isValid() === false) {
@@ -263,9 +249,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
 
     private function isManagedRoute(Request $request): bool
     {
-        $routeContext = $this->getRouteContext($request);
-
-        return isset($routeContext[RouteContext::RESOURCE]);
+        return $request->attributes->has(RouteContext::REQUEST_ATTRIBUTE);
     }
 
     private function getRouteContext(Request $request): ?array

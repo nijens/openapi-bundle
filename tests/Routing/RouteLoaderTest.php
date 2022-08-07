@@ -174,6 +174,7 @@ class RouteLoaderTest extends TestCase
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
+                RouteContext::REQUEST_BODY_SCHEMA => '{"type":"object","properties":{"id":{"type":"integer","format":"int32","readOnly":true,"example":1},"name":{"type":"string","example":"Dog"}}}',
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
             ],
             $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)
