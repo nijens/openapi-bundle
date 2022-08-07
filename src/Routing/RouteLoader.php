@@ -129,40 +129,14 @@ class RouteLoader extends FileLoader
         ];
 
         $this->parseOpenapiBundleSpecificationExtension($operation, $defaults, $openapiRouteContext);
-
-        $openapiRouteContext[RouteContext::REQUEST_BODY_REQUIRED] = false;
-        if (isset($operation->requestBody->required)) {
-            $openapiRouteContext[RouteContext::REQUEST_BODY_REQUIRED] = $operation->requestBody->required;
-        }
-
-        $openapiRouteContext[RouteContext::REQUEST_ALLOWED_CONTENT_TYPES] = [];
-        if (isset($operation->requestBody->content)) {
-            $openapiRouteContext[RouteContext::REQUEST_ALLOWED_CONTENT_TYPES] = array_keys(
-                get_object_vars($operation->requestBody->content)
-            );
-        }
-
-        $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS] = [];
-        $parameters = array_merge(
-            $pathItem->parameters ?? [],
-            $operation->parameters ?? []
+        $this->addRouteContextForValidation(
+            $jsonPointer,
+            $path,
+            $requestMethod,
+            $operation,
+            $pathItem,
+            $openapiRouteContext
         );
-        foreach ($parameters as $parameter) {
-            if ($parameter->in !== 'query') {
-                continue;
-            }
-
-            $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = $parameter;
-        }
-
-        if (isset($operation->requestBody->content->{'application/json'})) {
-            $openapiRouteContext[RouteContext::JSON_REQUEST_VALIDATION_POINTER] = sprintf(
-                '/paths/%s/%s/requestBody/content/%s/schema',
-                $jsonPointer->escape($path),
-                $requestMethod,
-                $jsonPointer->escape('application/json')
-            );
-        }
 
         $defaults[RouteContext::REQUEST_ATTRIBUTE] = $openapiRouteContext;
 
@@ -203,6 +177,49 @@ class RouteLoader extends FileLoader
             foreach ($additionalRouteAttributes as $key => $value) {
                 $defaults[$key] = $value;
             }
+        }
+    }
+
+    private function addRouteContextForValidation(
+        JsonPointer $jsonPointer,
+        string $path,
+        string $requestMethod,
+        stdClass $operation,
+        stdClass $pathItem,
+        array &$openapiRouteContext
+    ): void {
+        $openapiRouteContext[RouteContext::REQUEST_BODY_REQUIRED] = false;
+        if (isset($operation->requestBody->required)) {
+            $openapiRouteContext[RouteContext::REQUEST_BODY_REQUIRED] = $operation->requestBody->required;
+        }
+
+        $openapiRouteContext[RouteContext::REQUEST_ALLOWED_CONTENT_TYPES] = [];
+        if (isset($operation->requestBody->content)) {
+            $openapiRouteContext[RouteContext::REQUEST_ALLOWED_CONTENT_TYPES] = array_keys(
+                get_object_vars($operation->requestBody->content)
+            );
+        }
+
+        $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS] = [];
+        $parameters = array_merge(
+            $pathItem->parameters ?? [],
+            $operation->parameters ?? []
+        );
+        foreach ($parameters as $parameter) {
+            if ($parameter->in !== 'query') {
+                continue;
+            }
+
+            $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = $parameter;
+        }
+
+        if (isset($operation->requestBody->content->{'application/json'})) {
+            $openapiRouteContext[RouteContext::JSON_REQUEST_VALIDATION_POINTER] = sprintf(
+                '/paths/%s/%s/requestBody/content/%s/schema',
+                $jsonPointer->escape($path),
+                $requestMethod,
+                $jsonPointer->escape('application/json')
+            );
         }
     }
 
