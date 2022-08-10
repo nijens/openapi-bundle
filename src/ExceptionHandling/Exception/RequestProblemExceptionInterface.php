@@ -13,6 +13,6 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\ExceptionHandling\Exception;
 
-final class InvalidContentTypeProblemException extends ProblemException implements RequestProblemExceptionInterface
+interface RequestProblemExceptionInterface extends ProblemExceptionInterface
 {
 }

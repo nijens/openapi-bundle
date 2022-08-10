@@ -21,7 +21,7 @@ namespace Nijens\OpenapiBundle\ExceptionHandling\Exception;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-interface InvalidRequestProblemExceptionInterface extends ProblemExceptionInterface
+interface InvalidRequestProblemExceptionInterface extends RequestProblemExceptionInterface
 {
     /**
      * @return ViolationInterface[]
