@@ -210,7 +210,7 @@ class RouteLoader extends FileLoader
                 continue;
             }
 
-            $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = $parameter;
+            $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = json_encode($parameter);
         }
 
         if (isset($operation->requestBody->content->{'application/json'}->schema)) {

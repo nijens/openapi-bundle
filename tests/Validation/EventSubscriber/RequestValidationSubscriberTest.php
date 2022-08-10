@@ -94,14 +94,14 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'string',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -121,14 +121,14 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'string',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -167,14 +167,14 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'boolean',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -198,14 +198,14 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'string',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -229,14 +229,14 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'integer',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -260,14 +260,14 @@ class RequestValidationSubscriberTest extends TestCase
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'integer',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );

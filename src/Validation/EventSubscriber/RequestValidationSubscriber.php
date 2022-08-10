@@ -81,6 +81,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
 
         $violations = [];
         foreach ($routeContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS] as $parameterName => $parameter) {
+            $parameter = json_decode($parameter);
             if ($request->query->has($parameterName) === false && $parameter->required ?? false) {
                 $violations[] = new Violation(
                     'required_query_parameter',
@@ -88,6 +89,10 @@ class RequestValidationSubscriber implements EventSubscriberInterface
                     $parameterName
                 );
 
+                continue;
+            }
+
+            if ($request->query->has($parameterName) === false) {
                 continue;
             }
 

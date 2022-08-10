@@ -43,14 +43,14 @@ class RequestParameterValidatorTest extends TestCase
             RouteContext::REQUEST_ATTRIBUTE,
             [
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'string',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -67,14 +67,14 @@ class RequestParameterValidatorTest extends TestCase
             RouteContext::REQUEST_ATTRIBUTE,
             [
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'string',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -99,14 +99,14 @@ class RequestParameterValidatorTest extends TestCase
             RouteContext::REQUEST_ATTRIBUTE,
             [
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'boolean',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -124,14 +124,14 @@ class RequestParameterValidatorTest extends TestCase
             RouteContext::REQUEST_ATTRIBUTE,
             [
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'string',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -149,14 +149,14 @@ class RequestParameterValidatorTest extends TestCase
             RouteContext::REQUEST_ATTRIBUTE,
             [
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'integer',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );
@@ -174,14 +174,14 @@ class RequestParameterValidatorTest extends TestCase
             RouteContext::REQUEST_ATTRIBUTE,
             [
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
                         'required' => true,
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'integer',
                         ],
-                    ],
+                    ]),
                 ],
             ]
         );

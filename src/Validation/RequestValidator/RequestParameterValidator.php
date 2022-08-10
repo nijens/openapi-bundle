@@ -44,7 +44,7 @@ final class RequestParameterValidator implements ValidatorInterface
         foreach ($validateQueryParameters as $parameterName => $parameter) {
             $violations = array_merge(
                 $violations,
-                $this->validateQueryParameter($request, $parameterName, $parameter)
+                $this->validateQueryParameter($request, $parameterName, json_decode($parameter))
             );
         }
 
@@ -65,7 +65,7 @@ final class RequestParameterValidator implements ValidatorInterface
     private function getValidateQueryParametersFromRequest(Request $request): array
     {
         return $request->attributes
-            ->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS];
+            ->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS] ?? [];
     }
 
     private function validateQueryParameter(Request $request, string $parameterName, stdClass $parameter): array
@@ -78,6 +78,10 @@ final class RequestParameterValidator implements ValidatorInterface
                 $parameterName
             );
 
+            return $violations;
+        }
+
+        if ($request->query->has($parameterName) === false) {
             return $violations;
         }
 

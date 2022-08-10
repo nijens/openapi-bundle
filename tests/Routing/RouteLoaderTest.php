@@ -149,13 +149,13 @@ class RouteLoaderTest extends TestCase
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => (object) [
+                    'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
-                        'schema' => (object) [
+                        'schema' => [
                             'type' => 'string',
                         ],
-                    ],
+                    ]),
                 ],
             ],
             $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)
