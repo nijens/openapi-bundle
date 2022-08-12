@@ -16,6 +16,12 @@ namespace Nijens\OpenapiBundle\Validation\RequestValidator;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\RequestProblemExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Combines multiple request validators into a single request validator.
+ * When a request validator returns an exception, all following request validators will not be called.
+ *
+ * @author Niels Nijens <nijens.niels@gmail.com>
+ */
 final class CompositeRequestValidator implements ValidatorInterface
 {
     /**

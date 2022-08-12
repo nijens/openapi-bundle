@@ -27,6 +27,11 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Validates a JSON request body with the JSON schema.
+ *
+ * @author Niels Nijens <nijens.niels@gmail.com>
+ */
 final class RequestBodyValidator implements ValidatorInterface
 {
     /**

@@ -21,6 +21,11 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Validates the allowed content types for the request.
+ *
+ * @author Niels Nijens <nijens.niels@gmail.com>
+ */
 final class RequestContentTypeValidator implements ValidatorInterface
 {
     public function validate(Request $request): ?RequestProblemExceptionInterface
