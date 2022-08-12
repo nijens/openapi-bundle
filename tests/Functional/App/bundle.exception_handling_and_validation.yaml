@@ -4,3 +4,5 @@ nijens_openapi:
 
     validation:
         enabled: true
+
+        parameter_validation: true

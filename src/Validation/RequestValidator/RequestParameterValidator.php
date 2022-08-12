@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Validates the query parameters of the request with the schema from the OpenAPI document.
  *
+ * @experimental
+ *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
 final class RequestParameterValidator implements ValidatorInterface

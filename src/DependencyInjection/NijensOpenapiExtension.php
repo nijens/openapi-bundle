@@ -19,6 +19,7 @@ use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExc
 use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use Nijens\OpenapiBundle\Validation\EventSubscriber\RequestValidationSubscriber;
+use Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -77,6 +78,10 @@ class NijensOpenapiExtension extends Extension
 
         if ($config['enabled'] !== null) {
             $container->removeDefinition('nijens_openapi.event_subscriber.json_request_body_validation');
+        }
+
+        if ($config['parameter_validation'] === false) {
+            $container->removeDefinition(RequestParameterValidator::class);
         }
     }
 

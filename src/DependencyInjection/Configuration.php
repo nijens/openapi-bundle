@@ -96,6 +96,10 @@ class Configuration implements ConfigurationInterface
                             })
                             ->end()
                         ->end()
+                    ->booleanNode('parameter_validation')
+                        ->info('Enables the experimental query parameter request validation.')
+                        ->defaultFalse()
+                        ->end()
                     ->end()
                 ->end()
             ->end();
