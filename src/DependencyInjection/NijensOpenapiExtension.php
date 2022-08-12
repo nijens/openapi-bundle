@@ -50,6 +50,12 @@ class NijensOpenapiExtension extends Extension
         $this->registerRoutingConfiguration($config['routing'], $container);
         $this->registerValidationConfiguration($config['validation'], $container);
         $this->registerExceptionHandlingConfiguration($config['exception_handling'], $container);
+
+        if ($config['validation']['enabled'] === true && $config['exception_handling']['enabled'] !== true) {
+            trigger_error(
+                'Enabling the validation component without the exception handling component might cause unexpected results.',
+            );
+        }
     }
 
     /**
