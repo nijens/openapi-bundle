@@ -10,7 +10,7 @@ Helps you create a REST API from your OpenAPI specification.
 This bundle supports a design-first methodology for creating an API with Symfony by providing the following tools:
 
 * [Loading the path items and operations of an OpenAPI specification as routes](#routing)
-* [Validation of a JSON request body to those routes](#validate-a-json-request-body)
+* [Validation of the request to those routes](#validation-of-the-request)
 * [Deserialization of a validated JSON request body into an object](#deserialize-a-json-request-body)
 * [OpenAPI-based serialization context for the Symfony Serializer](#openapi-based-serialization-context-for-the-symfony-serializer)
 * [Exception handling](#exception-handling)
@@ -160,17 +160,37 @@ nijens_openapi:
 Using the `operationId` for your routes gives you more control over the API route names and allows you to better use
 them with a `UrlGenerator`.
 
-### Validate a JSON request body
-When the operations of the path items have a `requestBody` property configured with the content-type `application/json`,
-the bundle validates the incoming request bodies for those routes in the specification.
+### Validation of the request
+By default, the [deprecated validation component](docs/validation/deprecated-validation-component.md) is enabled.
+To enable the improved validation component, add the following YAML configuration.
 
-The following exceptions can be thrown when validation fails during a request made to a route managed by the OpenAPI bundle:
-* `BadJsonRequestHttpException`: when the request content-type is not `application/json`
-* `BadJsonRequestHttpException`: when the JSON within the request body is invalid
-* `InvalidRequestHttpException`: when the JSON within the request body does not validate with the JSON schema of the route
+```yaml
+# config/packages/nijens_openapi.yaml
+nijens_openapi:
+    exception_handling:
+        enabled: true
 
-The exceptions are converted to JSON responses by the [exception handling](#exception-handling) component
-of this bundle.
+    validation:
+        enabled: true
+```
+
+It is strongly advised to also enable the improved exception handling component, as it will convert the details of
+the validation exceptions into proper JSON responses.
+
+The validation component comes with validation for the following parts of a request:
+
+* **Content-type**: Based on the configured content types configured in the `requestBody` property of an operation
+* **Query parameters**: Validates the query parameters configured of the operation and path item.
+  *Note that this type of validation is experimental as it might be missing validation of certain query parameter types.*
+* **JSON request body**: Based on the JSON schema in the `requestBody` property of an operation
+
+#### Learn more
+
+* Content-type validation explained
+* JSON request body validation explained
+* Activate request query parameter validation
+* Query parameter validation explained
+* Create your own request validator
 
 ### Deserialize a JSON request body
 
