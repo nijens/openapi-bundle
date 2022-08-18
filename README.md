@@ -186,11 +186,11 @@ The validation component comes with validation for the following parts of a requ
 
 #### Learn more
 
-* Content-type validation explained
-* JSON request body validation explained
-* Activate request query parameter validation
-* Query parameter validation explained
-* Create your own request validator
+* [Activate query parameter request validation](docs/validation/activate-query-parameter-request-validation.md)
+* [Create your custom request validator](docs/validation/create-your-custom-request-validator.md)
+* Content-type validation explained (coming soon™)
+* JSON request body validation explained (coming soon™)
+* Query parameter validation explained (coming soon™)
 
 ### Deserialize a JSON request body
 
