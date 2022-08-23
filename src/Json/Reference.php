@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Json;
 
+use JsonSerializable;
+use Nijens\OpenapiBundle\Json\Exception\InvalidArgumentException;
 use stdClass;
 
 /**
@@ -20,7 +22,7 @@ use stdClass;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-class Reference
+class Reference implements JsonSerializable
 {
     /**
      * @var string
@@ -31,6 +33,11 @@ class Reference
      * @var stdClass
      */
     private $jsonSchema;
+
+    /**
+     * @var JsonPointer
+     */
+    private $jsonPointer;
 
     /**
      * Constructs a new {@see Reference} instance.
@@ -55,5 +62,62 @@ class Reference
     public function getJsonSchema(): stdClass
     {
         return $this->jsonSchema;
+    }
+
+    public function has(string $property): bool
+    {
+        $schema = $this->resolve();
+
+        return isset($schema->{$property});
+    }
+
+    /**
+     * @return array|string|int|float|bool|stdClass|null
+     */
+    public function get(string $property)
+    {
+        if ($this->has($property) === false) {
+            throw new InvalidArgumentException(sprintf('Unknown property "%s".', $property));
+        }
+
+        $schema = $this->resolve();
+
+        return $schema->{$property};
+    }
+
+    public function resolve(): stdClass
+    {
+        $jsonPointer = $this->createJsonPointer();
+
+        return $jsonPointer->get($this->getPointer());
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            '$ref' => $this->getPointer(),
+        ];
+    }
+
+    public function __isset(string $property): bool
+    {
+        return $this->has($property);
+    }
+
+    /**
+     * @return array|string|int|float|bool|stdClass|null
+     */
+    public function __get(string $property)
+    {
+        return $this->get($property);
+    }
+
+    private function createJsonPointer(): JsonPointer
+    {
+        if ($this->jsonPointer instanceof JsonPointer === false) {
+            $this->jsonPointer = new JsonPointer($this->getJsonSchema());
+        }
+
+        return $this->jsonPointer;
     }
 }
