@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Functional\ExceptionHandling;
 
+use stdClass;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -96,6 +97,48 @@ class ValidationResponsesTest extends WebTestCase
                     'constraint' => 'required',
                     'message' => 'The property photoUrls is required',
                     'property' => 'photoUrls',
+                ],
+            ],
+        ];
+
+        static::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        static::assertJsonStringEqualsJsonString(
+            json_encode($expectedJsonResponseBody),
+            $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testCanReturnProblemJsonObjectForInvalidRequestBodyWithNestedObjects(): void
+    {
+        $jsonRequestBody = [
+            'name' => 'Cat',
+            'photoUrls' => [
+                'https://example.com/photos/cat.jpg',
+            ],
+            'category' => new stdClass(),
+        ];
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/pets',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode($jsonRequestBody)
+        );
+
+        $expectedJsonResponseBody = [
+            'type' => 'about:blank',
+            'title' => 'The request body contains errors.',
+            'status' => 400,
+            'detail' => 'Validation of JSON request body failed.',
+            'violations' => [
+                [
+                    'constraint' => 'required',
+                    'message' => 'The property name is required',
+                    'property' => 'category.name',
                 ],
             ],
         ];

@@ -226,6 +226,8 @@ components:
           format: int64
         name:
           type: string
+      required:
+        - name
       xml:
         name: Category
 
