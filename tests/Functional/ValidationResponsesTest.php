@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Functional;
 
+use stdClass;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -101,6 +102,41 @@ class ValidationResponsesTest extends WebTestCase
         self::assertJsonStringEqualsJsonString(
             json_encode($expectedJsonResponseBody),
             $response->getContent()
+        );
+    }
+
+    public function testInvalidNestedRequestBodyReturnsUnprocessableEntityResponse(): void
+    {
+        $jsonRequestBody = [
+            'name' => 'Cat',
+            'photoUrls' => [
+                'https://example.com/photos/cat.jpg',
+            ],
+            'category' => new stdClass(),
+        ];
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/pets',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode($jsonRequestBody)
+        );
+
+        $expectedJsonResponseBody = [
+            'message' => 'Validation of JSON request body failed.',
+            'errors' => [
+                'The property name is required',
+            ],
+        ];
+
+        static::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        static::assertJsonStringEqualsJsonString(
+            json_encode($expectedJsonResponseBody),
+            $this->client->getResponse()->getContent()
         );
     }
 
