@@ -69,7 +69,7 @@ class RequestBodyValidatorTest extends TestCase
         $exception = $this->validator->validate($request);
 
         static::assertInstanceOf(InvalidRequestBodyProblemException::class, $exception);
-        static::assertSame('Validation of JSON request body failed.', $exception->getMessage());
+        static::assertSame('The request body must be valid JSON.', $exception->getMessage());
         static::assertEquals(
             [
                 new Violation('valid_json', 'An Invalid JSON error message'),

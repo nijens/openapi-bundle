@@ -67,7 +67,10 @@ final class RequestBodyValidator implements ValidatorInterface
 
         $violations = $this->validateJsonSyntax($requestBody, $decodedJsonRequestBody);
         if (count($violations) > 0) {
-            return $this->createInvalidRequestBodyProblemException($violations);
+            return $this->createInvalidRequestBodyProblemException(
+                $violations,
+                'The request body must be valid JSON.'
+            );
         }
 
         $violations = array_merge(
@@ -79,7 +82,10 @@ final class RequestBodyValidator implements ValidatorInterface
         );
 
         if (count($violations) > 0) {
-            return $this->createInvalidRequestBodyProblemException($violations);
+            return $this->createInvalidRequestBodyProblemException(
+                $violations,
+                'Validation of JSON request body failed.'
+            );
         }
 
         $request->attributes->set(
@@ -150,13 +156,15 @@ final class RequestBodyValidator implements ValidatorInterface
     /**
      * @param Violation[] $violations
      */
-    private function createInvalidRequestBodyProblemException(array $violations): InvalidRequestProblemExceptionInterface
-    {
+    private function createInvalidRequestBodyProblemException(
+        array $violations,
+        string $message
+    ): InvalidRequestProblemExceptionInterface {
         $exception = new InvalidRequestBodyProblemException(
             ProblemException::DEFAULT_TYPE_URI,
             'The request body contains errors.',
             Response::HTTP_BAD_REQUEST,
-            'Validation of JSON request body failed.'
+            $message
         );
 
         return $exception->withViolations($violations);
