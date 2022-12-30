@@ -18,6 +18,8 @@ use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJso
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
+use Nijens\OpenapiBundle\Validation\EventSubscriber\RequestValidationSubscriber;
+use Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -46,7 +48,14 @@ class NijensOpenapiExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $this->registerRoutingConfiguration($config['routing'], $container);
+        $this->registerValidationConfiguration($config['validation'], $container);
         $this->registerExceptionHandlingConfiguration($config['exception_handling'], $container);
+
+        if ($config['validation']['enabled'] === true && $config['exception_handling']['enabled'] !== true) {
+            trigger_error(
+                'Enabling the validation component without the exception handling component might cause unexpected results.',
+            );
+        }
     }
 
     /**
@@ -65,6 +74,21 @@ class NijensOpenapiExtension extends Extension
     {
         $definition = $container->getDefinition(RouteLoader::class);
         $definition->replaceArgument(2, $config['operation_id_as_route_name']);
+    }
+
+    private function registerValidationConfiguration(array $config, ContainerBuilder $container): void
+    {
+        if ($config['enabled'] !== true) {
+            $container->removeDefinition(RequestValidationSubscriber::class);
+        }
+
+        if ($config['enabled'] !== null) {
+            $container->removeDefinition('nijens_openapi.event_subscriber.json_request_body_validation');
+        }
+
+        if ($config['parameter_validation'] === false) {
+            $container->removeDefinition(RequestParameterValidator::class);
+        }
     }
 
     private function registerExceptionHandlingConfiguration(array $config, ContainerBuilder $container): void

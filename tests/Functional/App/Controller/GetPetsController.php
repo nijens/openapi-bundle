@@ -15,12 +15,17 @@ namespace Nijens\OpenapiBundle\Tests\Functional\App\Controller;
 
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface;
-use Nijens\OpenapiBundle\Tests\Functional\App\Model\UpdatePet;
+use Nijens\OpenapiBundle\Tests\Functional\App\Model\Pet;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class UpdatePetController
+/**
+ * Controller for functional testing the validation of query parameters from the OpenAPI specification.
+ *
+ * @author Niels Nijens <nijens.niels@gmail.com>
+ */
+class GetPetsController
 {
     /**
      * @var SerializerInterface
@@ -40,24 +45,32 @@ class UpdatePetController
         $this->serializationContextBuilder = $serializationContextBuilder;
     }
 
-    public function __invoke(
-        Request $request,
-        string $petId,
-        ?UpdatePet $pet,
-        string $responseSerializationSchemaObject
-    ): JsonResponse {
-        if ($pet instanceof UpdatePet === false) {
-            $pet = new UpdatePet('Cat');
-        }
-        $pet->setId((int) $petId);
+    /**
+     * Handles GET /api/pets.
+     */
+    public function __invoke(Request $request): JsonResponse
+    {
+        $filterByName = $request->get('filterByName', '');
+        $pets = [
+            new Pet(1, 'Cat'),
+            new Pet(2, 'Dog'),
+            new Pet(3, 'Parrot'),
+        ];
+
+        $filteredPets = array_filter(
+            $pets,
+            function (Pet $pet) use ($filterByName): bool {
+                return strpos($pet->getName(), $filterByName) !== false;
+            }
+        );
 
         $serializationContext = $this->serializationContextBuilder->getContextForSchemaObject(
-            $responseSerializationSchemaObject,
+            'Pet',
             $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
         );
 
         return JsonResponse::fromJsonString(
-            $this->serializer->serialize($pet, 'json', $serializationContext)
+            $this->serializer->serialize($filteredPets, 'json', $serializationContext)
         );
     }
 }

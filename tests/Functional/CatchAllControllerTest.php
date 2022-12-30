@@ -75,7 +75,7 @@ class CatchAllControllerTest extends WebTestCase
     public function testReturnsMethodNotAllowedResponseWhenRouteIsAvailableButRequestMethodIsNotAllowed(): void
     {
         $this->client->request(
-            Request::METHOD_GET,
+            Request::METHOD_DELETE,
             '/api/pets',
             [],
             [],
@@ -83,7 +83,7 @@ class CatchAllControllerTest extends WebTestCase
         );
 
         $expectedJsonResponseBody = [
-            'message' => "No route found for 'GET /api/pets': Method Not Allowed (Allowed: POST, PATCH).",
+            'message' => "No route found for 'DELETE /api/pets': Method Not Allowed (Allowed: GET, POST, PATCH).",
         ];
 
         $response = $this->client->getResponse();

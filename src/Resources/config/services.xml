@@ -79,14 +79,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="nijens_openapi.event_subscriber.json_request_body_validation" class="%nijens_openapi.event_subscriber.json_request_body_validation.class%">
-            <argument type="service" id="nijens_openapi.json.parser"/>
-            <argument type="service" id="nijens_openapi.json.schema_loader"/>
-            <argument type="service" id="nijens_openapi.json.validator"/>
-
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
         <service id="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer">
             <argument>~</argument>
         </service>
@@ -143,5 +135,34 @@
         </service>
 
         <service id="Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface" alias="Nijens\OpenapiBundle\Serialization\SerializationContextBuilder"/>
+
+        <service id="Nijens\OpenapiBundle\Validation\EventSubscriber\RequestValidationSubscriber">
+            <argument type="service" id="Nijens\OpenapiBundle\Validation\RequestValidator\ValidatorInterface"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Validation\RequestValidator\ValidatorInterface" alias="Nijens\OpenapiBundle\Validation\RequestValidator\CompositeRequestValidator"/>
+
+        <service id="Nijens\OpenapiBundle\Validation\RequestValidator\CompositeRequestValidator">
+            <argument type="tagged_iterator" tag="nijens_openapi.validation.validator"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Validation\RequestValidator\RequestBodyValidator">
+            <argument type="service" id="nijens_openapi.json.parser"/>
+            <argument type="service" id="nijens_openapi.json.validator"/>
+
+            <tag name="nijens_openapi.validation.validator" priority="0"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Validation\RequestValidator\RequestContentTypeValidator">
+            <tag name="nijens_openapi.validation.validator" priority="16"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator">
+            <argument type="service" id="nijens_openapi.json.validator"/>
+
+            <tag name="nijens_openapi.validation.validator" priority="32"/>
+        </service>
     </services>
 </container>

@@ -46,6 +46,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         $this->addRoutingSection($rootNode);
+        $this->addValidationSection($rootNode);
         $this->addExceptionsSection($rootNode);
 
         return $treeBuilder;
@@ -59,6 +60,44 @@ class Configuration implements ConfigurationInterface
                 ->children()
                     ->booleanNode('operation_id_as_route_name')
                         ->info('Toggle using the path item operation ID from the OpenAPI documents as route name.')
+                        ->defaultFalse()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addValidationSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode->children()
+            ->arrayNode('validation')
+                ->treatTrueLike(['enabled' => true])
+                ->treatFalseLike(['enabled' => false])
+                ->treatNullLike(['enabled' => null])
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('enabled')
+                        ->info(
+                            'Set to true to enable the new request validation component.'.PHP_EOL.
+                            'Set to false to disable request validation provided by this bundle.'.PHP_EOL.
+                            'Set to null to keep using the deprecated request validation.'
+                        )
+                        ->defaultNull()
+                        ->validate()
+                            ->ifNull()
+                            ->then(function ($value) {
+                                trigger_deprecation(
+                                    self::BUNDLE_NAME,
+                                    '1.5',
+                                    'Setting the "nijens_openapi.validation.enabled" option to "null" is deprecated. It will default to "true" as of version 2.0.'
+                                );
+
+                                return $value;
+                            })
+                            ->end()
+                        ->end()
+                    ->booleanNode('parameter_validation')
+                        ->info('Enables the experimental query parameter request validation.')
                         ->defaultFalse()
                         ->end()
                     ->end()

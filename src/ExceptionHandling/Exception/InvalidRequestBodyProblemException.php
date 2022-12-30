@@ -13,59 +13,6 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\ExceptionHandling\Exception;
 
-use Throwable;
-
-final class InvalidRequestBodyProblemException extends ProblemException
+final class InvalidRequestBodyProblemException extends InvalidRequestProblemException
 {
-    /**
-     * @var ViolationInterface[]
-     */
-    private $violations;
-
-    public function __construct(
-        string $typeUri,
-        string $title,
-        int $statusCode,
-        string $message = '',
-        Throwable $previous = null,
-        ?string $instanceUri = null,
-        array $headers = [],
-        array $violations = []
-    ) {
-        parent::__construct($typeUri, $title, $statusCode, $message, $previous, $instanceUri, $headers);
-
-        $this->violations = $violations;
-    }
-
-    public function getViolations(): array
-    {
-        return $this->violations;
-    }
-
-    /**
-     * @param ViolationInterface[] $violations
-     */
-    public function withViolations(array $violations): ProblemExceptionInterface
-    {
-        $exception = $this->clone();
-        $exception->violations = $violations;
-
-        return $exception;
-    }
-
-    public function jsonSerialize(): array
-    {
-        $data = parent::jsonSerialize();
-        $data['violations'] = $this->getViolations();
-
-        return $data;
-    }
-
-    protected function clone()
-    {
-        $clone = parent::clone();
-        $clone->violations = $this->violations;
-
-        return $clone;
-    }
 }

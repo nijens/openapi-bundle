@@ -1,0 +1,8 @@
+nijens_openapi:
+    exception_handling:
+        enabled: true
+
+    validation:
+        enabled: true
+
+        parameter_validation: true

@@ -5,6 +5,36 @@ info:
 
 paths:
   /pets:
+    get:
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetsController'
+        additionalRouteAttributes:
+          responseSerializationSchemaObject: 'Pet'
+      parameters:
+        - name: filterByName
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 3
+        - name: itemsPerPage
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 30
+      responses:
+        '200':
+          description: Successfully retrieved the pets from the store.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pet'
+      tags:
+        - pet
     post:
       x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\CreatePetController'
       summary: Add a new pet to the store.

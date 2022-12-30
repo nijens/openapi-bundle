@@ -55,7 +55,7 @@ class RouteLoaderTest extends TestCase
      */
     public function testSupports(): void
     {
-        $this->assertTrue($this->routeLoader->supports('route-loader-minimal.json', 'openapi'));
+        static::assertTrue($this->routeLoader->supports('route-loader-minimal.json', 'openapi'));
     }
 
     /**
@@ -66,13 +66,13 @@ class RouteLoaderTest extends TestCase
         $routes = $this->routeLoader->load('route-loader-minimal.json', 'openapi');
         $route = $routes->get('pets_get');
 
-        $this->assertInstanceOf(Route::class, $route);
+        static::assertInstanceOf(Route::class, $route);
 
-        $this->assertSame('/pets', $route->getPath());
-        $this->assertSame([Request::METHOD_GET], $route->getMethods());
-        $this->assertSame(
+        static::assertSame('/pets', $route->getPath());
+        static::assertSame([Request::METHOD_GET], $route->getMethods());
+        static::assertSame(
             __DIR__.'/../Resources/specifications/route-loader-minimal.json',
-            $route->getDefaults()[RouteContext::REQUEST_ATTRIBUTE][RouteContext::RESOURCE]
+            $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
         );
     }
 
@@ -86,11 +86,11 @@ class RouteLoaderTest extends TestCase
 
         $this->assertInstanceOf(Route::class, $route);
 
-        $this->assertSame('/pets', $route->getPath());
-        $this->assertSame([Request::METHOD_GET], $route->getMethods());
-        $this->assertSame(
+        static::assertSame('/pets', $route->getPath());
+        static::assertSame([Request::METHOD_GET], $route->getMethods());
+        static::assertSame(
             __DIR__.'/../Resources/specifications/route-loader-minimal.yaml',
-            $route->getDefaults()[RouteContext::REQUEST_ATTRIBUTE][RouteContext::RESOURCE]
+            $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
         );
     }
 
@@ -104,11 +104,11 @@ class RouteLoaderTest extends TestCase
 
         $this->assertInstanceOf(Route::class, $route);
 
-        $this->assertSame('/pets', $route->getPath());
-        $this->assertSame([Request::METHOD_GET], $route->getMethods());
-        $this->assertSame(
+        static::assertSame('/pets', $route->getPath());
+        static::assertSame([Request::METHOD_GET], $route->getMethods());
+        static::assertSame(
             __DIR__.'/../Resources/specifications/route-loader-minimal.yml',
-            $route->getDefaults()[RouteContext::REQUEST_ATTRIBUTE][RouteContext::RESOURCE]
+            $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::RESOURCE]
         );
     }
 
@@ -118,25 +118,8 @@ class RouteLoaderTest extends TestCase
     public function testLoadFromUnsupportedExtension(): void
     {
         $this->expectException(LoaderLoadException::class);
+
         $this->routeLoader->load('route-loader-minimal.txt', 'openapi');
-    }
-
-    /**
-     * Tests if {@see RouteLoader::load} adds a {@see RouteContext::JSON_REQUEST_VALIDATION_POINTER} option
-     * when the request body of an operation can be validated.
-     *
-     * @depends testLoadMinimalFromJson
-     */
-    public function testLoadWithValidationPointer(): void
-    {
-        $routes = $this->routeLoader->load('route-loader-validation-pointer.json', 'openapi');
-        $route = $routes->get('pets_put');
-
-        $this->assertInstanceOf(Route::class, $route);
-        $this->assertSame(
-            '/paths/~1pets/put/requestBody/content/application~1json/schema',
-            $route->getDefaults()[RouteContext::REQUEST_ATTRIBUTE][RouteContext::JSON_REQUEST_VALIDATION_POINTER]
-        );
     }
 
     /**
@@ -150,8 +133,52 @@ class RouteLoaderTest extends TestCase
         $routes = $this->routeLoader->load('route-loader-symfony-controller.json', 'openapi');
         $route = $routes->get('pets_uuid_put');
 
-        $this->assertInstanceOf(Route::class, $route);
-        $this->assertSame('Nijens\OpenapiBundle\Controller\FooController::bar', $route->getDefault('_controller'));
+        static::assertInstanceOf(Route::class, $route);
+        static::assertSame('Nijens\OpenapiBundle\Controller\FooController::bar', $route->getDefault('_controller'));
+    }
+
+    public function testCanLoadRoutesWithRouteContextForRequestParameterValidation(): void
+    {
+        $routes = $this->routeLoader->load('route-loader-request-validation.yaml', 'openapi');
+        $route = $routes->get('pets_get');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertEquals(
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/route-loader-request-validation.yaml',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => json_encode([
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'schema' => [
+                            'type' => 'string',
+                        ],
+                    ]),
+                ],
+            ],
+            $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)
+        );
+    }
+
+    public function testCanLoadRoutesWithRouteContextForRequestBodyValidation(): void
+    {
+        $routes = $this->routeLoader->load('route-loader-request-validation.yaml', 'openapi');
+        $route = $routes->get('pets_put');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertSame(
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/route-loader-request-validation.yaml',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],
+                RouteContext::REQUEST_BODY_SCHEMA => 'O:8:"stdClass":2:{s:4:"type";s:6:"object";s:10:"properties";O:8:"stdClass":2:{s:2:"id";O:8:"stdClass":4:{s:4:"type";s:7:"integer";s:6:"format";s:5:"int32";s:8:"readOnly";b:1;s:7:"example";i:1;}s:4:"name";O:8:"stdClass":2:{s:4:"type";s:6:"string";s:7:"example";s:3:"Dog";}}}',
+                RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+            ],
+            $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)
+        );
     }
 
     public function testCanUseOperationIdAsRouteName(): void
@@ -164,7 +191,7 @@ class RouteLoaderTest extends TestCase
         $routes = $this->routeLoader->load('route-loader-symfony-controller.json', 'openapi');
         $route = $routes->get('createPet');
 
-        $this->assertInstanceOf(Route::class, $route);
+        static::assertInstanceOf(Route::class, $route);
     }
 
     public function testCanLoadRouteWithControllerFromOpenapiBundleSpecificationExtension(): void

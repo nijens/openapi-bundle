@@ -29,6 +29,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Validates a JSON request body for routes loaded through the OpenAPI specification.
  *
+ * @deprecated since 1.5, to be removed in 2.0. Use the new request validation instead.
+ *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
 class JsonRequestBodyValidationSubscriber implements EventSubscriberInterface

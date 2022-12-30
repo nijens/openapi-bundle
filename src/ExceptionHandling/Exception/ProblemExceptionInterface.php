@@ -17,7 +17,7 @@ use JsonSerializable;
 use Throwable;
 
 /**
- * The interface describing the information required for an RFC 7807 problem JSON object response.
+ * The interface describing the information required for an RFC 7807 Problem Details JSON object response.
  *
  * @see https://datatracker.ietf.org/doc/html/rfc7807#section-3
  *
