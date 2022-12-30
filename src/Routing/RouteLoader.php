@@ -214,7 +214,7 @@ class RouteLoader extends FileLoader
         }
 
         if (isset($operation->requestBody->content->{'application/json'}->schema)) {
-            $openapiRouteContext[RouteContext::REQUEST_BODY_SCHEMA] = json_encode($operation->requestBody->content->{'application/json'}->schema);
+            $openapiRouteContext[RouteContext::REQUEST_BODY_SCHEMA] = serialize($operation->requestBody->content->{'application/json'}->schema);
         }
 
         if (isset($operation->requestBody->content->{'application/json'})) {

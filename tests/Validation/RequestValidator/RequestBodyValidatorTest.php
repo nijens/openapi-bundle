@@ -171,7 +171,7 @@ class RequestBodyValidatorTest extends TestCase
 
     private function createRequestBodySchema(): string
     {
-        return json_encode([
+        return serialize((object) [
             'type' => 'object',
             'properties' => [
                 'id' => [

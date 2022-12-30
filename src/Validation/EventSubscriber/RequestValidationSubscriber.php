@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Validation\EventSubscriber;
 
-use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestProblemExceptionInterface;
+use Nijens\OpenapiBundle\ExceptionHandling\Exception\RequestProblemExceptionInterface;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Validation\RequestValidator\ValidatorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -55,7 +55,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
         }
 
         $exception = $this->requestValidator->validate($request);
-        if ($exception instanceof InvalidRequestProblemExceptionInterface) {
+        if ($exception instanceof RequestProblemExceptionInterface) {
             throw $exception;
         }
     }

@@ -43,9 +43,12 @@ class UpdatePetController
     public function __invoke(
         Request $request,
         string $petId,
-        UpdatePet $pet,
+        ?UpdatePet $pet,
         string $responseSerializationSchemaObject
     ): JsonResponse {
+        if ($pet instanceof UpdatePet === false) {
+            $pet = new UpdatePet('Cat');
+        }
         $pet->setId((int) $petId);
 
         $serializationContext = $this->serializationContextBuilder->getContextForSchemaObject(

@@ -19,6 +19,7 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestProblemExcept
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\ProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\RequestProblemExceptionInterface;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
+use Nijens\OpenapiBundle\Json\Reference;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Validation\ValidationContext;
 use Seld\JsonLint\JsonParser;
@@ -76,7 +77,7 @@ final class RequestBodyValidator implements ValidatorInterface
         $violations = array_merge(
             $violations,
             $this->validateJsonAgainstSchema(
-                json_decode($requestBodySchema),
+                unserialize($requestBodySchema),
                 $decodedJsonRequestBody
             )
         );
@@ -130,11 +131,12 @@ final class RequestBodyValidator implements ValidatorInterface
     }
 
     /**
+     * @param stdClass|Reference                        $jsonSchema
      * @param array|stdClass|string|int|float|bool|null $decodedJsonRequestBody
      *
      * @return Violation[]
      */
-    private function validateJsonAgainstSchema(stdClass $jsonSchema, &$decodedJsonRequestBody): array
+    private function validateJsonAgainstSchema($jsonSchema, &$decodedJsonRequestBody): array
     {
         $this->jsonValidator->validate($decodedJsonRequestBody, $jsonSchema);
 

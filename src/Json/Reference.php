@@ -112,6 +112,14 @@ class Reference implements JsonSerializable
         return $this->get($property);
     }
 
+    public function __serialize(): array
+    {
+        return [
+            'pointer' => $this->pointer,
+            'jsonSchema' => $this->jsonSchema,
+        ];
+    }
+
     private function createJsonPointer(): JsonPointer
     {
         if ($this->jsonPointer instanceof JsonPointer === false) {
