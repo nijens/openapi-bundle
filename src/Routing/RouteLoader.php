@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Nijens\OpenapiBundle\Routing;
 
 use Nijens\OpenapiBundle\Controller\CatchAllController;
+use Nijens\OpenapiBundle\DependencyInjection\Configuration;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use stdClass;
@@ -161,6 +162,12 @@ class RouteLoader extends FileLoader
         }
 
         if (isset($defaults['_controller']) === false && isset($operation->{'x-symfony-controller'})) {
+            trigger_deprecation(
+                Configuration::BUNDLE_NAME,
+                '1.5',
+                'Using the "x-symfony-controller" specification extension is deprecated and will be removed in 2.0. Please use the "x-openapi-bundle" specification extension instead.'
+            );
+
             $defaults['_controller'] = $operation->{'x-symfony-controller'};
         }
 
