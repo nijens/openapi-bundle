@@ -25,6 +25,6 @@
 
     <php>
         <server name="KERNEL_CLASS" value="Nijens\OpenapiBundle\Tests\Functional\App\Kernel"/>
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=15&amp;max[indirect]=4"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[direct]=15&amp;max[self]=39&amp;max[indirect]=4"/>
     </php>
 </phpunit>
