@@ -38,7 +38,7 @@ final class ThrowableToProblemExceptionSubscriber implements EventSubscriberInte
     {
         return [
             KernelEvents::EXCEPTION => [
-                ['onKernelExceptionTransformToProblemException', 10],
+                ['onKernelExceptionTransformToProblemException', -16],
             ],
         ];
     }
