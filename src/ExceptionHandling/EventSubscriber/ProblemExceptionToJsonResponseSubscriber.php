@@ -36,7 +36,7 @@ final class ProblemExceptionToJsonResponseSubscriber implements EventSubscriberI
     {
         return [
             KernelEvents::EXCEPTION => [
-                ['onKernelExceptionCreateJsonResponse', 0],
+                ['onKernelExceptionCreateJsonResponse', -32],
             ],
         ];
     }
