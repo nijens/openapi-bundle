@@ -39,7 +39,7 @@ class JsonPointer implements JsonPointerInterface
     /**
      * Constructs a new {@see JsonPointer} instance.
      */
-    public function __construct(?stdClass $json = null)
+    public function __construct(stdClass $json = null)
     {
         $this->json = $json;
     }

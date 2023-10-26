@@ -59,7 +59,7 @@ class ProblemException extends Exception implements ProblemExceptionInterface
         int $statusCode,
         string $message = '',
         Throwable $previous = null,
-        ?string $instanceUri = null,
+        string $instanceUri = null,
         array $headers = []
     ) {
         parent::__construct($message, 0, $previous);
@@ -154,7 +154,7 @@ class ProblemException extends Exception implements ProblemExceptionInterface
 
     public static function fromHttpException(
         HttpExceptionInterface $exception,
-        ?int $statusCode = null,
+        int $statusCode = null,
         string $typeUri = self::DEFAULT_TYPE_URI,
         string $title = self::DEFAULT_TITLE,
         string $instanceUri = null

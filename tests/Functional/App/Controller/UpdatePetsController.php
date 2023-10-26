@@ -17,7 +17,6 @@ use Nijens\OpenapiBundle\Deserialization\Attribute\DeserializedObject;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Serialization\SerializationContextBuilderInterface;
 use Nijens\OpenapiBundle\Tests\Functional\App\Model\UpdatePet;
-use const PHP_VERSION_ID;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -64,9 +63,6 @@ abstract class AbstractUpdatePetsController
 if (PHP_VERSION_ID >= 80000) {
     class UpdatePetsController extends AbstractUpdatePetsController
     {
-        /**
-         * @param UpdatePet[] $updatePets
-         */
         public function __invoke(
             Request $request,
             #[DeserializedObject] array $updatePets,
