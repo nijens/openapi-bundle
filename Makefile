@@ -22,10 +22,9 @@ ifeq ($(filter $(version),5.3 5.4 6.0 6.1 6.2 6.3),)
 	sed -i -e "s/\(\s\+\)\(storage_factory_id:\)/\1# \2/" tests/Functional/App/config.yaml
 endif
 
-	composer global require symfony/flex --no-interaction || true
 	composer global config --no-plugins allow-plugins.symfony/flex true
-	SYMFONY_REQUIRE=$(version).* composer update symfony/* monolog/monolog --prefer-dist --with-all-dependencies --no-progress
-	composer global config --no-plugins allow-plugins.symfony/flex false
+	composer global require symfony/flex --no-interaction || true
+	SYMFONY_REQUIRE=$(version).* composer update symfony/* monolog/monolog --prefer-dist --with-all-dependencies --no-progress -vvv
 .PHONY: switch-symfony
 
 test: install ## Run the unit tests.
