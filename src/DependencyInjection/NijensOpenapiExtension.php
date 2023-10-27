@@ -17,15 +17,14 @@ use Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJsonResponseSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
+use Nijens\OpenapiBundle\NijensOpenapiBundle;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use Nijens\OpenapiBundle\Validation\EventSubscriber\RequestValidationSubscriber;
 use Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Loads and manages the bundle configuration and services.
@@ -64,7 +63,7 @@ class NijensOpenapiExtension extends Extension
     private function loadDeprecatedServices(XmlFileLoader $loader): void
     {
         $deprecatedServicesFileSuffix = '';
-        if ($this->getSymfonyVersion() >= 50100) {
+        if (NijensOpenapiBundle::getSymfonyVersion() >= 50100) {
             $deprecatedServicesFileSuffix = '_5.1';
         }
         $loader->load(sprintf('services_deprecated%s.xml', $deprecatedServicesFileSuffix));
@@ -108,21 +107,5 @@ class NijensOpenapiExtension extends Extension
             $container->removeDefinition(JsonResponseExceptionSubscriber::class);
             $container->removeDefinition('nijens_openapi.service.exception_json_response_builder');
         }
-    }
-
-    private function getSymfonyVersion(): int
-    {
-        $kernel = new class('symfony_version', false) extends Kernel {
-            public function registerBundles(): iterable
-            {
-                return [];
-            }
-
-            public function registerContainerConfiguration(LoaderInterface $loader)
-            {
-            }
-        };
-
-        return $kernel::VERSION_ID;
     }
 }

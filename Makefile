@@ -17,14 +17,15 @@ ifndef version
 	@exit 1
 endif
 
-ifeq ($(filter $(version),5.3 5.4 6.0 6.1),)
+ifeq ($(filter $(version),5.3 5.4 6.0 6.1 6.2 6.3),)
 	sed -i -e "s/\(\s\+\)# \(storage_id:\)/\1\2/" tests/Functional/App/config.yaml
 	sed -i -e "s/\(\s\+\)\(storage_factory_id:\)/\1# \2/" tests/Functional/App/config.yaml
 endif
 
-	composer require "symfony/symfony:$(version).*" --dev --no-update
-	composer update symfony/* monolog/monolog --prefer-dist --with-all-dependencies --no-progress
-.PHONY: switch-symfony-version
+	composer global config --no-plugins allow-plugins.symfony/flex true
+	composer global require symfony/flex --no-interaction
+	SYMFONY_REQUIRE=$(version).* composer update symfony/* monolog/monolog --prefer-dist --with-all-dependencies --no-progress
+.PHONY: switch-symfony
 
 test: install ## Run the unit tests.
 	./vendor/bin/phpunit

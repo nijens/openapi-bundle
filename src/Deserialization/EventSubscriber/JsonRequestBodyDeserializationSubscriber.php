@@ -53,12 +53,17 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
             return;
         }
 
+        /**
+         * TODO: Remove when support for Symfony 6.4 is dropped.
+         */
+        $format = method_exists($request, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType();
+
         $request->attributes->set(
             DeserializationContext::REQUEST_ATTRIBUTE,
             $this->serializer->deserialize(
                 $validationContext[ValidationContext::REQUEST_BODY],
                 $routeContext[RouteContext::DESERIALIZATION_OBJECT],
-                $request->getContentType()
+                $format
             )
         );
     }

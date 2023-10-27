@@ -17,7 +17,6 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\ProblemExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 use Throwable;
@@ -27,7 +26,7 @@ use Throwable;
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-final class ProblemExceptionNormalizer implements ContextAwareNormalizerInterface, NormalizerAwareInterface
+final class ProblemExceptionNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
     use NormalizerAwareTrait;
 
@@ -43,6 +42,9 @@ final class ProblemExceptionNormalizer implements ContextAwareNormalizerInterfac
         $this->debug = $debug;
     }
 
+    /**
+     * @return array
+     */
     public function normalize($object, $format = null, array $context = [])
     {
         if ($object instanceof ProblemExceptionInterface === false) {
@@ -69,6 +71,13 @@ final class ProblemExceptionNormalizer implements ContextAwareNormalizerInterfac
         }
 
         return $data instanceof ProblemExceptionInterface;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            ProblemExceptionInterface::class => false,
+        ];
     }
 
     private function removeDetailsToPreventInformationDisclosure(ProblemExceptionInterface $object, array &$data): void

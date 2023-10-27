@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Deserialization\Attribute;
 
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+use Attribute;
+
+#[Attribute(Attribute::TARGET_PARAMETER)]
 class DeserializedObject
 {
 }
