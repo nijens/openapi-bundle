@@ -54,7 +54,7 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
         }
 
         /**
-         * TODO: Remove when support for Symfony 5.4 is dropped.
+         * TODO: Remove when support for Symfony 6.4 is dropped.
          */
         $format = method_exists($request, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType();
 

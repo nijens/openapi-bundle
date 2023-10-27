@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface as BaseNormalize
 /*
  * Ensures compatibility with both Symfony versions 5.4 and 7.0.
  *
- * TODO: Remove when support for Symfony 5.4 is dropped.
+ * TODO: Remove when support for Symfony 6.4 is dropped.
  */
 if (NijensOpenapiBundle::getSymfonyVersion() < 60100) {
     interface NormalizerInterface extends ContextAwareNormalizerInterface

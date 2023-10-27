@@ -17,11 +17,13 @@ use Nijens\OpenapiBundle\Deserialization\Attribute\DeserializedObject;
 use Nijens\OpenapiBundle\Deserialization\DeserializationContext;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
-class DeserializedObjectArgumentResolver implements ArgumentValueResolverInterface
+class DeserializedObjectArgumentResolver implements ValueResolverInterface
 {
+    /**
+     * TODO: Remove when support for Symfony 6.4 is dropped.
+     */
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         if ($request->attributes->has(DeserializationContext::REQUEST_ATTRIBUTE) === false) {
@@ -46,6 +48,10 @@ class DeserializedObjectArgumentResolver implements ArgumentValueResolverInterfa
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
+        if ($this->supports($request, $argument) === false) {
+            return;
+        }
+
         yield $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE);
     }
 
