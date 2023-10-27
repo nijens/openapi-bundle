@@ -23,8 +23,8 @@ ifeq ($(filter $(version),5.3 5.4 6.0 6.1 6.2 6.3),)
 endif
 
 	composer global config --no-plugins allow-plugins.symfony/flex true
-	composer global require symfony/flex --no-interaction || true
-	SYMFONY_REQUIRE=$(version).* composer update symfony/* monolog/monolog --prefer-dist --with-all-dependencies --no-progress -vvv
+	composer global require symfony/flex --no-interaction
+	SYMFONY_REQUIRE=$(version).* composer update symfony/* monolog/monolog --prefer-dist --with-all-dependencies --no-progress
 .PHONY: switch-symfony
 
 test: install ## Run the unit tests.
