@@ -35,7 +35,7 @@ class Violation implements ViolationInterface
      */
     private $propertyPath;
 
-    public function __construct(string $constraint, string $message, string $propertyPath = null)
+    public function __construct(string $constraint, string $message, ?string $propertyPath = null)
     {
         $this->constraint = $constraint;
         $this->message = $message;

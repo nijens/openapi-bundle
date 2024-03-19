@@ -27,8 +27,8 @@ class InvalidRequestProblemException extends ProblemException implements Invalid
         string $title,
         int $statusCode,
         string $message = '',
-        Throwable $previous = null,
-        string $instanceUri = null,
+        ?Throwable $previous = null,
+        ?string $instanceUri = null,
         array $headers = [],
         array $violations = []
     ) {
