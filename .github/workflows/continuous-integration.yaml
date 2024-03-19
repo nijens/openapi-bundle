@@ -9,8 +9,8 @@ jobs:
 
         strategy:
             matrix:
-                php-version: ['7.4', '8.0', '8.1', '8.2']
-                symfony-version: ['4.4', '5.0', '5.1', '5.2', '5.3', '5.4', '6.0', '6.1', '6.2', '6.3']
+                php-version: ['7.4', '8.0', '8.1', '8.2', '8.3']
+                symfony-version: ['4.4', '5.0', '5.1', '5.2', '5.3', '5.4', '6.0', '6.1', '6.2', '6.3', '6.4']
                 test-options: ['']
                 coverage: [false]
                 include:
@@ -29,6 +29,8 @@ jobs:
                       symfony-version: '6.2'
                     - php-version: '7.4'
                       symfony-version: '6.3'
+                    - php-version: '7.4'
+                      symfony-version: '6.4'
                     - php-version: '8.0'
                       symfony-version: '5.0'
                     - php-version: '8.0'
@@ -37,6 +39,8 @@ jobs:
                       symfony-version: '6.2'
                     - php-version: '8.0'
                       symfony-version: '6.3'
+                    - php-version: '8.0'
+                      symfony-version: '6.4'
                     - php-version: '8.1'
                       symfony-version: '5.0'
                     - php-version: '8.1'
@@ -48,6 +52,12 @@ jobs:
                     - php-version: '8.2'
                       symfony-version: '5.1'
                     - php-version: '8.2'
+                      symfony-version: '5.2'
+                    - php-version: '8.3'
+                      symfony-version: '5.0'
+                    - php-version: '8.3'
+                      symfony-version: '5.1'
+                    - php-version: '8.3'
                       symfony-version: '5.2'
 
         steps:
