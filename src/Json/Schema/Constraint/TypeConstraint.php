@@ -24,7 +24,7 @@ class TypeConstraint extends BaseTypeConstraint
     /**
      * {@inheritdoc}
      */
-    public function check(&$value = null, $schema = null, JsonPointer $path = null, $i = null): void
+    public function check(&$value = null, $schema = null, ?JsonPointer $path = null, $i = null): void
     {
         $type = $schema->type ?? null;
         $nullable = $schema->nullable ?? false;

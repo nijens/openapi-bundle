@@ -15,8 +15,15 @@ framework:
         # storage_id: session.storage.mock_file
         storage_factory_id: session.storage.factory.mock_file
 
+        cookie_secure: auto
+        cookie_samesite: lax
+
     profiler:
         collect: false
+
+    handle_all_throwables: false # Changing this to true causes failing tests. Needs investigation.
+    php_errors:
+      log: true
 
 services:
     logger:
