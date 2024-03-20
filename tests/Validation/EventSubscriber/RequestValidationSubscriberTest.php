@@ -54,7 +54,7 @@ class RequestValidationSubscriberTest extends TestCase
         $this->assertSame(
             [
                 KernelEvents::REQUEST => [
-                    ['validateRequest', 28],
+                    ['validateRequest', 7],
                 ],
             ],
             $subscribedEvents

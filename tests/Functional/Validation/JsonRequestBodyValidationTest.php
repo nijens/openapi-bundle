@@ -133,4 +133,20 @@ class JsonRequestBodyValidationTest extends WebTestCase
             $this->client->getResponse()->getContent()
         );
     }
+
+    public function testCannotReturnProblemDetailsJsonObjectWhenNotAuthenticated(): void
+    {
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/authenticated/pets',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            '{}'
+        );
+
+        static::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    }
 }

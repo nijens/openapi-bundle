@@ -25,6 +25,26 @@ framework:
     php_errors:
       log: true
 
+security:
+  enable_authenticator_manager: true
+
+  providers:
+    users_in_memory: { memory: null }
+
+  firewalls:
+    main:
+      pattern: '^/api/authenticated'
+      lazy: true
+      stateless: true
+      provider: users_in_memory
+      json_login:
+        check_path: "/api/authenticated"
+        username_path: email
+        password_path: password
+
+  access_control:
+    - { path: '^/api/authenticated/pets', roles: ROLE_USER }
+
 services:
     logger:
         class: Symfony\Component\HttpKernel\Log\Logger

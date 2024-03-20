@@ -17,6 +17,10 @@ ifndef version
 	@exit 1
 endif
 
+ifeq ($(filter $(version),5.3 5.4 6.0 6.1),)
+	sed -i -e "s/\(\s\+\)\(enable_authenticator_manager:\)/\1# \2/" tests/Functional/App/config.yaml
+endif
+
 ifeq ($(filter $(version),6.2 6.3 6.4),)
 	sed -i -e "s/\(\s\+\)\(handle_all_throwables:\)/\1# \2/" tests/Functional/App/config.yaml
 endif
@@ -24,6 +28,7 @@ endif
 ifeq ($(filter $(version),5.3 5.4 6.0 6.1 6.2 6.3 6.4),)
 	sed -i -e "s/\(\s\+\)# \(storage_id:\)/\1\2/" tests/Functional/App/config.yaml
 	sed -i -e "s/\(\s\+\)\(storage_factory_id:\)/\1# \2/" tests/Functional/App/config.yaml
+	sed -i -e "s/\(\s\+\)\(lazy:\)/\1# \2/" tests/Functional/App/config.yaml
 endif
 
 	composer global config --no-plugins allow-plugins.symfony/flex true
