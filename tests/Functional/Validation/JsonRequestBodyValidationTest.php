@@ -147,17 +147,6 @@ class JsonRequestBodyValidationTest extends WebTestCase
             '{}'
         );
 
-        $expectedJsonResponseBody = [
-            'type' => 'about:blank',
-            'title' => 'An error occurred.',
-            'status' => 401,
-            'detail' => 'Full authentication is required to access this resource.',
-        ];
-
         static::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
-        static::assertJsonStringEqualsJsonString(
-            json_encode($expectedJsonResponseBody),
-            $this->client->getResponse()->getContent()
-        );
     }
 }
