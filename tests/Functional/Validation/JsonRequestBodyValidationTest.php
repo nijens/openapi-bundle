@@ -133,4 +133,31 @@ class JsonRequestBodyValidationTest extends WebTestCase
             $this->client->getResponse()->getContent()
         );
     }
+
+    public function testCannotReturnProblemDetailsJsonObjectWhenNotAuthenticated(): void
+    {
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/authenticated/pets',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            '{}'
+        );
+
+        $expectedJsonResponseBody = [
+            'type' => 'about:blank',
+            'title' => 'An error occurred.',
+            'status' => 401,
+            'detail' => 'Full authentication is required to access this resource.',
+        ];
+
+        static::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        static::assertJsonStringEqualsJsonString(
+            json_encode($expectedJsonResponseBody),
+            $this->client->getResponse()->getContent()
+        );
+    }
 }

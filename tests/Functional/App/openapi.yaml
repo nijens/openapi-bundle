@@ -149,6 +149,34 @@ paths:
           type: integer
           format: int64
 
+  /authenticated/pets:
+    post:
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\CreatePetController'
+      summary: Add a new pet to the store.
+      operationId: addPetAuthenticated
+      requestBody:
+        description: Pet object that needs to be added to the store.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Pet'
+        required: true
+      responses:
+        '201':
+          description: Successfully added a new pet to the store.
+        '400':
+          description: Invalid input
+        '422':
+          description: Invalid input
+      security:
+        - api_key: []
+      tags:
+        - pet
+
   /error/trigger-error:
     get:
       x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::triggerError'
@@ -271,6 +299,12 @@ components:
           type: string
       xml:
         name: Tag
+
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
 
 tags:
   - name: pet
