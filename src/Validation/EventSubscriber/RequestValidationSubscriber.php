@@ -37,7 +37,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['validateRequest', 28],
+                ['validateRequest', 7],
             ],
         ];
     }
