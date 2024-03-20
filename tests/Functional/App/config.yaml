@@ -33,11 +33,12 @@ security:
 
   firewalls:
     main:
+      pattern: '^/api/authenticated'
       lazy: true
       stateless: true
       provider: users_in_memory
       json_login:
-        check_path: "/api/authenticate"
+        check_path: "/api/authenticated"
         username_path: email
         password_path: password
 
