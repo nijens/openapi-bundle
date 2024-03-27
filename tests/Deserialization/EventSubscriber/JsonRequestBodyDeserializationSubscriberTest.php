@@ -52,7 +52,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         static::assertSame(
             [
                 KernelEvents::REQUEST => [
-                    ['deserializeRequestBody', 27],
+                    ['deserializeRequestBody', 6],
                 ],
             ],
             $subscribedEvents
