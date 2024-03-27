@@ -32,7 +32,7 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
     {
         return [
             KernelEvents::REQUEST => [
-                ['deserializeRequestBody', 27],
+                ['deserializeRequestBody', 6],
             ],
         ];
     }

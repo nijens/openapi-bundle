@@ -27,7 +27,7 @@ class DeserializationTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client = static::createClient();
+        $this->client = static::createClient(['environment' => 'exception_handling_and_validation']);
     }
 
     public function testCanDeserializeRequestBodyIntoObject(): void
