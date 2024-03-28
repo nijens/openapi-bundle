@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\DependencyInjection;
 
-use Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJsonResponseSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
@@ -101,11 +100,6 @@ class NijensOpenapiExtension extends Extension
         if ($config['enabled'] !== true) {
             $container->removeDefinition(ThrowableToProblemExceptionSubscriber::class);
             $container->removeDefinition(ProblemExceptionToJsonResponseSubscriber::class);
-        }
-
-        if ($config['enabled'] !== null) {
-            $container->removeDefinition(JsonResponseExceptionSubscriber::class);
-            $container->removeDefinition('nijens_openapi.service.exception_json_response_builder');
         }
     }
 }

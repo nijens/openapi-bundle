@@ -111,28 +111,14 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('exception_handling')
                 ->treatTrueLike(['enabled' => true])
                 ->treatFalseLike(['enabled' => false])
-                ->treatNullLike(['enabled' => null])
                 ->addDefaultsIfNotSet()
                 ->children()
                     ->booleanNode('enabled')
                         ->info(
                             'Set to true to enable the new serialization-based exception handling.'.PHP_EOL.
-                            'Set to false to disable exception handling provided by this bundle.'.PHP_EOL.
-                            'Set to null to keep using the deprecated exception JSON response builder.'
+                            'Set to false to disable exception handling provided by this bundle.'
                         )
-                        ->defaultNull()
-                        ->validate()
-                            ->ifNull()
-                            ->then(function ($value) {
-                                trigger_deprecation(
-                                    self::BUNDLE_NAME,
-                                    '1.3',
-                                    'Setting the "nijens_openapi.exceptions.enabled" option to "null" is deprecated. It will default to "true" as of version 2.0.'
-                                );
-
-                                return $value;
-                            })
-                            ->end()
+                        ->defaultTrue()
                         ->end()
                     ->arrayNode('exceptions')
                         ->useAttributeAsKey('class')

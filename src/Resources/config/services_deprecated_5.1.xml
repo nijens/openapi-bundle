@@ -4,25 +4,10 @@
            xsi:schemaLocation='http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd'>
 
     <parameters>
-        <parameter key="nijens_openapi.service.exception_json_response_builder.class">Nijens\OpenapiBundle\Service\ExceptionJsonResponseBuilder</parameter>
         <parameter key="nijens_openapi.event_subscriber.json_request_body_validation.class">Nijens\OpenapiBundle\EventListener\JsonRequestBodyValidationSubscriber</parameter>
     </parameters>
 
     <services>
-        <service id="nijens_openapi.service.exception_json_response_builder" class="%nijens_openapi.service.exception_json_response_builder.class%">
-            <argument>%kernel.debug%</argument>
-
-            <deprecated package="nijens/openapi-bundle" version="1.3">The "%service_id%" service is deprecated since nijens/openapi-bundle 1.3 and will be removed in 2.0.</deprecated>
-        </service>
-
-        <service id="Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber">
-            <argument type="service" id="nijens_openapi.service.exception_json_response_builder"/>
-
-            <tag name="kernel.event_subscriber"/>
-
-            <deprecated package="nijens/openapi-bundle" version="1.3">The "%service_id%" service is deprecated since nijens/openapi-bundle 1.3 and will be removed in 2.0.</deprecated>
-        </service>
-
         <service id="nijens_openapi.event_subscriber.json_request_body_validation" class="%nijens_openapi.event_subscriber.json_request_body_validation.class%">
             <argument type="service" id="nijens_openapi.json.parser"/>
             <argument type="service" id="nijens_openapi.json.schema_loader"/>
