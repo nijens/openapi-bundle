@@ -80,10 +80,6 @@ class NijensOpenapiExtension extends Extension
             $container->removeDefinition(RequestValidationSubscriber::class);
         }
 
-        if ($config['enabled'] !== null) {
-            $container->removeDefinition('nijens_openapi.event_subscriber.json_request_body_validation');
-        }
-
         if ($config['parameter_validation'] === false) {
             $container->removeDefinition(RequestParameterValidator::class);
         }
