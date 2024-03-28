@@ -56,9 +56,15 @@ class ValidationResponsesTest extends WebTestCase
         );
 
         $expectedJsonResponseBody = [
-            'message' => 'The request body should be valid JSON.',
-            'errors' => [
-                "Parse error on line 1:\n\n^\nExpected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['",
+            'type' => 'about:blank',
+            'title' => 'The request body contains errors.',
+            'status' => Response::HTTP_BAD_REQUEST,
+            'detail' => 'The request body should be valid JSON.',
+            'violations' => [
+                [
+                    'constraint' => 'valid_json',
+                    'message' => "Parse error on line 1:\n\n^\nExpected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['",
+                ],
             ],
         ];
 
@@ -73,9 +79,9 @@ class ValidationResponsesTest extends WebTestCase
 
     /**
      * Tests if sending a request body with invalid JSON according to the OpenAPI specification
-     * returns a '422 Unprocessable Entity' response.
+     * returns a '400 Bad Request' response.
      */
-    public function testInvalidRequestBodyReturnsUnprocessableEntityResponse(): void
+    public function testInvalidRequestBodyReturnsBadRequestResponse(): void
     {
         $this->client->request(
             Request::METHOD_POST,
@@ -89,23 +95,34 @@ class ValidationResponsesTest extends WebTestCase
         );
 
         $expectedJsonResponseBody = [
-            'message' => 'Validation of JSON request body failed.',
-            'errors' => [
-                'The property name is required',
-                'The property photoUrls is required',
+            'type' => 'about:blank',
+            'title' => 'The request body contains errors.',
+            'status' => Response::HTTP_BAD_REQUEST,
+            'detail' => 'Validation of JSON request body failed.',
+            'violations' => [
+                [
+                    'constraint' => 'required',
+                    'property' => 'name',
+                    'message' => 'The property name is required',
+                ],
+                [
+                    'constraint' => 'required',
+                    'property' => 'photoUrls',
+                    'message' => 'The property photoUrls is required',
+                ],
             ],
         ];
 
         $response = $this->client->getResponse();
 
-        self::assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        self::assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
         self::assertJsonStringEqualsJsonString(
             json_encode($expectedJsonResponseBody),
             $response->getContent()
         );
     }
 
-    public function testInvalidNestedRequestBodyReturnsUnprocessableEntityResponse(): void
+    public function testInvalidNestedRequestBodyReturnsBadRequestResponse(): void
     {
         $jsonRequestBody = [
             'name' => 'Cat',
@@ -127,13 +144,20 @@ class ValidationResponsesTest extends WebTestCase
         );
 
         $expectedJsonResponseBody = [
-            'message' => 'Validation of JSON request body failed.',
-            'errors' => [
-                'The property name is required',
+            'type' => 'about:blank',
+            'title' => 'The request body contains errors.',
+            'status' => Response::HTTP_BAD_REQUEST,
+            'detail' => 'Validation of JSON request body failed.',
+            'violations' => [
+                [
+                    'constraint' => 'required',
+                    'property' => 'category.name',
+                    'message' => 'The property name is required',
+                ],
             ],
         ];
 
-        static::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        static::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         static::assertJsonStringEqualsJsonString(
             json_encode($expectedJsonResponseBody),
             $this->client->getResponse()->getContent()
