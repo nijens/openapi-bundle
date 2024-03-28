@@ -36,7 +36,8 @@ paths:
       tags:
         - pet
     post:
-      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\CreatePetController'
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\CreatePetController'
       summary: Add a new pet to the store.
       operationId: addPet
       requestBody:
@@ -94,7 +95,8 @@ paths:
 
   /pets/{petId}:
     get:
-      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetController'
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetController'
       summary: Find pet by ID
       description: Returns a single pet
       operationId: getPetById
@@ -179,7 +181,8 @@ paths:
 
   /error/trigger-error:
     get:
-      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::triggerError'
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::triggerError'
       responses:
         '500':
           description: Returns an error.
@@ -188,7 +191,8 @@ paths:
 
   /error/throw-error:
     get:
-      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwError'
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwError'
       responses:
         '500':
           description: Returns an error.
@@ -197,7 +201,8 @@ paths:
 
   /error/throw-http-exception:
     get:
-      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwHttpException'
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwHttpException'
       responses:
         '500':
           description: Returns an error.
@@ -206,7 +211,8 @@ paths:
 
   /error/throw-exception:
     get:
-      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwException'
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwException'
       responses:
         '500':
           description: Returns an error.
@@ -215,7 +221,8 @@ paths:
 
   /error/throw-invalid-argument-exception:
     get:
-      x-symfony-controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwInvalidArgumentException'
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\ErrorController::throwInvalidArgumentException'
       responses:
         '500':
           description: Returns an error.
