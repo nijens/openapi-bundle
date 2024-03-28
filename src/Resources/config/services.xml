@@ -83,10 +83,6 @@
             <argument>~</argument>
         </service>
 
-        <service id="Nijens\OpenapiBundle\ExceptionHandling\DeprecatedExceptionToProblemExceptionTransformer" decorates="Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer">
-            <argument type="service" id="Nijens\OpenapiBundle\ExceptionHandling\DeprecatedExceptionToProblemExceptionTransformer.inner"/>
-        </service>
-
         <service id="Nijens\OpenapiBundle\Deserialization\ArgumentResolver\DeserializedObjectArgumentResolver">
             <tag name="controller.argument_value_resolver" priority="100"/>
         </service>
