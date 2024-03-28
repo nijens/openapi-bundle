@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Nijens\OpenapiBundle\Routing;
 
 use Nijens\OpenapiBundle\Controller\CatchAllController;
-use Nijens\OpenapiBundle\DependencyInjection\Configuration;
 use Nijens\OpenapiBundle\Json\JsonPointer;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use stdClass;

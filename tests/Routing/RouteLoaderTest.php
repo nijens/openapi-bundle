@@ -23,7 +23,6 @@ use Nijens\OpenapiBundle\Json\SchemaLoader;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use Nijens\OpenapiBundle\Tests\Functional\App\Controller\CreatePetController;
-use Nijens\OpenapiBundle\Tests\Functional\App\Controller\UpdatePetController;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpFoundation\Request;
