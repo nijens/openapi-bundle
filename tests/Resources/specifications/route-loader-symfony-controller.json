@@ -32,7 +32,9 @@
                         }
                     }
                 },
-                "x-symfony-controller": "Nijens\\OpenapiBundle\\Controller\\FooController::bar"
+                "x-openapi-bundle": {
+                    "controller": "Nijens\\OpenapiBundle\\Controller\\FooController::bar"
+                }
             },
             "parameters": [
                 {
