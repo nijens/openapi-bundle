@@ -13,25 +13,18 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\ExceptionHandling\Normalizer;
 
-use Nijens\OpenapiBundle\NijensOpenapiBundle;
+use ArrayObject;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 
-/*
+/**
  * Normalizes a {@see Throwable} implementing the {@see ProblemExceptionInterface}.
  *
  * @author Niels Nijens <nijens.niels@gmail.com>
  */
-if (NijensOpenapiBundle::getSymfonyVersion() < 70000) {
-    final class ProblemExceptionNormalizer extends AbstractProblemExceptionNormalizer implements NormalizerInterface, NormalizerAwareInterface
+final class ProblemExceptionNormalizer extends AbstractProblemExceptionNormalizer implements NormalizerInterface, NormalizerAwareInterface
+{
+    public function normalize($object, $format = null, array $context = []): float|int|bool|ArrayObject|array|string|null
     {
-        /**
-         * @return array
-         */
-        public function normalize($object, $format = null, array $context = [])
-        {
-            return $this->doNormalize($object, $format, $context);
-        }
+        return $this->doNormalize($object, $format, $context);
     }
-} else {
-    require_once __DIR__.'/ProblemExceptionNormalizer.php8';
 }
