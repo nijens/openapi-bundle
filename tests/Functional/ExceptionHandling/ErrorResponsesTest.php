@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Functional\ExceptionHandling;
 
+use Nijens\OpenapiBundle\NijensOpenapiBundle;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -57,14 +58,16 @@ class ErrorResponsesTest extends WebTestCase
 
     public function testCanReturnProblemJsonObjectForThrownError(): void
     {
-        /*
-         * Insulating the client to prevent PHPUnit from catching the error before
-         * the ThrowableToProblemExceptionSubscriber and ProblemExceptionToJsonResponseSubscriber.
-         */
-        $this->client->insulate();
+        if (NijensOpenapiBundle::getSymfonyVersion() < 70000) {
+            /*
+             * Insulating the client to prevent PHPUnit from catching the error before
+             * the ThrowableToProblemExceptionSubscriber and ProblemExceptionToJsonResponseSubscriber.
+             */
+            $this->client->insulate();
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('OUTPUT: {"type":"about:blank","title":"An error occurred.","status":500,"detail":"This is an error thrown by the OpenAPI bundle test suite."} ERROR OUTPUT: .');
+            $this->expectException(RuntimeException::class);
+            $this->expectExceptionMessage('OUTPUT: {"type":"about:blank","title":"An error occurred.","status":500,"detail":"This is an error thrown by the OpenAPI bundle test suite."} ERROR OUTPUT: .');
+        }
 
         $this->client->request(
             Request::METHOD_GET,
@@ -74,6 +77,12 @@ class ErrorResponsesTest extends WebTestCase
             [
                 'CONTENT_TYPE' => 'application/json',
             ]
+        );
+
+        static::assertResponseStatusCodeSame(Response::HTTP_INTERNAL_SERVER_ERROR);
+        static::assertJsonStringEqualsJsonString(
+            '{"type":"about:blank","title":"An error occurred.","status":500,"detail":"This is an error thrown by the OpenAPI bundle test suite."}',
+            $this->client->getResponse()->getContent()
         );
     }
 

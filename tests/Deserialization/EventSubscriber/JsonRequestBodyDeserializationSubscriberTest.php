@@ -137,6 +137,10 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     {
         $kernelMock = $this->createMock(HttpKernelInterface::class);
 
-        return new RequestEvent($kernelMock, $request, HttpKernelInterface::MASTER_REQUEST);
+        return new RequestEvent(
+            $kernelMock,
+            $request,
+            defined('Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST
+        );
     }
 }
