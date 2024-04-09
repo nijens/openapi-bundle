@@ -57,15 +57,11 @@ class NijensOpenapiExtension extends Extension
     }
 
     /**
-     * Loads the deprecated services file with backwards compatibility for XML Schema.
+     * Loads the deprecated services file.
      */
     private function loadDeprecatedServices(XmlFileLoader $loader): void
     {
-        $deprecatedServicesFileSuffix = '';
-        if (NijensOpenapiBundle::getSymfonyVersion() >= 50100) {
-            $deprecatedServicesFileSuffix = '_5.1';
-        }
-        $loader->load(sprintf('services_deprecated%s.xml', $deprecatedServicesFileSuffix));
+        $loader->load('services_deprecated.xml');
     }
 
     private function registerRoutingConfiguration(array $config, ContainerBuilder $container): void
