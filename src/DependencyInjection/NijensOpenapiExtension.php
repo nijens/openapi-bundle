@@ -16,7 +16,6 @@ namespace Nijens\OpenapiBundle\DependencyInjection;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJsonResponseSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
-use Nijens\OpenapiBundle\NijensOpenapiBundle;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use Nijens\OpenapiBundle\Validation\EventSubscriber\RequestValidationSubscriber;
 use Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator;
