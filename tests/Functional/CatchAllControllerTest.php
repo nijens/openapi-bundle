@@ -54,7 +54,10 @@ class CatchAllControllerTest extends WebTestCase
         );
 
         $expectedJsonResponseBody = [
-            'message' => "No route found for 'GET /api/does-not-exist'.",
+            'type' => 'about:blank',
+            'title' => 'An error occurred.',
+            'status' => Response::HTTP_NOT_FOUND,
+            'detail' => "No route found for 'GET /api/does-not-exist'.",
         ];
 
         $response = $this->client->getResponse();
@@ -83,7 +86,10 @@ class CatchAllControllerTest extends WebTestCase
         );
 
         $expectedJsonResponseBody = [
-            'message' => "No route found for 'DELETE /api/pets': Method Not Allowed (Allowed: GET, POST, PATCH).",
+            'type' => 'about:blank',
+            'title' => 'An error occurred.',
+            'status' => Response::HTTP_METHOD_NOT_ALLOWED,
+            'detail' => "No route found for 'DELETE /api/pets': Method Not Allowed (Allowed: GET, POST, PATCH).",
         ];
 
         $response = $this->client->getResponse();

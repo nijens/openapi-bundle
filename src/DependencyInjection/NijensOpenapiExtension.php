@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\DependencyInjection;
 
-use Nijens\OpenapiBundle\EventListener\JsonResponseExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ProblemExceptionToJsonResponseSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\EventSubscriber\ThrowableToProblemExceptionSubscriber;
 use Nijens\OpenapiBundle\ExceptionHandling\ThrowableToProblemExceptionTransformer;
-use Nijens\OpenapiBundle\NijensOpenapiBundle;
 use Nijens\OpenapiBundle\Routing\RouteLoader;
 use Nijens\OpenapiBundle\Validation\EventSubscriber\RequestValidationSubscriber;
 use Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator;
@@ -58,15 +56,11 @@ class NijensOpenapiExtension extends Extension
     }
 
     /**
-     * Loads the deprecated services file with backwards compatibility for XML Schema.
+     * Loads the deprecated services file.
      */
     private function loadDeprecatedServices(XmlFileLoader $loader): void
     {
-        $deprecatedServicesFileSuffix = '';
-        if (NijensOpenapiBundle::getSymfonyVersion() >= 50100) {
-            $deprecatedServicesFileSuffix = '_5.1';
-        }
-        $loader->load(sprintf('services_deprecated%s.xml', $deprecatedServicesFileSuffix));
+        $loader->load('services_deprecated.xml');
     }
 
     private function registerRoutingConfiguration(array $config, ContainerBuilder $container): void
@@ -79,10 +73,6 @@ class NijensOpenapiExtension extends Extension
     {
         if ($config['enabled'] !== true) {
             $container->removeDefinition(RequestValidationSubscriber::class);
-        }
-
-        if ($config['enabled'] !== null) {
-            $container->removeDefinition('nijens_openapi.event_subscriber.json_request_body_validation');
         }
 
         if ($config['parameter_validation'] === false) {
@@ -101,11 +91,6 @@ class NijensOpenapiExtension extends Extension
         if ($config['enabled'] !== true) {
             $container->removeDefinition(ThrowableToProblemExceptionSubscriber::class);
             $container->removeDefinition(ProblemExceptionToJsonResponseSubscriber::class);
-        }
-
-        if ($config['enabled'] !== null) {
-            $container->removeDefinition(JsonResponseExceptionSubscriber::class);
-            $container->removeDefinition('nijens_openapi.service.exception_json_response_builder');
         }
     }
 }

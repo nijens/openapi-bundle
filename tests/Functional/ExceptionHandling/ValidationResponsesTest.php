@@ -53,7 +53,7 @@ class ValidationResponsesTest extends WebTestCase
             'type' => 'about:blank',
             'title' => 'The request body contains errors.',
             'status' => 400,
-            'detail' => 'The request body should be valid JSON.',
+            'detail' => 'The request body must be valid JSON.',
             'violations' => [
                 [
                     'constraint' => 'valid_json',
