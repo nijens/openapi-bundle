@@ -20,5 +20,5 @@ namespace Nijens\OpenapiBundle\Serialization;
  */
 interface SerializationContextBuilderInterface
 {
-    public function getContextForSchemaObject(string $schemaObjectName, string $openApiSpecificationFile/*, bool $treatAnyOfAndOneOfAsAllOf = false*/): array;
+    public function getContextForSchemaObject(string $schemaObjectName, string $openApiSpecificationFile/* , bool $treatAnyOfAndOneOfAsAllOf = false */): array;
 }
