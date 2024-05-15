@@ -492,6 +492,127 @@ class SerializationContextBuilderTest extends TestCase
         );
     }
 
+    public function testCanCreateContextForReferencedCombinedObjectSchemaWithAnyOfAndOneOfTreatedAsAllOf(): void
+    {
+        $schema = $this->convertToObject([
+            'components' => [
+                'schemas' => [
+                    'Pet' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                            'owner' => [
+                                'anyOf' => [
+                                    [
+                                        '$ref' => '#/components/schemas/Robot',
+                                    ],
+                                    [
+                                        '$ref' => '#/components/schemas/Human',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'Robot' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => [
+                                'type' => 'integer',
+                            ],
+                        ],
+                    ],
+                    'Human' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $schema->components->schemas->Pet->properties->owner->anyOf[0] = new Reference('#/components/schemas/Robot', $schema);
+        $schema->components->schemas->Pet->properties->owner->anyOf[1] = new Reference('#/components/schemas/Human', $schema);
+
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => [
+                    'name',
+                    'owner' => [
+                        'id',
+                        'name',
+                    ],
+                ],
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '', true)
+        );
+    }
+
+    public function testCanCreateContextForReferencedCombinedObjectSchemaWithAnyOfAndOneOfNotTreatedAsAllOf(): void
+    {
+        $schema = $this->convertToObject([
+            'components' => [
+                'schemas' => [
+                    'Pet' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                            'owner' => [
+                                'anyOf' => [
+                                    [
+                                        '$ref' => '#/components/schemas/Robot',
+                                    ],
+                                    [
+                                        '$ref' => '#/components/schemas/Human',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'Robot' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'id' => [
+                                'type' => 'integer',
+                            ],
+                        ],
+                    ],
+                    'Human' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'name' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $schema->components->schemas->Pet->properties->owner->anyOf[0] = new Reference('#/components/schemas/Robot', $schema);
+        $schema->components->schemas->Pet->properties->owner->anyOf[1] = new Reference('#/components/schemas/Human', $schema);
+
+        $this->schemaLoader->setSchema($schema);
+
+        $this->assertSame(
+            [
+                AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
+                AbstractNormalizer::ATTRIBUTES => [
+                    'name',
+                    'owner',
+                ],
+            ],
+            $this->serializationContextBuilder->getContextForSchemaObject('Pet', '')
+        );
+    }
+
     public function testCanCreateContextForUnimplementedJsonSchemaKeywordsWithoutErrors(): void
     {
         $schema = $this->convertToObject([

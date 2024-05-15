@@ -40,26 +40,26 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
         $this->schemaLoader = $schemaLoader;
     }
 
-    public function getContextForSchemaObject(string $schemaObjectName, string $openApiSpecificationFile): array
+    public function getContextForSchemaObject(string $schemaObjectName, string $openApiSpecificationFile, bool $treatAnyOfAndOneOfAsAllOf = false): array
     {
         $jsonPointer = new JsonPointer($this->schemaLoader->load($openApiSpecificationFile));
         $schemaObject = $jsonPointer->get(sprintf('/components/schemas/%s', $schemaObjectName));
 
         return [
             AbstractObjectNormalizer::SKIP_NULL_VALUES => true,
-            AbstractNormalizer::ATTRIBUTES => $this->getAttributeContextFromSchemaObject($schemaObject),
+            AbstractNormalizer::ATTRIBUTES => $this->getAttributeContextFromSchemaObject($schemaObject, $treatAnyOfAndOneOfAsAllOf),
         ];
     }
 
     /**
      * @param stdClass|Reference $schemaObject
      */
-    private function getAttributeContextFromSchemaObject($schemaObject): array
+    private function getAttributeContextFromSchemaObject($schemaObject, bool $treatAnyOfAndOneOfAsAllOf): array
     {
         $schemaObject = $this->dereference($schemaObject);
 
-        if (isset($schemaObject->allOf)) {
-            return $this->getAttributeContextFromCombinedSchemaObject($schemaObject);
+        if (isset($schemaObject->allOf) || ($treatAnyOfAndOneOfAsAllOf && (isset($schemaObject->anyOf) || isset($schemaObject->oneOf)))) {
+            return $this->getAttributeContextFromCombinedSchemaObject($schemaObject, $treatAnyOfAndOneOfAsAllOf);
         }
 
         if (isset($schemaObject->type) === false) {
@@ -68,30 +68,35 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
 
         switch ($schemaObject->type) {
             case 'object':
-                return $this->getAttributeContextFromSchemaObjectProperties($schemaObject);
+                return $this->getAttributeContextFromSchemaObjectProperties($schemaObject, $treatAnyOfAndOneOfAsAllOf);
             case 'array':
-                return $this->getAttributeContextFromSchemaObject($schemaObject->items);
+                return $this->getAttributeContextFromSchemaObject($schemaObject->items, $treatAnyOfAndOneOfAsAllOf);
         }
 
         return [];
     }
 
-    private function getAttributeContextFromCombinedSchemaObject(stdClass $schemaObject): array
+    private function getAttributeContextFromCombinedSchemaObject(stdClass $schemaObject, bool $treatAnyOfAndOneOfAsAllOf): array
     {
         $context = [];
-        foreach ($schemaObject->allOf as $allOfSchemaObject) {
-            $context = array_merge($context, $this->getAttributeContextFromSchemaObject($allOfSchemaObject));
+        $allOfSchemaObjects = $schemaObject->allOf ?? [];
+        if ($treatAnyOfAndOneOfAsAllOf) {
+            $allOfSchemaObjects = array_merge($allOfSchemaObjects, $schemaObject->anyOf ?? [], $schemaObject->oneOf ?? []);
+        }
+
+        foreach ($allOfSchemaObjects as $allOfSchemaObject) {
+            $context = array_merge($context, $this->getAttributeContextFromSchemaObject($allOfSchemaObject, $treatAnyOfAndOneOfAsAllOf));
         }
 
         return $context;
     }
 
-    private function getAttributeContextFromSchemaObjectProperties(stdClass $schemaObject): array
+    private function getAttributeContextFromSchemaObjectProperties(stdClass $schemaObject, bool $treatAnyOfAndOneOfAsAllOf): array
     {
         $objectContext = [];
         $properties = $schemaObject->properties ?? [];
         foreach ($properties as $propertyKey => $property) {
-            $propertyContext = $this->getAttributeContextFromSchemaObject($property);
+            $propertyContext = $this->getAttributeContextFromSchemaObject($property, $treatAnyOfAndOneOfAsAllOf);
 
             if ($this->isType($property, 'object') || count($propertyContext) > 0) {
                 $objectContext[$propertyKey] = $propertyContext;
@@ -105,7 +110,7 @@ class SerializationContextBuilder implements SerializationContextBuilderInterfac
         if (isset($schemaObject->additionalProperties) && $schemaObject->additionalProperties !== false) {
             $objectContext = array_merge(
                 $objectContext,
-                $this->getAttributeContextFromSchemaObject($schemaObject->additionalProperties)
+                $this->getAttributeContextFromSchemaObject($schemaObject->additionalProperties, $treatAnyOfAndOneOfAsAllOf)
             );
         }
 
