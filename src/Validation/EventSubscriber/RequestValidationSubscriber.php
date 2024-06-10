@@ -37,6 +37,7 @@ class RequestValidationSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
+                ['validateRequestBeforeFirewall', 10],
                 ['validateRequest', 7],
             ],
         ];
@@ -45,6 +46,16 @@ class RequestValidationSubscriber implements EventSubscriberInterface
     public function __construct(ValidatorInterface $requestValidator)
     {
         $this->requestValidator = $requestValidator;
+    }
+
+    public function validateRequestBeforeFirewall(RequestEvent $event): void
+    {
+        $request = $event->getRequest();
+        if ($this->isManagedRoute($request) === false || $this->isPreFirewallRequestValidationEnabled($request) === false) {
+            return;
+        }
+
+        $this->validateRequest($event);
     }
 
     public function validateRequest(RequestEvent $event): void
@@ -63,5 +74,12 @@ class RequestValidationSubscriber implements EventSubscriberInterface
     private function isManagedRoute(Request $request): bool
     {
         return $request->attributes->has(RouteContext::REQUEST_ATTRIBUTE);
+    }
+
+    private function isPreFirewallRequestValidationEnabled(Request $request): bool
+    {
+        $routeContext = $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
+
+        return $routeContext[RouteContext::REQUEST_VALIDATE_BEFORE_FIREWALL] ?? false;
     }
 }
