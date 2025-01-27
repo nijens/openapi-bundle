@@ -20,13 +20,7 @@ paths:
           schema:
             type: string
             minLength: 3
-        - name: itemsPerPage
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-            default: 30
+        - $ref: '#/components/parameters/ItemsPerPage'
       responses:
         '200':
           description: Successfully retrieved the pets from the store.
@@ -233,6 +227,16 @@ paths:
         - error
 
 components:
+  parameters:
+    ItemsPerPage:
+      name: itemsPerPage
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 30
+
   schemas:
     Pet:
       type: object
