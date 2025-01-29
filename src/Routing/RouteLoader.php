@@ -15,6 +15,7 @@ namespace Nijens\OpenapiBundle\Routing;
 
 use Nijens\OpenapiBundle\Controller\CatchAllController;
 use Nijens\OpenapiBundle\Json\JsonPointer;
+use Nijens\OpenapiBundle\Json\Reference;
 use Nijens\OpenapiBundle\Json\SchemaLoaderInterface;
 use stdClass;
 use Symfony\Component\Config\FileLocatorInterface;
@@ -204,6 +205,10 @@ class RouteLoader extends FileLoader
         foreach ($parameters as $parameter) {
             if ($parameter->in !== 'query') {
                 continue;
+            }
+
+            if ($parameter instanceof Reference) {
+                $parameter = $parameter->resolve();
             }
 
             $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = json_encode($parameter);
