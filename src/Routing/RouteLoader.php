@@ -161,6 +161,8 @@ class RouteLoader extends FileLoader
             $defaults['_controller'] = $operation->{'x-openapi-bundle'}->controller;
         }
 
+        $openapiRouteContext[RouteContext::REQUEST_VALIDATE_BEFORE_FIREWALL] = $operation->{'x-openapi-bundle'}->validateBeforeFirewall ?? false;
+
         if (isset($operation->{'x-openapi-bundle'}->deserializationObject)) {
             $openapiRouteContext[RouteContext::DESERIALIZATION_OBJECT] = $operation->{'x-openapi-bundle'}->deserializationObject;
         }

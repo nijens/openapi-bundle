@@ -54,6 +54,7 @@ class RequestValidationSubscriberTest extends TestCase
         $this->assertSame(
             [
                 KernelEvents::REQUEST => [
+                    ['validateRequestBeforeFirewall', 10],
                     ['validateRequest', 7],
                 ],
             ],

@@ -148,6 +148,34 @@ paths:
           type: integer
           format: int64
 
+  /authenticate:
+    post:
+      operationId: authenticate
+      summary: Authenticate a user
+      x-openapi-bundle:
+        validateBeforeFirewall: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '204':
+          description: Successfully authenticated the user.
+        '401':
+          description: Invalid username/password supplied.
+      tags:
+        - pet
+
   /authenticated/pets:
     post:
       x-openapi-bundle:
