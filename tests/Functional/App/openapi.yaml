@@ -6,6 +6,9 @@ info:
 paths:
   /pets:
     get:
+      description: |
+        This description contains a test if %abc% is not attempted to be resolved as
+        Symfony service container parameter.
       x-openapi-bundle:
         controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetsController'
         additionalRouteAttributes:
