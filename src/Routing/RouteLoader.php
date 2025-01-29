@@ -210,7 +210,12 @@ class RouteLoader extends FileLoader
         }
 
         if (isset($operation->requestBody->content->{'application/json'}->schema)) {
-            $openapiRouteContext[RouteContext::REQUEST_BODY_SCHEMA] = serialize($operation->requestBody->content->{'application/json'}->schema);
+            // Escape %-characters to prevent the router from interpreting them as service container parameters.
+            $openapiRouteContext[RouteContext::REQUEST_BODY_SCHEMA] = str_replace(
+                '%',
+                '%%',
+                serialize($operation->requestBody->content->{'application/json'}->schema)
+            );
         }
 
         if (isset($operation->requestBody->content->{'application/json'})) {
