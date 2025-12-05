@@ -39,6 +39,7 @@ class RequestParameterValidatorTest extends TestCase
     {
         $request = new Request();
         $request->query->set('foo', 'bar');
+        $request->headers->set('bar', 'foo');
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
@@ -46,6 +47,16 @@ class RequestParameterValidatorTest extends TestCase
                     'foo' => json_encode([
                         'name' => 'foo',
                         'in' => 'query',
+                        'required' => true,
+                        'schema' => [
+                            'type' => 'string',
+                        ],
+                    ]),
+                ],
+                RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS => [
+                    'bar' => json_encode([
+                        'name' => 'bar',
+                        'in' => 'header',
                         'required' => true,
                         'schema' => [
                             'type' => 'string',
@@ -76,6 +87,16 @@ class RequestParameterValidatorTest extends TestCase
                         ],
                     ]),
                 ],
+                RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS => [
+                    'bar' => json_encode([
+                        'name' => 'bar',
+                        'in' => 'header',
+                        'required' => true,
+                        'schema' => [
+                            'type' => 'string',
+                        ],
+                    ]),
+                ],
             ]
         );
 
@@ -86,6 +107,7 @@ class RequestParameterValidatorTest extends TestCase
         static::assertEquals(
             [
                 new Violation('required_query_parameter', 'Query parameter foo is required.', 'foo'),
+                new Violation('required_header_parameter', 'Header parameter bar is required.', 'bar'),
             ],
             $exception->getViolations()
         );

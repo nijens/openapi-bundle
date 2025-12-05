@@ -46,12 +46,20 @@ final class RequestParameterValidator implements ValidatorInterface
     public function validate(Request $request): ?RequestProblemExceptionInterface
     {
         $validateQueryParameters = $this->getValidateQueryParametersFromRequest($request);
+        $validateHeaderParameters = $this->getValidateHeaderParametersFromRequest($request);
 
         $violations = [];
         foreach ($validateQueryParameters as $parameterName => $parameter) {
             $violations = array_merge(
                 $violations,
                 $this->validateQueryParameter($request, $parameterName, json_decode($parameter))
+            );
+        }
+
+        foreach ($validateHeaderParameters as $parameterName => $parameter) {
+            $violations = array_merge(
+                $violations,
+                $this->validateHeaderParameter($request, $parameterName, json_decode($parameter))
             );
         }
 
@@ -94,9 +102,42 @@ final class RequestParameterValidator implements ValidatorInterface
 
         $parameterValue = $request->query->get($parameterName);
 
+        return $this->validateParameterValue($parameterName, $parameter, $parameterValue, $violations);
+    }
+
+    private function getValidateHeaderParametersFromRequest(Request $request): array
+    {
+        return $request->attributes
+            ->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS] ?? [];
+    }
+
+    private function validateHeaderParameter(Request $request, string $parameterName, stdClass $parameter): array
+    {
+        $violations = [];
+        if ($request->headers->has($parameterName) === false && $parameter->required ?? false) {
+            $violations[] = new Violation(
+                'required_header_parameter',
+                sprintf('Header parameter %s is required.', $parameterName),
+                $parameterName
+            );
+
+            return $violations;
+        }
+
+        if ($request->headers->has($parameterName) === false) {
+            return $violations;
+        }
+
+        $parameterValue = $request->headers->get($parameterName);
+
+        return $this->validateParameterValue($parameterName, $parameter, $parameterValue, $violations);
+    }
+
+    private function validateParameterValue(string $parameterName, stdClass $parameter, mixed $parameterValue, array $currentViolations): array
+    {
         $this->jsonValidator->validate($parameterValue, $parameter->schema, Constraint::CHECK_MODE_COERCE_TYPES);
         if ($this->jsonValidator->isValid()) {
-            return $violations;
+            return $currentViolations;
         }
 
         $validationErrors = $this->jsonValidator->getErrors();
