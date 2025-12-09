@@ -18,6 +18,7 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestProblemExcept
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator;
+use Nijens\OpenapiBundle\Validation\ValidationContext;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,6 +41,7 @@ class RequestParameterValidatorTest extends TestCase
         $request = new Request();
         $request->query->set('foo', 'bar');
         $request->headers->set('bar', 'foo');
+        $request->attributes->set('_route_params', ['lorum' => 'ipsum']);
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
@@ -63,12 +65,29 @@ class RequestParameterValidatorTest extends TestCase
                         ],
                     ]),
                 ],
+                RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS => [
+                    'lorum' => json_encode([
+                        'name' => 'lorum',
+                        'in' => 'path',
+                        'required' => true,
+                        'schema' => [
+                            'type' => 'string',
+                        ],
+                    ]),
+                ],
             ]
         );
 
         static::assertNull(
             $this->validator->validate($request)
         );
+
+        $validatedContent = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE);
+        static::assertEquals([
+            'foo' => 'bar',
+            'bar' => 'foo',
+            'lorum' => 'ipsum',
+        ], \json_decode($validatedContent[ValidationContext::REQUEST_PARAMETERS], true));
     }
 
     public function testCannotValidateRequiredRequestParameterWithoutValue(): void

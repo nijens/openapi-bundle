@@ -20,6 +20,7 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\ProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\RequestProblemExceptionInterface;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
 use Nijens\OpenapiBundle\Routing\RouteContext;
+use Nijens\OpenapiBundle\Validation\ValidationContext;
 use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,19 +48,27 @@ final class RequestParameterValidator implements ValidatorInterface
     {
         $validateQueryParameters = $this->getValidateQueryParametersFromRequest($request);
         $validateHeaderParameters = $this->getValidateHeaderParametersFromRequest($request);
+        $validatePathParameters = $this->getValidatePathParametersFromRequest($request);
 
         $violations = [];
         foreach ($validateQueryParameters as $parameterName => $parameter) {
-            $violations = array_merge(
+            $violations = \array_merge(
                 $violations,
-                $this->validateQueryParameter($request, $parameterName, json_decode($parameter))
+                $this->validateQueryParameter($request, $parameterName, \json_decode($parameter))
             );
         }
 
         foreach ($validateHeaderParameters as $parameterName => $parameter) {
-            $violations = array_merge(
+            $violations = \array_merge(
                 $violations,
-                $this->validateHeaderParameter($request, $parameterName, json_decode($parameter))
+                $this->validateHeaderParameter($request, $parameterName, \json_decode($parameter))
+            );
+        }
+
+        foreach ($validatePathParameters as $parameterName => $parameter) {
+            $violations = \array_merge(
+                $violations,
+                $this->validatePathParameter($request, $parameterName, $parameter)
             );
         }
 
@@ -73,6 +82,19 @@ final class RequestParameterValidator implements ValidatorInterface
 
             return $exception->withViolations($violations);
         }
+
+        $validationContext = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE) ?? [
+            ValidationContext::VALIDATED => true,
+        ];
+        $validationContext[ValidationContext::REQUEST_PARAMETERS] = \json_encode(\array_merge(
+            $this->getValidatedQueryParametersWithValues($validateQueryParameters, $request),
+            $this->getValidatedHeaderParametersWithValues($validateHeaderParameters, $request),
+            $this->getValidatedPathParametersWithValues($validatePathParameters, $request)
+        ));
+        $request->attributes->set(
+            ValidationContext::REQUEST_ATTRIBUTE,
+            $validationContext
+        );
 
         return null;
     }
@@ -105,6 +127,16 @@ final class RequestParameterValidator implements ValidatorInterface
         return $this->validateParameterValue($parameterName, $parameter, $parameterValue, $violations);
     }
 
+    private function getValidatedQueryParametersWithValues(array $validatedParameters, Request $request): array
+    {
+        $parameters = [];
+        foreach ($validatedParameters as $parameterName => $parameterInfo) {
+            $parameters[$parameterName] = $request->query->get($parameterName);
+        }
+
+        return $parameters;
+    }
+
     private function getValidateHeaderParametersFromRequest(Request $request): array
     {
         return $request->attributes
@@ -131,6 +163,59 @@ final class RequestParameterValidator implements ValidatorInterface
         $parameterValue = $request->headers->get($parameterName);
 
         return $this->validateParameterValue($parameterName, $parameter, $parameterValue, $violations);
+    }
+
+    private function getValidatedHeaderParametersWithValues(array $validatedParameters, Request $request): array
+    {
+        $parameters = [];
+        foreach ($validatedParameters as $parameterName => $parameterInfo) {
+            $parameters[$parameterName] = $request->headers->get($parameterName);
+        }
+
+        return $parameters;
+    }
+
+    private function getValidatePathParametersFromRequest(Request $request): array
+    {
+        $pathParameters = $request->attributes
+            ->get(RouteContext::REQUEST_ATTRIBUTE)[RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS] ?? [];
+
+        return array_map(static fn (string $parameterJson) => \json_decode($parameterJson), $pathParameters);
+    }
+
+    private function validatePathParameter(Request $request, string $parameterName, stdClass $parameter): array
+    {
+        $violations = [];
+        $routeParameters = $request->attributes->get('_route_params') ?? null;
+
+        $paramExists = \array_key_exists($parameterName, $routeParameters);
+        if ($paramExists === false && $parameter->required ?? false) {
+            $violations[] = new Violation(
+                'required_path_parameter',
+                sprintf('Path parameter %s is required.', $parameterName),
+                $parameterName
+            );
+
+            return $violations;
+        }
+
+        if ($paramExists === false) {
+            return $violations;
+        }
+
+        $parameterValue = $routeParameters[$parameterName];
+
+        return $this->validateParameterValue($parameterName, $parameter, $parameterValue, $violations);
+    }
+
+    private function getValidatedPathParametersWithValues(array $validatedParameters, Request $request): array
+    {
+        $parameters = [];
+        foreach ($validatedParameters as $parameterName => $parameterInfo) {
+            $parameters[$parameterName] = $request->attributes->get('_route_params')[$parameterName];
+        }
+
+        return $parameters;
     }
 
     private function validateParameterValue(string $parameterName, stdClass $parameter, mixed $parameterValue, array $currentViolations): array

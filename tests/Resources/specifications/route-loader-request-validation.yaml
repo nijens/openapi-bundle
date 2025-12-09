@@ -16,6 +16,11 @@ paths:
           in: header
           schema:
             type: string
+        - name: lorum
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Returns the pets.

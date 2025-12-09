@@ -36,6 +36,8 @@ final class RouteContext
 
     public const REQUEST_VALIDATE_HEADER_PARAMETERS = 'request_validate_header_parameters';
 
+    public const REQUEST_VALIDATE_PATH_PARAMETERS = 'request_validate_path_parameters';
+
     public const DESERIALIZATION_OBJECT = 'deserialization_object';
 
     public const DESERIALIZATION_OBJECT_ARGUMENT_NAME = 'deserialization_object_argument_name';
