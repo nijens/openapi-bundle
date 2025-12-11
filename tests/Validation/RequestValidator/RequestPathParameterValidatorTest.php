@@ -17,21 +17,21 @@ use JsonSchema\Validator;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
 use Nijens\OpenapiBundle\Routing\RouteContext;
-use Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator;
+use Nijens\OpenapiBundle\Validation\RequestValidator\RequestPathParameterValidator;
 use Nijens\OpenapiBundle\Validation\ValidationContext;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class RequestParameterValidatorTest extends TestCase
+class RequestPathParameterValidatorTest extends TestCase
 {
     /**
-     * @var RequestParameterValidator
+     * @var RequestPathParameterValidator
      */
     private $validator;
 
     protected function setUp(): void
     {
-        $this->validator = new RequestParameterValidator(
+        $this->validator = new RequestPathParameterValidator(
             new Validator()
         );
     }
@@ -39,14 +39,14 @@ class RequestParameterValidatorTest extends TestCase
     public function testCanValidateRequiredRequestParameter(): void
     {
         $request = new Request();
-        $request->query->set('foo', 'bar');
+        $request->attributes->set('_route_params', ['lorum' => 'ipsum']);
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
-                    'foo' => json_encode([
-                        'name' => 'foo',
-                        'in' => 'query',
+                RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS => [
+                    'lorum' => json_encode([
+                        'name' => 'lorum',
+                        'in' => 'path',
                         'required' => true,
                         'schema' => [
                             'type' => 'string',
@@ -62,8 +62,8 @@ class RequestParameterValidatorTest extends TestCase
 
         $validatedContent = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE);
         static::assertEquals([
-            'foo' => 'bar',
-        ], \json_decode($validatedContent[ValidationContext::REQUEST_PARAMETERS], true));
+            'lorum' => 'ipsum',
+        ], \json_decode($validatedContent[ValidationContext::REQUEST_PATH_PARAMETERS], true));
     }
 
     public function testCannotValidateRequiredRequestParameterWithoutValue(): void
@@ -72,10 +72,10 @@ class RequestParameterValidatorTest extends TestCase
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS => [
                     'foo' => json_encode([
                         'name' => 'foo',
-                        'in' => 'query',
+                        'in' => 'path',
                         'required' => true,
                         'schema' => [
                             'type' => 'string',
@@ -88,10 +88,10 @@ class RequestParameterValidatorTest extends TestCase
         $exception = $this->validator->validate($request);
 
         static::assertInstanceOf(InvalidRequestProblemException::class, $exception);
-        static::assertSame('Validation of query parameters failed.', $exception->getMessage());
+        static::assertSame('Validation of path parameters failed.', $exception->getMessage());
         static::assertEquals(
             [
-                new Violation('required_query_parameter', 'Query parameter foo is required.', 'foo'),
+                new Violation('required_path_parameter', 'Path parameter foo is required.', 'foo'),
             ],
             $exception->getViolations()
         );
@@ -100,14 +100,14 @@ class RequestParameterValidatorTest extends TestCase
     public function testCanValidateRequestParameterOfTypeBoolean(): void
     {
         $request = new Request();
-        $request->query->set('foo', 'true');
+        $request->attributes->set('_route_params', ['foo' => 'true']);
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS => [
                     'foo' => json_encode([
                         'name' => 'foo',
-                        'in' => 'query',
+                        'in' => 'path',
                         'required' => true,
                         'schema' => [
                             'type' => 'boolean',
@@ -125,14 +125,14 @@ class RequestParameterValidatorTest extends TestCase
     public function testCanValidateRequestParameterOfTypeString(): void
     {
         $request = new Request();
-        $request->query->set('foo', 'bar');
+        $request->attributes->set('_route_params', ['foo' => 'bar']);
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS => [
                     'foo' => json_encode([
                         'name' => 'foo',
-                        'in' => 'query',
+                        'in' => 'path',
                         'required' => true,
                         'schema' => [
                             'type' => 'string',
@@ -150,14 +150,14 @@ class RequestParameterValidatorTest extends TestCase
     public function testCanValidateRequestParameterOfTypeInteger(): void
     {
         $request = new Request();
-        $request->query->set('foo', '1');
+        $request->attributes->set('_route_params', ['foo' => '1']);
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS => [
                     'foo' => json_encode([
                         'name' => 'foo',
-                        'in' => 'query',
+                        'in' => 'path',
                         'required' => true,
                         'schema' => [
                             'type' => 'integer',
@@ -175,14 +175,14 @@ class RequestParameterValidatorTest extends TestCase
     public function testCannotValidateRequestParameterOfTypeIntegerAsValidWithInvalidValue(): void
     {
         $request = new Request();
-        $request->query->set('foo', 'bar');
+        $request->attributes->set('_route_params', ['foo' => 'bar']);
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
-                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS => [
                     'foo' => json_encode([
                         'name' => 'foo',
-                        'in' => 'query',
+                        'in' => 'path',
                         'required' => true,
                         'schema' => [
                             'type' => 'integer',
@@ -195,7 +195,7 @@ class RequestParameterValidatorTest extends TestCase
         $exception = $this->validator->validate($request);
 
         static::assertInstanceOf(InvalidRequestProblemException::class, $exception);
-        static::assertSame('Validation of query parameters failed.', $exception->getMessage());
+        static::assertSame('Validation of path parameters failed.', $exception->getMessage());
         static::assertEquals(
             [
                 new Violation('type', 'String value found, but an integer is required', 'foo'),
