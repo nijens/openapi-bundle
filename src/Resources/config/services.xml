@@ -160,5 +160,17 @@
 
             <tag name="nijens_openapi.validation.validator" priority="32"/>
         </service>
+
+        <service id="Nijens\OpenapiBundle\Validation\RequestValidator\RequestHeadersParameterValidator">
+            <argument type="service" id="nijens_openapi.json.validator"/>
+
+            <tag name="nijens_openapi.validation.validator" priority="32"/>
+        </service>
+
+        <service id="Nijens\OpenapiBundle\Validation\RequestValidator\RequestPathParameterValidator">
+            <argument type="service" id="nijens_openapi.json.validator"/>
+
+            <tag name="nijens_openapi.validation.validator" priority="32"/>
+        </service>
     </services>
 </container>

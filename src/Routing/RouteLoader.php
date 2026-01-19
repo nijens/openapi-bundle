@@ -198,12 +198,14 @@ class RouteLoader extends FileLoader
         }
 
         $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS] = [];
+        $openapiRouteContext[RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS] = [];
+        $openapiRouteContext[RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS] = [];
         $parameters = array_merge(
             $pathItem->parameters ?? [],
             $operation->parameters ?? []
         );
         foreach ($parameters as $parameter) {
-            if ($parameter->in !== 'query') {
+            if (!in_array($parameter->in, ['query', 'header', 'path'])) {
                 continue;
             }
 
@@ -211,7 +213,13 @@ class RouteLoader extends FileLoader
                 $parameter = $parameter->resolve();
             }
 
-            $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = json_encode($parameter);
+            if ($parameter->in === 'query') {
+                $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = json_encode($parameter);
+            } elseif ($parameter->in === 'header') {
+                $openapiRouteContext[RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS][$parameter->name] = json_encode($parameter);
+            } elseif ($parameter->in === 'path') {
+                $openapiRouteContext[RouteContext::REQUEST_VALIDATE_PATH_PARAMETERS][$parameter->name] = json_encode($parameter);
+            }
         }
 
         if (isset($operation->requestBody->content->{'application/json'}->schema)) {

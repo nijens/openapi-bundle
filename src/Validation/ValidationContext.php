@@ -20,4 +20,10 @@ final class ValidationContext
     public const VALIDATED = 'validated';
 
     public const REQUEST_BODY = 'request_body';
+
+    public const REQUEST_PARAMETERS = 'request_parameters';
+
+    public const REQUEST_HEADERS_PARAMETERS = 'request_headers_parameters';
+
+    public const REQUEST_PATH_PARAMETERS = 'request_path_parameters';
 }
