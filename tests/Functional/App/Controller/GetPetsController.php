@@ -50,7 +50,7 @@ class GetPetsController
      */
     public function __invoke(Request $request): JsonResponse
     {
-        $filterByName = $request->get('filterByName', '');
+        $filterByName = $request->query->get('filterByName', '');
         $pets = [
             new Pet(1, 'Cat'),
             new Pet(2, 'Dog'),
