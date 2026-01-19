@@ -22,9 +22,13 @@ framework:
         enabled: false
         collect: false
 
-    handle_all_throwables: false # Changing this to true causes failing tests. Needs investigation.
+    property_info:
+        enabled: true
+        with_constructor_extractor: false
+
+    handle_all_throwables: false # Changing this to true causes failing tests in Symfony 6.x. Needs investigation.
     php_errors:
-      log: true
+        log: true
 
 security:
   enable_authenticator_manager: true

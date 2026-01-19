@@ -25,10 +25,8 @@ ifeq ($(filter $(version),6.2 6.3 6.4),)
 	sed -i -e "s/\(\s\+\)\(handle_all_throwables:\)/\1# \2/" tests/Functional/App/config.yaml
 endif
 
-ifeq ($(filter $(version),5.3 5.4 6.0 6.1 6.2 6.3 6.4 7.0 7.1 7.2 7.3 7.4 8.0),)
-	sed -i -e "s/\(\s\+\)# \(storage_id:\)/\1\2/" tests/Functional/App/config.yaml
-	sed -i -e "s/\(\s\+\)\(storage_factory_id:\)/\1# \2/" tests/Functional/App/config.yaml
-	sed -i -e "s/\(\s\+\)\(lazy:\)/\1# \2/" tests/Functional/App/config.yaml
+ifeq ($(filter $(version),7.0 7.1 7.2 7.3 7.4 8.0),)
+	sed -i -e "s/\(\s\+\)\(with_constructor_extractor:\)/\1# \2/" tests/Functional/App/config.yaml
 endif
 
 	composer global config --no-plugins allow-plugins.symfony/flex true
