@@ -48,7 +48,12 @@ class Kernel extends BaseKernel
      */
     public function getLogDir(): string
     {
-        return $this->getTemporaryDirectory().'/var/log';
+        $logDirectory = $this->getTemporaryDirectory().'/var/log';
+        if (is_dir($logDirectory) === false) {
+            mkdir($logDirectory, 0700, true);
+        }
+
+        return $logDirectory;
     }
 
     /**
