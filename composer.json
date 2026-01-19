@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
+        "php": "^8.2",
         "ext-json": "*",
         "justinrainbow/json-schema": "^5.2",
         "league/uri": "^6.3",
