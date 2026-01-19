@@ -34,7 +34,7 @@ class UpdatePetController
 
     public function __construct(
         SerializerInterface $serializer,
-        SerializationContextBuilderInterface $serializationContextBuilder
+        SerializationContextBuilderInterface $serializationContextBuilder,
     ) {
         $this->serializer = $serializer;
         $this->serializationContextBuilder = $serializationContextBuilder;
@@ -44,7 +44,7 @@ class UpdatePetController
         Request $request,
         string $petId,
         ?UpdatePet $pet,
-        string $responseSerializationSchemaObject
+        string $responseSerializationSchemaObject,
     ): JsonResponse {
         if ($pet instanceof UpdatePet === false) {
             $pet = new UpdatePet('Cat');

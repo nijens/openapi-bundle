@@ -151,7 +151,7 @@ class SerializationContextBuilderTest extends TestCase
      */
     public function testCanCreateContextForObjectSchemaWithAdditionalProperties(
         stdClass $schema,
-        array $expectedAttributes
+        array $expectedAttributes,
     ): void {
         $this->schemaLoader->setSchema($schema);
 

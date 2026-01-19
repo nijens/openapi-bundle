@@ -58,7 +58,7 @@ final class ThrowableToProblemExceptionTransformer implements ThrowableToProblem
      */
     private function addAdditionalProblemInformation(
         ProblemExceptionInterface $exception,
-        array $exceptionData
+        array $exceptionData,
     ): ProblemExceptionInterface {
         if (isset($exceptionData['type_uri'])) {
             $exception = $exception->withTypeUri($exceptionData['type_uri']);

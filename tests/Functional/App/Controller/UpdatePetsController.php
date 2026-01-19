@@ -35,7 +35,7 @@ abstract class AbstractUpdatePetsController
 
     public function __construct(
         SerializerInterface $serializer,
-        SerializationContextBuilderInterface $serializationContextBuilder
+        SerializationContextBuilderInterface $serializationContextBuilder,
     ) {
         $this->serializer = $serializer;
         $this->serializationContextBuilder = $serializationContextBuilder;
@@ -47,7 +47,7 @@ abstract class AbstractUpdatePetsController
     protected function invoke(
         Request $request,
         array $updatePets,
-        string $responseSerializationSchemaObject
+        string $responseSerializationSchemaObject,
     ): JsonResponse {
         $serializationContext = $this->serializationContextBuilder->getContextForSchemaObject(
             $responseSerializationSchemaObject,
@@ -66,7 +66,7 @@ if (PHP_VERSION_ID >= 80000) {
         public function __invoke(
             Request $request,
             #[DeserializedObject] array $updatePets,
-            string $responseSerializationSchemaObject
+            string $responseSerializationSchemaObject,
         ): JsonResponse {
             return $this->invoke($request, $updatePets, $responseSerializationSchemaObject);
         }
@@ -80,7 +80,7 @@ if (PHP_VERSION_ID >= 80000) {
         public function __invoke(
             Request $request,
             array $updatePets,
-            string $responseSerializationSchemaObject
+            string $responseSerializationSchemaObject,
         ): JsonResponse {
             return $this->invoke($request, $updatePets, $responseSerializationSchemaObject);
         }

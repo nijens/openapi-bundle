@@ -30,7 +30,7 @@ class InvalidRequestProblemException extends ProblemException implements Invalid
         ?Throwable $previous = null,
         ?string $instanceUri = null,
         array $headers = [],
-        array $violations = []
+        array $violations = [],
     ) {
         parent::__construct($typeUri, $title, $statusCode, $message, $previous, $instanceUri, $headers);
 
