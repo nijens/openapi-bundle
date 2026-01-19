@@ -160,7 +160,7 @@ final class RequestBodyValidator implements ValidatorInterface
      */
     private function createInvalidRequestBodyProblemException(
         array $violations,
-        string $message
+        string $message,
     ): InvalidRequestProblemExceptionInterface {
         $exception = new InvalidRequestBodyProblemException(
             ProblemException::DEFAULT_TYPE_URI,

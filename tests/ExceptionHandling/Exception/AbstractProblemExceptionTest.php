@@ -87,7 +87,7 @@ abstract class AbstractProblemExceptionTest extends TestCase
     public static function assertProblemExceptionEqualsExcludingProperty(
         ProblemExceptionInterface $expected,
         ProblemExceptionInterface $actual,
-        string $excludedProperty
+        string $excludedProperty,
     ): void {
         $expected = $expected->jsonSerialize();
         $actual = $actual->jsonSerialize();

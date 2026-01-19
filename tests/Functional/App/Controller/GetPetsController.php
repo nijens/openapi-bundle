@@ -39,7 +39,7 @@ class GetPetsController
 
     public function __construct(
         SerializerInterface $serializer,
-        SerializationContextBuilderInterface $serializationContextBuilder
+        SerializationContextBuilderInterface $serializationContextBuilder,
     ) {
         $this->serializer = $serializer;
         $this->serializationContextBuilder = $serializationContextBuilder;

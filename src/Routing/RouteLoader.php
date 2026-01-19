@@ -52,7 +52,7 @@ class RouteLoader extends FileLoader
     public function __construct(
         FileLocatorInterface $locator,
         SchemaLoaderInterface $schemaLoader,
-        bool $useOperationIdAsRouteName = false
+        bool $useOperationIdAsRouteName = false,
     ) {
         parent::__construct($locator);
 
@@ -100,7 +100,7 @@ class RouteLoader extends FileLoader
         string $resource,
         RouteCollection $collection,
         string $path,
-        stdClass $pathItem
+        stdClass $pathItem,
     ): void {
         $operations = get_object_vars($pathItem);
         foreach ($operations as $requestMethod => $operation) {
@@ -122,7 +122,7 @@ class RouteLoader extends FileLoader
         string $path,
         string $requestMethod,
         stdClass $operation,
-        stdClass $pathItem
+        stdClass $pathItem,
     ): void {
         $defaults = [];
         $openapiRouteContext = [
@@ -183,7 +183,7 @@ class RouteLoader extends FileLoader
         string $requestMethod,
         stdClass $operation,
         stdClass $pathItem,
-        array &$openapiRouteContext
+        array &$openapiRouteContext,
     ): void {
         $openapiRouteContext[RouteContext::REQUEST_BODY_REQUIRED] = false;
         if (isset($operation->requestBody->required)) {

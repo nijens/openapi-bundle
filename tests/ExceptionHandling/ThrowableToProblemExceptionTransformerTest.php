@@ -83,7 +83,7 @@ class ThrowableToProblemExceptionTransformerTest extends TestCase
      */
     public function testCanAddAdditionalProblemInformationToProblemException(
         Throwable $exception,
-        ProblemExceptionInterface $expectedException
+        ProblemExceptionInterface $expectedException,
     ): void {
         static::assertEquals(
             $expectedException,
