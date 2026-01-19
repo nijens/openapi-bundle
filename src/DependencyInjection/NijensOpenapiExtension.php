@@ -22,7 +22,7 @@ use Nijens\OpenapiBundle\Validation\RequestValidator\RequestParameterValidator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 /**
  * Loads and manages the bundle configuration and services.
@@ -36,8 +36,8 @@ class NijensOpenapiExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.xml');
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../config'));
+        $loader->load('services.php');
 
         $this->loadDeprecatedServices($loader);
 
@@ -58,9 +58,9 @@ class NijensOpenapiExtension extends Extension
     /**
      * Loads the deprecated services file.
      */
-    private function loadDeprecatedServices(XmlFileLoader $loader): void
+    private function loadDeprecatedServices(PhpFileLoader $loader): void
     {
-        $loader->load('services_deprecated.xml');
+        $loader->load('services_deprecated.php');
     }
 
     private function registerRoutingConfiguration(array $config, ContainerBuilder $container): void
