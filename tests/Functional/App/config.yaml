@@ -19,6 +19,7 @@ framework:
         cookie_samesite: lax
 
     profiler:
+        enabled: false
         collect: false
 
     handle_all_throwables: false # Changing this to true causes failing tests. Needs investigation.
