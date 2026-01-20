@@ -147,6 +147,165 @@ paths:
         schema:
           type: integer
           format: int64
+        x-openapi-bundle-deserialize-as: 'id'
+
+  /validate-path/boolean/{boolean}:
+    get:
+      operationId: validatePathBoolean
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: boolean
+        in: path
+        required: true
+        schema:
+          type: boolean
+
+  /validate-path/integer/{integer}:
+    get:
+      operationId: validatePathInteger
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: integer
+        in: path
+        required: true
+        schema:
+          type: integer
+
+  /validate-path/number/{number}:
+    get:
+      operationId: validatePathNumber
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: number
+        in: path
+        required: true
+        schema:
+          type: number
+
+  /validate-path/string/date/{date}:
+    get:
+      operationId: validatePathStringDate
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: date
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+
+  /validate-path/string/date-time/{dateTime}:
+    get:
+      operationId: validatePathStringDateTime
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: dateTime
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date-time
+
+  /validate-path/string/email/{email}:
+    get:
+      operationId: validatePathStringEmail
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: email
+        in: path
+        required: true
+        schema:
+          type: string
+          format: email
+
+  /validate-path/string/uuid/{uuid}:
+    get:
+      operationId: validatePathStringUuid
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+  /validate-path/string/pattern/{stringPattern}:
+    get:
+      operationId: validatePathStringPattern
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: stringPattern
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: '[A-Z]{2}'
+
+  /validate-path/string/{string}:
+    get:
+      operationId: validatePathString
+      summary: Endpoint to validate path parameter requirement.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController'
+      responses:
+        '200':
+          description: Success!
+
+    parameters:
+      - name: string
+        in: path
+        required: true
+        schema:
+          type: string
 
   /authenticated/pets:
     post:

@@ -71,6 +71,10 @@ services:
       tags:
         - 'controller.service_arguments'
 
+    Nijens\OpenapiBundle\Tests\Functional\App\Controller\SuccessController:
+      tags:
+        - 'controller.service_arguments'
+
     Nijens\OpenapiBundle\Tests\Functional\App\Controller\UpdatePetController:
         arguments:
             - '@Symfony\Component\Serializer\SerializerInterface'
