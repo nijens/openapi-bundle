@@ -253,7 +253,7 @@ class RouteLoader extends FileLoader
             $format = $parameterSchema->format ?? null;
             $pattern = $parameterSchema->pattern ?? null;
 
-            $requirements[$parameter->name] = match($type) {
+            $requirements[$parameter->name] = match ($type) {
                 'boolean' => '(?:true|false)',
                 'integer' => '-?\d+',
                 'number' => '-?(?:\d+)(?:\.\d+)?(?:[eE][+-]?\d+)?',
