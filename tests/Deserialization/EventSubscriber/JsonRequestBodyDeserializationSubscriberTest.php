@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Deserialization\EventSubscriber;
 
+use JsonSchema\Validator;
 use Nijens\OpenapiBundle\Deserialization\DeserializationContext;
 use Nijens\OpenapiBundle\Deserialization\EventSubscriber\JsonRequestBodyDeserializationSubscriber;
 use Nijens\OpenapiBundle\Routing\RouteContext;
+use Nijens\OpenapiBundle\Tests\Deserialization\DenormalizerInterface;
 use Nijens\OpenapiBundle\Tests\Functional\App\Model\UpdatePet;
 use Nijens\OpenapiBundle\Validation\ValidationContext;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -29,6 +31,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 class JsonRequestBodyDeserializationSubscriberTest extends TestCase
 {
     /**
+     * @var Validator
+     */
+    private $validator;
+
+    /**
      * @var JsonRequestBodyDeserializationSubscriber
      */
     private $subscriber;
@@ -40,9 +47,10 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->serializer = $this->createMock(SerializerInterface::class);
+        $this->validator = $this->createMock(Validator::class);
+        $this->serializer = $this->createMock(DenormalizerInterface::class);
 
-        $this->subscriber = new JsonRequestBodyDeserializationSubscriber($this->serializer);
+        $this->subscriber = new JsonRequestBodyDeserializationSubscriber($this->validator, $this->serializer);
     }
 
     public function testCanGetSubscribedEvents(): void
@@ -61,7 +69,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
 
     public function testCannotDeserializeRequestBodyWhenNotValidated(): void
     {
-        $this->serializer->expects($this->never())->method('deserialize');
+        $this->serializer->expects($this->never())->method('decode');
 
         $request = new Request([], [], [], [], [], [], '{"name":"Dog"}');
         $request->headers->set('Content-Type', 'application/json');
@@ -81,7 +89,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
 
     public function testCannotDeserializeRequestBodyWhenNoDeserializationObjectHasBeenDefinedInRouteContext(): void
     {
-        $this->serializer->expects($this->never())->method('deserialize');
+        $this->serializer->expects($this->never())->method('decode');
 
         $request = new Request([], [], [], [], [], [], '{"name":"Dog"}');
         $request->headers->set('Content-Type', 'application/json');
@@ -107,8 +115,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     public function testCanDeserializeRequestBodyIntoObject(): void
     {
         $this->serializer->expects($this->once())
-            ->method('deserialize')
-            ->with('{"name":"Dog"}', UpdatePet::class, 'json');
+            ->method('decode')
+            ->with('{"name":"Dog"}', 'json');
 
         $request = new Request([], [], [], [], [], [], '{"name":"Dog"}');
         $request->headers->set('Content-Type', 'application/json');
@@ -123,6 +131,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
             RouteContext::REQUEST_ATTRIBUTE,
             [
                 RouteContext::DESERIALIZATION_OBJECT => UpdatePet::class,
+                RouteContext::DESERIALIZATION_PARAMETERS => [],
             ]
         );
 
@@ -131,6 +140,199 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         $this->subscriber->deserializeRequestBody($event);
 
         static::assertTrue($request->attributes->has(DeserializationContext::REQUEST_ATTRIBUTE));
+    }
+
+    public function testCanDeserializeBooleanQueryParameterIntoObject(): void {
+        $expectedValue = new DeserializationDummy(true);
+
+        $this->serializer->expects($this->once())
+            ->method('decode')
+            ->with('', 'json')
+            ->willReturn(null);
+
+        $this->serializer->expects($this->once())
+            ->method('denormalize')
+            ->with(['boolean' => true], DeserializationDummy::class, 'json')
+            ->willReturn($expectedValue);
+
+        $parameter = [
+            'name' => 'value',
+            'in' => 'query',
+            'schema' => [
+                'type' => 'boolean',
+            ],
+            'x-openapi-bundle-deserialize-as' => 'boolean',
+        ];
+
+        $request = new Request(['value' => '1'], [], [], [], [], []);
+        $request->headers->set('Content-Type', 'application/json');
+//        $request->attributes->set(
+//            ValidationContext::REQUEST_ATTRIBUTE,
+//            [
+//                ValidationContext::VALIDATED => true,
+//                ValidationContext::REQUEST_BODY => '{"name":"Dog"}',
+//            ]
+//        );
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::DESERIALIZATION_OBJECT => DeserializationDummy::class,
+                RouteContext::DESERIALIZATION_PARAMETERS => [
+                    'value' => json_encode($parameter),
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->subscriber->deserializeRequestBody($event);
+
+        static::assertSame($expectedValue, $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE));
+    }
+
+    public function testCanDeserializeIntegerQueryParameterIntoObject(): void {
+        $expectedValue = new DeserializationDummy(null, 1);
+
+        $this->serializer->expects($this->once())
+            ->method('decode')
+            ->with('', 'json')
+            ->willReturn(null);
+
+        $this->serializer->expects($this->once())
+            ->method('denormalize')
+            ->with(['integer' => 100], DeserializationDummy::class, 'json')
+            ->willReturn($expectedValue);
+
+        $parameter = [
+            'name' => 'value',
+            'in' => 'query',
+            'schema' => [
+                'type' => 'integer',
+            ],
+            'x-openapi-bundle-deserialize-as' => 'integer',
+        ];
+
+        $request = new Request(['value' => '100'], [], [], [], [], []);
+        $request->headers->set('Content-Type', 'application/json');
+//        $request->attributes->set(
+//            ValidationContext::REQUEST_ATTRIBUTE,
+//            [
+//                ValidationContext::VALIDATED => true,
+//                ValidationContext::REQUEST_BODY => '{"name":"Dog"}',
+//            ]
+//        );
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::DESERIALIZATION_OBJECT => DeserializationDummy::class,
+                RouteContext::DESERIALIZATION_PARAMETERS => [
+                    'value' => json_encode($parameter),
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->subscriber->deserializeRequestBody($event);
+
+        static::assertSame($expectedValue, $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE));
+    }
+
+    public function testCanDeserializeStringQueryParameterIntoObject(): void {
+        $expectedValue = new DeserializationDummy(string: 'a string');
+
+        $this->serializer->expects($this->once())
+            ->method('decode')
+            ->with('', 'json')
+            ->willReturn(null);
+
+        $this->serializer->expects($this->once())
+            ->method('denormalize')
+            ->with(['string' => 'a string'], DeserializationDummy::class, 'json')
+            ->willReturn($expectedValue);
+
+        $parameter = [
+            'name' => 'value',
+            'in' => 'query',
+            'schema' => [
+                'type' => 'string',
+            ],
+            'x-openapi-bundle-deserialize-as' => 'string',
+        ];
+
+        $request = new Request(['value' => 'a string'], [], [], [], [], []);
+        $request->headers->set('Content-Type', 'application/json');
+//        $request->attributes->set(
+//            ValidationContext::REQUEST_ATTRIBUTE,
+//            [
+//                ValidationContext::VALIDATED => true,
+//                ValidationContext::REQUEST_BODY => '{"name":"Dog"}',
+//            ]
+//        );
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::DESERIALIZATION_OBJECT => DeserializationDummy::class,
+                RouteContext::DESERIALIZATION_PARAMETERS => [
+                    'value' => json_encode($parameter),
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->subscriber->deserializeRequestBody($event);
+
+        static::assertSame($expectedValue, $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE));
+    }
+
+    public function testCanDeserializeUnavailableQueryParameterAsNullIntoObject(): void {
+        $expectedValue = new DeserializationDummy(false);
+
+        $this->serializer->expects($this->once())
+            ->method('decode')
+            ->with('', 'json')
+            ->willReturn(null);
+
+        $this->serializer->expects($this->once())
+            ->method('denormalize')
+            ->with(['boolean' => false], DeserializationDummy::class, 'json')
+            ->willReturn($expectedValue);
+
+        $parameter = [
+            'name' => 'value',
+            'in' => 'query',
+            'schema' => [
+                'type' => 'boolean',
+                'default' => false,
+            ],
+            'x-openapi-bundle-deserialize-as' => 'boolean',
+        ];
+
+        $request = new Request([], [], [], [], [], []);
+        $request->headers->set('Content-Type', 'application/json');
+//        $request->attributes->set(
+//            ValidationContext::REQUEST_ATTRIBUTE,
+//            [
+//                ValidationContext::VALIDATED => true,
+//                ValidationContext::REQUEST_BODY => '{"name":"Dog"}',
+//            ]
+//        );
+        $request->attributes->set(
+            RouteContext::REQUEST_ATTRIBUTE,
+            [
+                RouteContext::DESERIALIZATION_OBJECT => DeserializationDummy::class,
+                RouteContext::DESERIALIZATION_PARAMETERS => [
+                    'value' => json_encode($parameter),
+                ],
+            ]
+        );
+
+        $event = $this->createRequestEvent($request);
+
+        $this->subscriber->deserializeRequestBody($event);
+
+        static::assertSame($expectedValue, $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE));
     }
 
     private function createRequestEvent(Request $request): RequestEvent
