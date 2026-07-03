@@ -16,11 +16,6 @@ paths:
           in: header
           schema:
             type: string
-        - name: lorum
-          in: path
-          required: true
-          schema:
-            type: string
       responses:
         '200':
           description: Returns the pets.
@@ -48,6 +43,27 @@ paths:
       responses:
         '200':
           description: Returns the stored pet.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+
+  /pets/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          x-openapi-bundle-deserialize-as: 'id'
+        - name: foo
+          in: query
+          schema:
+            type: string
+          x-openapi-bundle-deserialize-as: 'bar'
+      responses:
+        '200':
+          description: Returns a pet.
           content:
             application/json:
               schema:

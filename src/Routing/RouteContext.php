@@ -39,4 +39,6 @@ final class RouteContext
     public const DESERIALIZATION_OBJECT = 'deserialization_object';
 
     public const DESERIALIZATION_OBJECT_ARGUMENT_NAME = 'deserialization_object_argument_name';
+
+    public const DESERIALIZATION_PARAMETERS = 'deserialization_parameters';
 }

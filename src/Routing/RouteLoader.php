@@ -138,6 +138,7 @@ class RouteLoader extends FileLoader
             $pathItem,
             $openapiRouteContext
         );
+        $this->addRouteContextForParameterDeserialization($operation, $pathItem, $openapiRouteContext);
 
         $defaults[RouteContext::REQUEST_ATTRIBUTE] = $openapiRouteContext;
 
@@ -225,6 +226,20 @@ class RouteLoader extends FileLoader
                 $requestMethod,
                 $jsonPointer->escape('application/json')
             );
+        }
+    }
+
+    private function addRouteContextForParameterDeserialization(stdClass $operation, stdClass $pathItem, array &$openapiRouteContext)
+    {
+        $openapiRouteContext[RouteContext::DESERIALIZATION_PARAMETERS] = [];
+
+        $parameters = $this->getParameters(null, $operation, $pathItem);
+        foreach ($parameters as $parameter) {
+            if (isset($parameter->{'x-openapi-bundle-deserialize-as'}) === false || is_string($parameter->{'x-openapi-bundle-deserialize-as'}) === false) {
+                continue;
+            }
+
+            $openapiRouteContext[RouteContext::DESERIALIZATION_PARAMETERS][$parameter->name] = json_encode($parameter);
         }
     }
 
