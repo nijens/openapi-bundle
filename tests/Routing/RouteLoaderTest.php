@@ -200,6 +200,15 @@ class RouteLoaderTest extends TestCase
         static::assertSame('bar', $route->getDefault('foo'));
     }
 
+    public function testCanLoadRouteWithEnumPathParameterRequirement(): void
+    {
+        $routes = $this->routeLoader->load('route-loader-enum-path-parameter.yaml', 'openapi');
+        $route = $routes->get('pets_status_get');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertSame(['status' => '(available|pending|sold)'], $route->getRequirements());
+    }
+
     private function createFileLocator(): FileLocator
     {
         return new FileLocator([

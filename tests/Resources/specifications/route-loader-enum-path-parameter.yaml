@@ -1,0 +1,22 @@
+openapi: 3.0.0
+
+info:
+  title: OpenAPI bundle enum path parameter test specification
+  version: 0.1.0
+
+paths:
+  /pets/{status}:
+    get:
+      responses:
+        '200':
+          description: Returns a pet status.
+    parameters:
+      - name: status
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+            - available
+            - pending
+            - sold
