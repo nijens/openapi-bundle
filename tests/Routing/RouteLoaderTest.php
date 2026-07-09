@@ -130,6 +130,7 @@ class RouteLoaderTest extends TestCase
         static::assertEquals(
             [
                 RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/route-loader-request-validation.yaml',
+                RouteContext::REQUEST_VALIDATE_BEFORE_FIREWALL => false,
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
@@ -155,6 +156,7 @@ class RouteLoaderTest extends TestCase
         static::assertSame(
             [
                 RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/route-loader-request-validation.yaml',
+                RouteContext::REQUEST_VALIDATE_BEFORE_FIREWALL => false,
                 RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => ['application/json'],
                 RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [],

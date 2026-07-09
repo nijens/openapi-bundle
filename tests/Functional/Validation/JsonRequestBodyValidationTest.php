@@ -108,6 +108,45 @@ class JsonRequestBodyValidationTest extends WebTestCase
         );
     }
 
+    public function testCanReturnProblemDetailsJsonObjectForInvalidRequestBodyBeforeFirewall(): void
+    {
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/authenticate',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            '{}'
+        );
+
+        $expectedJsonResponseBody = [
+            'type' => 'about:blank',
+            'title' => 'The request body contains errors.',
+            'status' => 400,
+            'detail' => 'Validation of JSON request body failed.',
+            'violations' => [
+                [
+                    'constraint' => 'required',
+                    'message' => 'The property username is required',
+                    'property' => 'username',
+                ],
+                [
+                    'constraint' => 'required',
+                    'message' => 'The property password is required',
+                    'property' => 'password',
+                ],
+            ],
+        ];
+
+        static::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        static::assertJsonStringEqualsJsonString(
+            json_encode($expectedJsonResponseBody),
+            $this->client->getResponse()->getContent()
+        );
+    }
+
     public function testCannotReturnProblemDetailsJsonObjectWithoutRequiredRequestBody(): void
     {
         $this->client->request(
