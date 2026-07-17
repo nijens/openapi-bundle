@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Throwable;
 
 class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterface
 {
@@ -103,14 +104,18 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
             $data[$parameter->{'x-openapi-bundle-deserialize-as'}] = $parameterValue;
         }
 
-        $request->attributes->set(
-            DeserializationContext::REQUEST_ATTRIBUTE,
-            $this->serializer->denormalize(
-                $data,
-                $routeContext[RouteContext::DESERIALIZATION_OBJECT],
-                $format
-            )
-        );
+        try {
+            $request->attributes->set(
+                DeserializationContext::REQUEST_ATTRIBUTE,
+                $this->serializer->denormalize(
+                    $data,
+                    $routeContext[RouteContext::DESERIALIZATION_OBJECT],
+                    $format
+                )
+            );
+        } catch (Throwable $throwable) {
+            // Continue when denormalization fails due to missing data.
+        }
     }
 
     private function resolveParameterValue(Request $request, stdClass $parameter)
