@@ -149,6 +149,42 @@ paths:
           format: int64
         x-openapi-bundle-deserialize-as: 'id'
 
+  /echo/{path}:
+    post:
+      operationId: echoPath
+      summary: Endpoint to echo a deserialized object.
+      x-openapi-bundle:
+        controller: 'Nijens\OpenapiBundle\Tests\Functional\App\Controller\EchoController'
+        deserializationObject: 'stdClass'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Success!
+          content:
+            application/json:
+              schema:
+                type: object
+    parameters:
+      - name: path
+        in: path
+        description: Path to echo.
+        required: true
+        schema:
+          type: string
+        x-openapi-bundle-deserialize-as: 'path'
+      - name: test
+        in: query
+        description: Test query parameter.
+        required: false
+        schema:
+          type: boolean
+          default: true
+        x-openapi-bundle-deserialize-as: 'test'
+
   /validate-path/boolean/{boolean}:
     get:
       operationId: validatePathBoolean

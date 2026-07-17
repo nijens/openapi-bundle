@@ -145,10 +145,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     public function testCanDeserializeBooleanQueryParameterIntoObject(): void {
         $expectedValue = new DeserializationDummy(true);
 
-        $this->serializer->expects($this->once())
-            ->method('decode')
-            ->with('', 'json')
-            ->willReturn(null);
+        $this->serializer->expects($this->never())
+            ->method('decode');
 
         $this->serializer->expects($this->once())
             ->method('denormalize')
@@ -193,10 +191,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     public function testCanDeserializeIntegerQueryParameterIntoObject(): void {
         $expectedValue = new DeserializationDummy(null, 1);
 
-        $this->serializer->expects($this->once())
-            ->method('decode')
-            ->with('', 'json')
-            ->willReturn(null);
+        $this->serializer->expects($this->never())
+            ->method('decode');
 
         $this->serializer->expects($this->once())
             ->method('denormalize')
@@ -241,10 +237,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     public function testCanDeserializeStringQueryParameterIntoObject(): void {
         $expectedValue = new DeserializationDummy(string: 'a string');
 
-        $this->serializer->expects($this->once())
-            ->method('decode')
-            ->with('', 'json')
-            ->willReturn(null);
+        $this->serializer->expects($this->never())
+            ->method('decode');
 
         $this->serializer->expects($this->once())
             ->method('denormalize')
@@ -289,10 +283,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     public function testCanDeserializeUnavailableQueryParameterAsNullIntoObject(): void {
         $expectedValue = new DeserializationDummy(false);
 
-        $this->serializer->expects($this->once())
-            ->method('decode')
-            ->with('', 'json')
-            ->willReturn(null);
+        $this->serializer->expects($this->never())
+            ->method('decode');
 
         $this->serializer->expects($this->once())
             ->method('denormalize')

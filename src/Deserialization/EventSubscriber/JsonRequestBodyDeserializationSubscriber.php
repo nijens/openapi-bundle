@@ -70,8 +70,21 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
          * TODO: Remove when support for Symfony 6.4 is dropped.
          */
         $format = method_exists($request, 'getContentTypeFormat') ? $request->getContentTypeFormat() : $request->getContentType();
+        if ($format === null) {
+            $format = 'json';
+        }
 
-        $data = $this->serializer->decode($validationContext[ValidationContext::REQUEST_BODY] ?? '', $format, [JsonDecode::ASSOCIATIVE => true]) ?? [];
+        $data = [];
+        if (isset($validationContext[ValidationContext::REQUEST_BODY])) {
+            $data = $this->serializer->decode(
+                $validationContext[ValidationContext::REQUEST_BODY],
+                $format,
+                [
+                    JsonDecode::ASSOCIATIVE => true,
+                ]
+            );
+        }
+
         foreach ($routeContext[RouteContext::DESERIALIZATION_PARAMETERS] as $encodedParameter) {
             $parameter = json_decode($encodedParameter);
 
