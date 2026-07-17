@@ -66,6 +66,10 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
             return;
         }
 
+        if ($routeContext[RouteContext::REQUEST_BODY_REQUIRED] === true && isset($validationContext[ValidationContext::REQUEST_BODY]) === false) {
+            return;
+        }
+
         /**
          * TODO: Remove when support for Symfony 6.4 is dropped.
          */

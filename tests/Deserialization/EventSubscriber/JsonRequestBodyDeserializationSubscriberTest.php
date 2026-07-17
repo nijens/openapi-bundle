@@ -130,6 +130,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
+                RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::DESERIALIZATION_OBJECT => UpdatePet::class,
                 RouteContext::DESERIALIZATION_PARAMETERS => [],
             ]
@@ -174,6 +175,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
+                RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::DESERIALIZATION_OBJECT => DeserializationDummy::class,
                 RouteContext::DESERIALIZATION_PARAMETERS => [
                     'value' => json_encode($parameter),
@@ -220,6 +222,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
+                RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::DESERIALIZATION_OBJECT => DeserializationDummy::class,
                 RouteContext::DESERIALIZATION_PARAMETERS => [
                     'value' => json_encode($parameter),
@@ -266,6 +269,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
+                RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::DESERIALIZATION_OBJECT => DeserializationDummy::class,
                 RouteContext::DESERIALIZATION_PARAMETERS => [
                     'value' => json_encode($parameter),
@@ -313,6 +317,7 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
+                RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::DESERIALIZATION_OBJECT => DeserializationDummy::class,
                 RouteContext::DESERIALIZATION_PARAMETERS => [
                     'value' => json_encode($parameter),
