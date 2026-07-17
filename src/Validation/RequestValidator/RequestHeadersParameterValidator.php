@@ -67,18 +67,6 @@ final class RequestHeadersParameterValidator implements ValidatorInterface
             return $exception->withViolations($violations);
         }
 
-        $validationContext = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE) ?? [
-            ValidationContext::VALIDATED => true,
-        ];
-        $validationContext[ValidationContext::REQUEST_HEADERS_PARAMETERS] = json_encode(
-            $this->getValidatedHeaderParametersWithValues($validateHeaderParameters, $request)
-        );
-
-        $request->attributes->set(
-            ValidationContext::REQUEST_ATTRIBUTE,
-            $validationContext
-        );
-
         return null;
     }
 
@@ -108,16 +96,6 @@ final class RequestHeadersParameterValidator implements ValidatorInterface
         $parameterValue = $request->headers->get($parameterName);
 
         return $this->validateParameterValue($parameterName, $parameter, $parameterValue, $violations);
-    }
-
-    private function getValidatedHeaderParametersWithValues(array $validatedParameters, Request $request): array
-    {
-        $parameters = [];
-        foreach ($validatedParameters as $parameterName => $parameterInfo) {
-            $parameters[$parameterName] = $request->headers->get($parameterName);
-        }
-
-        return $parameters;
     }
 
     private function validateParameterValue(string $parameterName, stdClass $parameter, mixed $parameterValue, array $currentViolations): array

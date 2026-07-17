@@ -59,11 +59,6 @@ class RequestParameterValidatorTest extends TestCase
         static::assertNull(
             $this->validator->validate($request)
         );
-
-        $validatedContent = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE);
-        static::assertEquals([
-            'foo' => 'bar',
-        ], \json_decode($validatedContent[ValidationContext::REQUEST_PARAMETERS], true));
     }
 
     public function testCannotValidateRequiredRequestParameterWithoutValue(): void
