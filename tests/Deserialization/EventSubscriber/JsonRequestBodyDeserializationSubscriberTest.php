@@ -76,7 +76,9 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
+                RouteContext::REQUEST_BODY_REQUIRED => false,
                 RouteContext::DESERIALIZATION_OBJECT => UpdatePet::class,
+                RouteContext::DESERIALIZATION_PARAMETERS => [],
             ]
         );
 
@@ -116,7 +118,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     {
         $this->serializer->expects($this->once())
             ->method('decode')
-            ->with('{"name":"Dog"}', 'json');
+            ->with('{"name":"Dog"}', 'json')
+            ->willReturn(['name' => 'Dog']);
 
         $request = new Request([], [], [], [], [], [], '{"name":"Dog"}');
         $request->headers->set('Content-Type', 'application/json');

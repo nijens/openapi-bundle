@@ -48,8 +48,8 @@ class UpdatePetController
     ): JsonResponse {
         if ($pet instanceof UpdatePet === false) {
             $pet = new UpdatePet('Cat');
+            $pet->setId((int) $petId);
         }
-        $pet->setId((int) $petId);
 
         $serializationContext = $this->serializationContextBuilder->getContextForSchemaObject(
             $responseSerializationSchemaObject,

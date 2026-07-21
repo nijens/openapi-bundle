@@ -104,6 +104,11 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
             $data[$parameter->{'x-openapi-bundle-deserialize-as'}] = $parameterValue;
         }
 
+        // Do not set an empty deserialization context.
+        if (empty($data)) {
+            return;
+        }
+
         try {
             $request->attributes->set(
                 DeserializationContext::REQUEST_ATTRIBUTE,
