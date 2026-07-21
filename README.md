@@ -212,6 +212,28 @@ The deserialized object is injected into the controller based on:
 3. The `deserializationObjectArgumentName` property that can be added to the `x-openapi-bundle`
    specification extension.
 
+#### Adding parameters to a deserialized object
+
+Use the `x-openapi-bundle-deserialize-as` specification extension on a path-level or operation-level parameter to add its value to the deserialized object.
+
+The parameter value is assigned to the property specified by the extension.
+
+```yaml
+parameters:
+  - name: petId
+    in: path
+    description: ID of the pet.
+    required: true
+    schema:
+      type: integer
+      format: int64
+    x-openapi-bundle-deserialize-as: id
+```
+
+In this example, the value of the `petId` path parameter is deserialized into the `id` property of the resulting object.
+
+It is also advisable to enable the parameter validation feature. This ensures that invalid parameter values result in clear validation errors for API consumers before deserialization takes place.
+
 #### Learn more
 
 * [How to use a single controller with the Symfony Messenger component](docs/deserialization/how-to-use-a-single-controller-with-the-symfony-messenger-component.md)
