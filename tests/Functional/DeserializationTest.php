@@ -142,6 +142,7 @@ class DeserializationTest extends WebTestCase
         $expectedJsonResponseBody = [
             'name' => 'Cat',
             'path' => 'pets',
+            'test' => true,
         ];
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);

@@ -145,7 +145,7 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
         }
 
         if ($parameterValueCollection->has($name) === false) {
-            return null;
+            return $default;
         }
 
         return match ($type) {
