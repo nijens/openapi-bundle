@@ -1,12 +1,7 @@
-# Remove all files from releases with 'export-ignore' by default.
-/**                 export-ignore
-
-# Exclude the following files from removal of releases with '-export-ignore'.
-/docs               -export-ignore
-/docs/**            -export-ignore
-/src                -export-ignore
-/src/**             -export-ignore
-/composer.json      -export-ignore
-/CONTRIBUTING.md    -export-ignore
-/LICENSE            -export-ignore
-/README.md          -export-ignore
+# Remove the following files from releases.
+/.github/**         export-ignore
+/.gitattributes     export-ignore
+/.gitignore         export-ignore
+/*.dist*            export-ignore
+/composer.lock      export-ignore
+/Makefile           export-ignore

@@ -24,6 +24,4 @@ final class ValidationContext
     public const REQUEST_PARAMETERS = 'request_parameters';
 
     public const REQUEST_HEADERS_PARAMETERS = 'request_headers_parameters';
-
-    public const REQUEST_PATH_PARAMETERS = 'request_path_parameters';
 }

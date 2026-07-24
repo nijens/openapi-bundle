@@ -54,8 +54,8 @@ class Dereferencer implements DereferencerInterface
         foreach ($references as $referenceLocationPointer => $referencePointer) {
             $reference = new Reference($referencePointer, $jsonSchema);
             if ($this->isExternalReference($referencePointer)) {
-                $externalFile = (string) Uri::createFromString($referencePointer)->withFragment(null);
-                $externalReferencePointer = '#'.Uri::createFromString($referencePointer)->getFragment();
+                $externalFile = (string) Uri::new($referencePointer)->withFragment(null);
+                $externalReferencePointer = '#'.Uri::new($referencePointer)->getFragment();
 
                 $externalJsonSchema = $this->dereference($this->loader->load($externalFile));
 
