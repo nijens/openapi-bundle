@@ -119,6 +119,7 @@ return static function (ContainerConfigurator $container): void {
 
     $services->set(JsonRequestBodyDeserializationSubscriber::class)
         ->args([
+            service('nijens_openapi.json.validator'),
             service('nijens_openapi.serializer'),
         ])
         ->tag('kernel.event_subscriber');

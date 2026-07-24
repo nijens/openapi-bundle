@@ -121,4 +121,66 @@ class DeserializationTest extends WebTestCase
             $this->client->getResponse()->getContent()
         );
     }
+
+    public function testCanDeserializePathParametersIntoObject(): void
+    {
+        $jsonRequestBody = [
+            'name' => 'Cat',
+        ];
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/echo/pets',
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode($jsonRequestBody)
+        );
+
+        $expectedJsonResponseBody = [
+            'name' => 'Cat',
+            'path' => 'pets',
+            'test' => true,
+        ];
+
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+        self::assertJsonStringEqualsJsonString(
+            json_encode($expectedJsonResponseBody),
+            $this->client->getResponse()->getContent()
+        );
+    }
+
+    public function testCanDeserializeQueryParametersIntoObject(): void
+    {
+        $jsonRequestBody = [
+            'name' => 'Cat',
+        ];
+
+        $this->client->request(
+            Request::METHOD_POST,
+            '/api/echo/pets',
+            [
+                'test' => '1',
+            ],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode($jsonRequestBody)
+        );
+
+        $expectedJsonResponseBody = [
+            'name' => 'Cat',
+            'path' => 'pets',
+            'test' => true,
+        ];
+
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+        self::assertJsonStringEqualsJsonString(
+            json_encode($expectedJsonResponseBody),
+            $this->client->getResponse()->getContent()
+        );
+    }
 }

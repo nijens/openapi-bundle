@@ -57,6 +57,14 @@ services:
             - ~
             - '%kernel.logs_dir%/%kernel.environment%.log'
 
+    Nijens\OpenapiBundle\Tests\Functional\App\Serializer\StdClassDenormalizer:
+        tags:
+            - 'nijens_openapi.serializer.normalizer'
+
+    Nijens\OpenapiBundle\Tests\Functional\App\Controller\EchoController:
+        tags:
+            - 'controller.service_arguments'
+
     Nijens\OpenapiBundle\Tests\Functional\App\Controller\GetPetController:
         arguments:
             - '@Symfony\Component\Serializer\SerializerInterface'

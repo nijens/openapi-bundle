@@ -18,7 +18,6 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestProblemExcept
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Validation\RequestValidator\RequestHeadersParameterValidator;
-use Nijens\OpenapiBundle\Validation\ValidationContext;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -59,11 +58,6 @@ class RequestHeadersParameterValidatorTest extends TestCase
         static::assertNull(
             $this->validator->validate($request)
         );
-
-        $validatedContent = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE);
-        static::assertEquals([
-            'bar' => 'foo',
-        ], json_decode($validatedContent[ValidationContext::REQUEST_HEADERS_PARAMETERS], true));
     }
 
     public function testCannotValidateRequiredRequestParameterWithoutValue(): void

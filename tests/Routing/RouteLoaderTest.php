@@ -150,6 +150,7 @@ class RouteLoaderTest extends TestCase
                         ],
                     ]),
                 ],
+                RouteContext::DESERIALIZATION_PARAMETERS => [],
             ],
             $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)
         );
@@ -170,6 +171,52 @@ class RouteLoaderTest extends TestCase
                 RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS => [],
                 RouteContext::REQUEST_BODY_SCHEMA => 'O:8:"stdClass":2:{s:4:"type";s:6:"object";s:10:"properties";O:8:"stdClass":2:{s:2:"id";O:8:"stdClass":4:{s:4:"type";s:7:"integer";s:6:"format";s:5:"int32";s:8:"readOnly";b:1;s:7:"example";i:1;}s:4:"name";O:8:"stdClass":2:{s:4:"type";s:6:"string";s:7:"example";s:3:"Dog";}}}',
                 RouteContext::JSON_REQUEST_VALIDATION_POINTER => '/paths/~1pets/put/requestBody/content/application~1json/schema',
+                RouteContext::DESERIALIZATION_PARAMETERS => [],
+            ],
+            $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)
+        );
+    }
+
+    public function testCanLoadRoutesWithRouteContextForParameterDeserialization(): void
+    {
+        $routes = $this->routeLoader->load('route-loader-request-validation.yaml', 'openapi');
+        $route = $routes->get('pets_id_get');
+
+        static::assertInstanceOf(Route::class, $route);
+        static::assertSame(
+            [
+                RouteContext::RESOURCE => __DIR__.'/../Resources/specifications/route-loader-request-validation.yaml',
+                RouteContext::REQUEST_BODY_REQUIRED => false,
+                RouteContext::REQUEST_ALLOWED_CONTENT_TYPES => [],
+                RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS => [
+                    'foo' => json_encode([
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'schema' => [
+                            'type' => 'string',
+                        ],
+                        'x-openapi-bundle-deserialize-as' => 'bar',
+                    ]),
+                ],
+                RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS => [],
+                RouteContext::DESERIALIZATION_PARAMETERS => [
+                    'id' => json_encode([
+                        'name' => 'id',
+                        'in' => 'path',
+                        'schema' => [
+                            'type' => 'integer',
+                        ],
+                        'x-openapi-bundle-deserialize-as' => 'id',
+                    ]),
+                    'foo' => json_encode([
+                        'name' => 'foo',
+                        'in' => 'query',
+                        'schema' => [
+                            'type' => 'string',
+                        ],
+                        'x-openapi-bundle-deserialize-as' => 'bar',
+                    ]),
+                ],
             ],
             $route->getDefault(RouteContext::REQUEST_ATTRIBUTE)
         );
