@@ -68,8 +68,13 @@ class Violation implements ViolationInterface
 
     public static function fromArray(array $violation): self
     {
+        $constraint = $violation['constraint'] ?? '';
+        if (is_string($constraint) === false) {
+            $constraint = $constraint['name'] ?? '';
+        }
+
         return new static(
-            $violation['constraint'] ?? '',
+            $constraint,
             $violation['message'] ?? '',
             $violation['property'] ?? $violation['propertyPath'] ?? null
         );

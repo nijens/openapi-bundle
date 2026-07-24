@@ -12,8 +12,8 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "justinrainbow/json-schema": "^5.2",
-        "league/uri": "^6.3",
+        "justinrainbow/json-schema": "^6.7.2",
+        "league/uri": "^7.8",
         "seld/jsonlint": "^1.7",
         "symfony/config": "^5.4 || ^6.0 || ^7.0 || ^8.0",
         "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0 || ^8.0",

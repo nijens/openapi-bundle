@@ -88,7 +88,7 @@ final class RequestParameterValidator implements ValidatorInterface
     private function validateQueryParameter(Request $request, string $parameterName, stdClass $parameter): array
     {
         $violations = [];
-        if ($request->query->has($parameterName) === false && $parameter->required ?? false) {
+        if (($parameter->required ?? false) && $request->query->has($parameterName) === false) {
             $violations[] = new Violation(
                 'required_query_parameter',
                 sprintf('Query parameter %s is required.', $parameterName),
@@ -103,6 +103,9 @@ final class RequestParameterValidator implements ValidatorInterface
         }
 
         $parameterValue = $request->query->get($parameterName);
+        if ($parameter->schema->type === 'boolean') {
+            $parameterValue = $request->query->getBoolean($parameterName, $parameter->schema->default ?? false);
+        }
 
         return $this->validateParameterValue($parameterName, $parameter, $parameterValue, $violations);
     }

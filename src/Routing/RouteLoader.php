@@ -248,7 +248,7 @@ class RouteLoader extends FileLoader
                         '|',
                         array_map(function ($value) {
                             return preg_quote($value, '/');
-                        }, $parameter->enum)
+                        }, $parameterSchema->enum)
                     )
                 );
 

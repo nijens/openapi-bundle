@@ -7,7 +7,8 @@ will receive security updates.
 
 | Version | Supported          | Supported until |
 |---------|--------------------|-----------------|
-| 2.1.x   | :white_check_mark: | TBD             |
+| 3.0.x   | :white_check_mark: | TBD             |
+| 2.1.x   | :white_check_mark: | 2026-12-01      |
 | 2.0.x   | :x:                | 2024-06-15      |
 | 1.5.x   | :x:                | 2024-10-10      |
 | 1.4.x   | :x:                | 2023-04-12      |
