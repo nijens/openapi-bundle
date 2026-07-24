@@ -89,12 +89,13 @@ final class RequestBodyValidator implements ValidatorInterface
             );
         }
 
+        $validationContext = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE) ?? [
+            ValidationContext::VALIDATED => true,
+        ];
+        $validationContext[ValidationContext::REQUEST_BODY] = json_encode($decodedJsonRequestBody);
         $request->attributes->set(
             ValidationContext::REQUEST_ATTRIBUTE,
-            [
-                ValidationContext::VALIDATED => true,
-                ValidationContext::REQUEST_BODY => json_encode($decodedJsonRequestBody),
-            ]
+            $validationContext
         );
 
         return null;

@@ -49,7 +49,7 @@ class JsonRequestBodyDeserializationSubscriber implements EventSubscriberInterfa
         $routeContext = $request->attributes->get(RouteContext::REQUEST_ATTRIBUTE);
         $validationContext = $request->attributes->get(ValidationContext::REQUEST_ATTRIBUTE);
 
-        if ($validationContext === null || isset($routeContext[RouteContext::DESERIALIZATION_OBJECT]) === false) {
+        if ($validationContext === null || \array_key_exists(ValidationContext::REQUEST_BODY, $validationContext) === false || isset($routeContext[RouteContext::DESERIALIZATION_OBJECT]) === false) {
             return;
         }
 

@@ -203,6 +203,12 @@ class RouteLoader extends FileLoader
             $openapiRouteContext[RouteContext::REQUEST_VALIDATE_QUERY_PARAMETERS][$parameter->name] = json_encode($parameter);
         }
 
+        $openapiRouteContext[RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS] = [];
+        $parameters = $this->getParameters('header', $operation, $pathItem);
+        foreach ($parameters as $parameter) {
+            $openapiRouteContext[RouteContext::REQUEST_VALIDATE_HEADER_PARAMETERS][$parameter->name] = json_encode($parameter);
+        }
+
         if (isset($operation->requestBody->content->{'application/json'}->schema)) {
             // Escape %-characters to prevent the router from interpreting them as service container parameters.
             $openapiRouteContext[RouteContext::REQUEST_BODY_SCHEMA] = str_replace(
