@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the OpenapiBundle package.
+ *
+ * (c) Niels Nijens <nijens.niels@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Nijens\OpenapiBundle\Tests\Functional\App\Serializer;
 
 use stdClass;
@@ -31,6 +40,7 @@ final class StdClassDenormalizer implements DenormalizerInterface, DenormalizerA
         // If it's not an array/object-like structure, just store it in a conventional property.
         if (!is_array($data)) {
             $obj->value = $data;
+
             return $obj;
         }
 

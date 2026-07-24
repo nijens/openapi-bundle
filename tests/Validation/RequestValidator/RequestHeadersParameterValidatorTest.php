@@ -18,7 +18,6 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\InvalidRequestProblemExcept
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
 use Nijens\OpenapiBundle\Routing\RouteContext;
 use Nijens\OpenapiBundle\Validation\RequestValidator\RequestHeadersParameterValidator;
-use Nijens\OpenapiBundle\Validation\ValidationContext;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 

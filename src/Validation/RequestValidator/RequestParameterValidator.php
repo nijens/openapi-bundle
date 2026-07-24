@@ -20,7 +20,6 @@ use Nijens\OpenapiBundle\ExceptionHandling\Exception\ProblemException;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\RequestProblemExceptionInterface;
 use Nijens\OpenapiBundle\ExceptionHandling\Exception\Violation;
 use Nijens\OpenapiBundle\Routing\RouteContext;
-use Nijens\OpenapiBundle\Validation\ValidationContext;
 use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

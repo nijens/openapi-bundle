@@ -146,7 +146,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         static::assertTrue($request->attributes->has(DeserializationContext::REQUEST_ATTRIBUTE));
     }
 
-    public function testCanDeserializeBooleanQueryParameterIntoObject(): void {
+    public function testCanDeserializeBooleanQueryParameterIntoObject(): void
+    {
         $expectedValue = new DeserializationDummy(true);
 
         $this->serializer->expects($this->never())
@@ -168,13 +169,6 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
 
         $request = new Request(['value' => '1'], [], [], [], [], []);
         $request->headers->set('Content-Type', 'application/json');
-//        $request->attributes->set(
-//            ValidationContext::REQUEST_ATTRIBUTE,
-//            [
-//                ValidationContext::VALIDATED => true,
-//                ValidationContext::REQUEST_BODY => '{"name":"Dog"}',
-//            ]
-//        );
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
@@ -193,7 +187,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         static::assertSame($expectedValue, $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE));
     }
 
-    public function testCanDeserializeIntegerQueryParameterIntoObject(): void {
+    public function testCanDeserializeIntegerQueryParameterIntoObject(): void
+    {
         $expectedValue = new DeserializationDummy(null, 1);
 
         $this->serializer->expects($this->never())
@@ -215,13 +210,6 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
 
         $request = new Request(['value' => '100'], [], [], [], [], []);
         $request->headers->set('Content-Type', 'application/json');
-//        $request->attributes->set(
-//            ValidationContext::REQUEST_ATTRIBUTE,
-//            [
-//                ValidationContext::VALIDATED => true,
-//                ValidationContext::REQUEST_BODY => '{"name":"Dog"}',
-//            ]
-//        );
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
@@ -240,7 +228,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         static::assertSame($expectedValue, $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE));
     }
 
-    public function testCanDeserializeStringQueryParameterIntoObject(): void {
+    public function testCanDeserializeStringQueryParameterIntoObject(): void
+    {
         $expectedValue = new DeserializationDummy(string: 'a string');
 
         $this->serializer->expects($this->never())
@@ -262,13 +251,6 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
 
         $request = new Request(['value' => 'a string'], [], [], [], [], []);
         $request->headers->set('Content-Type', 'application/json');
-//        $request->attributes->set(
-//            ValidationContext::REQUEST_ATTRIBUTE,
-//            [
-//                ValidationContext::VALIDATED => true,
-//                ValidationContext::REQUEST_BODY => '{"name":"Dog"}',
-//            ]
-//        );
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
@@ -287,7 +269,8 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
         static::assertSame($expectedValue, $request->attributes->get(DeserializationContext::REQUEST_ATTRIBUTE));
     }
 
-    public function testCanDeserializeUnavailableQueryParameterAsNullIntoObject(): void {
+    public function testCanDeserializeUnavailableQueryParameterAsNullIntoObject(): void
+    {
         $expectedValue = new DeserializationDummy(false);
 
         $this->serializer->expects($this->never())
@@ -310,13 +293,6 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
 
         $request = new Request([], [], [], [], [], []);
         $request->headers->set('Content-Type', 'application/json');
-//        $request->attributes->set(
-//            ValidationContext::REQUEST_ATTRIBUTE,
-//            [
-//                ValidationContext::VALIDATED => true,
-//                ValidationContext::REQUEST_BODY => '{"name":"Dog"}',
-//            ]
-//        );
         $request->attributes->set(
             RouteContext::REQUEST_ATTRIBUTE,
             [
