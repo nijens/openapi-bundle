@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Nijens\OpenapiBundle\Tests\Deserialization\EventSubscriber;
 
+use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 use Nijens\OpenapiBundle\Deserialization\DeserializationContext;
 use Nijens\OpenapiBundle\Deserialization\EventSubscriber\JsonRequestBodyDeserializationSubscriber;
@@ -150,6 +151,17 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     {
         $expectedValue = new DeserializationDummy(true);
 
+        $this->validator->expects($this->once())
+            ->method('reset');
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with(true, (object) ['type' => 'boolean'], Constraint::CHECK_MODE_COERCE_TYPES);
+
+        $this->validator->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
         $this->serializer->expects($this->never())
             ->method('decode');
 
@@ -190,6 +202,17 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     public function testCanDeserializeIntegerQueryParameterIntoObject(): void
     {
         $expectedValue = new DeserializationDummy(null, 1);
+
+        $this->validator->expects($this->once())
+            ->method('reset');
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with(100, (object) ['type' => 'integer'], Constraint::CHECK_MODE_COERCE_TYPES);
+
+        $this->validator->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
 
         $this->serializer->expects($this->never())
             ->method('decode');
@@ -232,6 +255,17 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     {
         $expectedValue = new DeserializationDummy(string: 'a string');
 
+        $this->validator->expects($this->once())
+            ->method('reset');
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with('a string', (object) ['type' => 'string'], Constraint::CHECK_MODE_COERCE_TYPES);
+
+        $this->validator->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
         $this->serializer->expects($this->never())
             ->method('decode');
 
@@ -272,6 +306,17 @@ class JsonRequestBodyDeserializationSubscriberTest extends TestCase
     public function testCanDeserializeUnavailableQueryParameterAsNullIntoObject(): void
     {
         $expectedValue = new DeserializationDummy(false);
+
+        $this->validator->expects($this->once())
+            ->method('reset');
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with(false, (object) ['type' => 'boolean', 'default' => false], Constraint::CHECK_MODE_COERCE_TYPES);
+
+        $this->validator->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
 
         $this->serializer->expects($this->never())
             ->method('decode');
